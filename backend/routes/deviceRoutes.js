@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// 3. UPDATE A DEVICE (e.g., Turn ON/OFF or change mode)
+// 3. UPDATE A DEVICE 
 router.put('/:id', async (req, res) => {
     try {
         const { status, mode } = req.body;
