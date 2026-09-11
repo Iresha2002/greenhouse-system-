@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+const startSimulator = require('./utils/sensorSimulator');
+
 
 const app = express();
 
@@ -25,6 +27,10 @@ const MONGO_URI = process.env.MONGO_URI;
 mongoose.connect(MONGO_URI)
     .then(() => {
         console.log('MongoDB Connected Successfully!');
+        
+        // Start the live sensor simulator
+        startSimulator();
+        
         app.listen(PORT, () => {
             console.log(`Server is running on port: ${PORT}`);
         });
