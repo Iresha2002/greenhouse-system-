@@ -19,6 +19,7 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/devices', require('./routes/deviceRoutes'));
 app.use('/api/sensors', require('./routes/sensorRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
 
 // Database Connection & Server Listening
 const PORT = process.env.PORT || 5000;
