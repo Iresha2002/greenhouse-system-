@@ -28,4 +28,16 @@ export const deleteDevice = async (id) => {
 };
 
 
+// 5. User Registration
+export const registerUser = async (userData) => {
+    const response = await axios.post(`${API_URL}/auth/register`, userData);
+    return response.data;
+};
+
+// 6. User Login
+export const loginUser = async (credentials) => {
+    const response = await axios.post(`${API_URL}/auth/login`, credentials);
+    return response.data;
+};
+
 

@@ -1,206 +1,119 @@
-/* General Layout */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Roboto, sans-serif;
-}
-
-body {
-  background-color: #f4f7f6;
-  color: #333;
-}
-
-.app-container {
-  min-height: 100vh;
+/* Auth Modal */
+.auth-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  flex-direction: column;
-}
-
-/* Navbar */
-.navbar {
-  background-color: #1b4d3e;
-  color: white;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.navbar-brand h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.status-badge {
-  background-color: rgba(255, 255, 255, 0.15);
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.status-badge .dot {
-  color: #4cd964;
-}
-
-/* Main Dashboard */
-.dashboard-main {
-  max-width: 1200px;
+.auth-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
   width: 100%;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
+  max-width: 420px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
-/* Sensor Grid */
-.sensor-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
-.sensor-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border-left: 6px solid #ccc;
-  transition: transform 0.2s ease;
-}
-
-.sensor-card:hover {
-  transform: translateY(-4px);
-}
-
-.card-red { border-left-color: #ff5252; }
-.card-blue { border-left-color: #448aff; }
-.card-green { border-left-color: #4caf50; }
-.card-yellow { border-left-color: #ffb300; }
-
-.sensor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.sensor-title {
-  font-size: 0.95rem;
-  color: #666;
-  font-weight: 600;
-}
-
-.sensor-value {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #222;
-}
-
-.sensor-unit {
-  font-size: 1.1rem;
-  color: #888;
-  margin-left: 0.3rem;
-}
-
-/* Device Control Panel */
-.device-control-panel {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.device-control-panel h2 {
-  font-size: 1.3rem;
+.auth-card h2 {
   margin-bottom: 1.5rem;
   color: #1b4d3e;
+  text-align: center;
 }
 
-.device-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.device-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  padding: 1.2rem;
-  background: #fafafa;
-}
-
-.device-info h3 {
-  font-size: 1.1rem;
-  margin-bottom: 0.2rem;
-}
-
-.device-type {
-  font-size: 0.8rem;
-  color: #777;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.device-badges {
-  display: flex;
-  gap: 0.5rem;
-  margin: 1rem 0;
-}
-
-.badge {
-  padding: 0.25rem 0.6rem;
+.auth-card input, .auth-card select {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
   border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.95rem;
 }
 
-.status-on { background: #e8f5e9; color: #2e7d32; }
-.status-off { background: #ffebee; color: #c62828; }
-.mode-badge { background: #e3f2fd; color: #1565c0; }
-
-.device-actions {
-  display: flex;
-  gap: 0.6rem;
-}
-
-.btn {
-  flex: 1;
-  padding: 0.5rem 0.8rem;
+.btn-auth {
+  width: 100%;
+  background: #1b4d3e;
+  color: white;
+  padding: 0.8rem;
+  font-size: 1rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  transition: background 0.2s;
 }
 
-.btn-on { background-color: #e53935; color: white; }
-.btn-on:hover { background-color: #c62828; }
+.btn-auth:hover { background: #143a2e; }
 
-.btn-off { background-color: #43a047; color: white; }
-.btn-off:hover { background-color: #2e7d32; }
-
-.btn-mode { background-color: #78909c; color: white; }
-.btn-mode:hover { background-color: #546e7a; }
-
-.loading-text {
+.auth-error {
+  background: #ffebee;
+  color: #c62828;
+  padding: 0.6rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
   text-align: center;
-  font-size: 1.2rem;
-  color: #666;
-  margin-top: 3rem;
+}
+
+.auth-toggle {
+  text-align: center;
+  margin-top: 1.2rem;
+  font-size: 0.9rem;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #1b4d3e;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* User Profile Navbar */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.role-badge {
+  background: #ffb300;
+  color: #333;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+}
+
+.user-name {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.btn-logout {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.btn-logout:hover { background: rgba(255, 255, 255, 0.3); }
+
+.role-portal-placeholder {
+  background: white;
+  padding: 3rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin-top: 2rem;
 }

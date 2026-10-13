@@ -1,0 +1,199 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #1a4d36;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Palette and Glassmorphism Perfectly Matched to Reference Video */
+.bg-video-canvas {
+  background: radial-gradient(120% 100% at 65% 35%, #2a6d4d 0%, #20573d 25%, #184732 55%, #123826 85%, #0e2d1f 100%);
+}
+
+.glass-pill-search {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.glass-tag {
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-tag:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25), 0 0 15px rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* Bottom Card Styles from Video */
+.bottom-card-inactive {
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.6s ease;
+}
+
+.bottom-card-inactive:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-2px);
+}
+
+/* Active Bottom Card as shown in Video */
+.bottom-card-active {
+  background: #eef5ee;
+  border: 2px solid #ffffff;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25), 0 0 25px rgba(255, 255, 255, 0.3);
+  transform: translateY(-3px) scale(1.02);
+  transition: all 0.6s ease;
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Floating Animations */
+@keyframes floatGentle1 {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes floatGentle2 {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(7px);
+  }
+}
+
+@keyframes floatGentle3 {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+.animate-float-1 {
+  animation: floatGentle1 6s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: floatGentle2 5s ease-in-out infinite;
+}
+
+.animate-float-3 {
+  animation: floatGentle3 7s ease-in-out infinite;
+}
+
+/* Glowing Pulse Line Animation */
+@keyframes pulseGlowDash {
+  0% {
+    stroke-dashoffset: 32;
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.6;
+  }
+}
+
+.animate-line-glow {
+  stroke-dasharray: 4 4;
+  animation: pulseGlowDash 2.5s linear infinite;
+}
+
+/* ============================================================ */
+/* TRULY SLOW, CALM, CINEMATIC SLIDE TRANSITIONS (2.0s Duration) */
+/* ============================================================ */
+.slide-enter-right {
+  animation: smoothSlowGlideRight 2000ms cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.slide-enter-left {
+  animation: smoothSlowGlideLeft 2000ms cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes smoothSlowGlideRight {
+  0% {
+    opacity: 0;
+    transform: translateX(70px);
+  }
+  20% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes smoothSlowGlideLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-70px);
+  }
+  20% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
