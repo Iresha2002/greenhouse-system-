@@ -29,7 +29,6 @@ export const Header: React.FC<HeaderProps> = ({
   onLogout,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -232,13 +231,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           ) : (
             <button
-              onClick={() => {
-                if (onOpenLogin) {
-                  onOpenLogin();
-                } else {
-                  setIsLoginModalOpen(true);
-                }
-              }}
+              onClick={() => onOpenLogin && onOpenLogin()}
               className="flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full bg-white/15 hover:bg-white text-white hover:text-[#113824] backdrop-blur-md border border-white/30 text-xs sm:text-sm font-bold tracking-wide shadow-md transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer group"
             >
               <LogIn className="w-4 h-4 text-[#4ade80] group-hover:text-[#113824] transition-colors" />
@@ -247,70 +240,6 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       </header>
-
-      {/* Sleek Minimalist Login Modal */}
-      {isLoginModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-sm rounded-3xl bg-[#123d29] border border-white/25 shadow-2xl p-6 text-white">
-            {/* Close Button */}
-            <button
-              onClick={() => setIsLoginModalOpen(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 hover:text-white transition-colors cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <div className="flex flex-col items-center text-center mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center mb-3 text-emerald-300">
-                <Lock className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold tracking-tight">SmartGrow Portal</h3>
-              <p className="text-xs text-white/60 mt-1">
-                Access your intelligent greenhouse telemetry
-              </p>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setIsLoginModalOpen(false);
-              }}
-              className="space-y-3.5"
-            >
-              <div>
-                <label className="block text-xs font-semibold text-white/70 mb-1">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  placeholder="grower@smartgrow.io"
-                  className="w-full px-3.5 py-2 rounded-xl bg-white/10 border border-white/20 text-sm text-white placeholder-white/40 focus:outline-none focus:border-emerald-400 focus:bg-white/15 transition-all"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-white/70 mb-1">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  className="w-full px-3.5 py-2 rounded-xl bg-white/10 border border-white/20 text-sm text-white placeholder-white/40 focus:outline-none focus:border-emerald-400 focus:bg-white/15 transition-all"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-2.5 mt-2 rounded-xl bg-[#4ade80] text-[#0f3322] font-bold text-sm hover:bg-[#3ec974] transition-all shadow-lg shadow-black/20 cursor-pointer"
-              >
-                Sign In to Platform
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
     </>
   );
 };
