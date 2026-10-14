@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { registerUser, loginUser } from '../services/api';
 
-const AuthModal = ({ onLoginSuccess }) => {
+const AuthModal = ({ onLoginSuccess, onClose }) => {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({
         username: '',
@@ -41,7 +41,16 @@ const AuthModal = ({ onLoginSuccess }) => {
 
     return (
         <div className="auth-modal-overlay">
-            <div className="auth-card">
+            <div className="auth-card relative">
+                {onClose && (
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 font-bold text-xl cursor-pointer w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100"
+                    >
+                        ✕
+                    </button>
+                )}
                 <h2>{isLogin ? '🔑 User Login' : '📝 Create Account'}</h2>
 
                 {error && <p className="auth-error">{error}</p>}

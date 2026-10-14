@@ -14,9 +14,20 @@ import {
 interface HeaderProps {
   activeIndex: number;
   onSelectSlide: (index: number) => void;
+  currentUser?: any;
+  onOpenLogin?: () => void;
+  onGoToDashboard?: () => void;
+  onLogout?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ activeIndex, onSelectSlide }) => {
+export const Header: React.FC<HeaderProps> = ({
+  activeIndex,
+  onSelectSlide,
+  currentUser,
+  onOpenLogin,
+  onGoToDashboard,
+  onLogout,
+}) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -199,15 +210,41 @@ export const Header: React.FC<HeaderProps> = ({ activeIndex, onSelectSlide }) =>
           </a>
         </nav>
 
-        {/* Right: Login Button */}
+        {/* Right: Login / Profile Button */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsLoginModalOpen(true)}
-            className="flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full bg-white/15 hover:bg-white text-white hover:text-[#113824] backdrop-blur-md border border-white/30 text-xs sm:text-sm font-bold tracking-wide shadow-md transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer group"
-          >
-            <LogIn className="w-4 h-4 text-[#4ade80] group-hover:text-[#113824] transition-colors" />
-            <span>Login</span>
-          </button>
+          {currentUser ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onGoToDashboard}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/30 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm tracking-wide shadow-md transition-all cursor-pointer border border-emerald-400/50"
+              >
+                <span>Dashboard ({currentUser.username})</span>
+              </button>
+              {onLogout && (
+                <button
+                  onClick={onLogout}
+                  className="px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs cursor-pointer"
+                  title="Logout"
+                >
+                  Logout
+                </button>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                if (onOpenLogin) {
+                  onOpenLogin();
+                } else {
+                  setIsLoginModalOpen(true);
+                }
+              }}
+              className="flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full bg-white/15 hover:bg-white text-white hover:text-[#113824] backdrop-blur-md border border-white/30 text-xs sm:text-sm font-bold tracking-wide shadow-md transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer group"
+            >
+              <LogIn className="w-4 h-4 text-[#4ade80] group-hover:text-[#113824] transition-colors" />
+              <span>Login</span>
+            </button>
+          )}
         </div>
       </header>
 
