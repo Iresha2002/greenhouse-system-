@@ -12,25 +12,42 @@
 .auth-card {
   background: white;
   padding: 2.5rem;
-  border-radius: 12px;
+  border-radius: 16px;
   width: 100%;
-  max-width: 420px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  max-width: 440px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  color: #1f2937;
+  user-select: text;
 }
 
 .auth-card h2 {
   margin-bottom: 1.5rem;
-  color: #1b4d3e;
+  color: #144630;
   text-align: center;
+  font-weight: 700;
 }
 
 .auth-card input, .auth-card select {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.85rem 1rem;
   margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
   font-size: 0.95rem;
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.auth-card input:focus, .auth-card select:focus {
+  border-color: #166534;
+  box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.15);
+}
+
+.auth-card input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1;
 }
 
 .btn-auth {
