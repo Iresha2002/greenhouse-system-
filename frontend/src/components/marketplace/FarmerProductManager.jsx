@@ -24,6 +24,7 @@ import {
   updateProduct,
   toggleProductStatus,
   deleteProduct,
+  updateProductStock,
 } from '../../services/api';
 
 const CATEGORIES = ['Vegetables', 'Fruits', 'Leafy Greens', 'Herbs', 'Other Produce'];
@@ -183,6 +184,18 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
       fetchMyListings();
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to change listing status');
+    }
+  };
+
+  // Quick increment / decrement stock adjustment
+  const handleQuickStockChange = async (product, delta) => {
+    const newQty = Math.max(0, (product.quantity || 0) + delta);
+    try {
+      const res = await updateProductStock(product._id, newQty);
+      showNotification(res.message || `Stock updated to ${newQty} ${product.unit}`);
+      fetchMyListings();
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to update stock');
     }
   };
 
@@ -352,30 +365,69 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                     </div>
                   </div>
 
-                  {/* Stock Metrics */}
-                  <div className="my-3 p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-between text-xs">
-                    <div>
-                      <span className="text-white/50 block text-[10px]">Inventory Stock</span>
-                      <span className="font-extrabold text-white text-sm">
-                        {product.quantity} {product.unit}
-                      </span>
+                  {/* Stock Metrics & Quick Inventory Controls */}
+                  <div className="my-3 p-3 rounded-2xl bg-white/[0.04] border border-white/10 space-y-2.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <div>
+                        <span className="text-white/50 block text-[10px]">Inventory Stock</span>
+                        <span className="font-extrabold text-white text-sm">
+                          {product.quantity} {product.unit}
+                        </span>
+                      </div>
+
+                      <div>
+                        {isOutOfStock ? (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+                            Sold Out
+                          </span>
+                        ) : isLowStock ? (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                            <AlertTriangle className="w-2.5 h-2.5" />
+                            Low Stock ({product.quantity})
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            In Stock
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    <div>
-                      {isOutOfStock ? (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
-                          Out of Stock
-                        </span>
-                      ) : isLowStock ? (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                          <AlertTriangle className="w-2.5 h-2.5" />
-                          Low Stock
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                          In Stock
-                        </span>
-                      )}
+                    {/* Quick Inventory Adjustment Buttons */}
+                    <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[11px]">
+                      <span className="text-white/40 text-[10px]">Quick Adjust:</span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleQuickStockChange(product, -10)}
+                          disabled={product.quantity <= 0}
+                          className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-white/15 disabled:opacity-30 text-white/80 hover:text-white border border-white/10 transition-all cursor-pointer font-bold"
+                          title="Reduce 10"
+                        >
+                          -10
+                        </button>
+                        <button
+                          onClick={() => handleQuickStockChange(product, -1)}
+                          disabled={product.quantity <= 0}
+                          className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-white/15 disabled:opacity-30 text-white/80 hover:text-white border border-white/10 transition-all cursor-pointer font-bold"
+                          title="Reduce 1"
+                        >
+                          -1
+                        </button>
+                        <button
+                          onClick={() => handleQuickStockChange(product, +1)}
+                          className="px-2 py-0.5 rounded-md bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 transition-all cursor-pointer font-bold"
+                          title="Add 1"
+                        >
+                          +1
+                        </button>
+                        <button
+                          onClick={() => handleQuickStockChange(product, +10)}
+                          className="px-2 py-0.5 rounded-md bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 transition-all cursor-pointer font-bold"
+                          title="Add 10"
+                        >
+                          +10
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

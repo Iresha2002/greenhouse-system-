@@ -7,12 +7,14 @@ const { protect, authorizeRoles } = require('../middleware/authMiddleware');
 // PUBLIC CUSTOMER PRODUCT APIS
 // ==========================================
 
-// 1. GET ALL ACTIVE PRODUCTS (with search, category, stock filter, sorting)
+// 1. GET ALL ACTIVE PRODUCTS (with real search, category, location, farmer, stock, price range & sorting)
 router.get('/', async (req, res) => {
   try {
     const {
       search,
       category,
+      location,
+      farmer,
       inStockOnly,
       minPrice,
       maxPrice,
@@ -33,14 +35,32 @@ router.get('/', async (req, res) => {
       query.quantity = { $gt: 0 };
     }
 
-    // Price range filter
-    if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = Number(minPrice);
-      if (maxPrice) query.price.$lte = Number(maxPrice);
+    // Location / District filter
+    if (location && location.trim() && location !== 'all') {
+      query.location = new RegExp(location.trim(), 'i');
     }
 
-    // Text search query
+    // Farmer name filter
+    if (farmer && farmer.trim()) {
+      query.farmerName = new RegExp(farmer.trim(), 'i');
+    }
+
+    // Price range validation and filter
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      query.price = {};
+      if (minPrice !== undefined && minPrice !== '') {
+        const numMin = Number(minPrice);
+        if (numMin < 0) return res.status(400).json({ error: 'minPrice cannot be negative' });
+        query.price.$gte = numMin;
+      }
+      if (maxPrice !== undefined && maxPrice !== '') {
+        const numMax = Number(maxPrice);
+        if (numMax < 0) return res.status(400).json({ error: 'maxPrice cannot be negative' });
+        query.price.$lte = numMax;
+      }
+    }
+
+    // Multi-field text search (crop name, farmer, location, description)
     if (search && search.trim()) {
       const regex = new RegExp(search.trim(), 'i');
       query.$or = [
@@ -57,23 +77,30 @@ router.get('/', async (req, res) => {
       sortOptions = { price: 1 };
     } else if (sortBy === 'price-high') {
       sortOptions = { price: -1 };
+    } else if (sortBy === 'stock-high') {
+      sortOptions = { quantity: -1 };
+    } else if (sortBy === 'name-asc') {
+      sortOptions = { name: 1 };
     } else if (sortBy === 'newest') {
       sortOptions = { harvestDate: -1, createdAt: -1 };
     }
 
-    const skip = (Number(page) - 1) * Number(limit);
+    const currentPage = Math.max(1, Number(page) || 1);
+    const pageLimit = Math.max(1, Math.min(100, Number(limit) || 50));
+    const skip = (currentPage - 1) * pageLimit;
+
     const total = await Product.countDocuments(query);
     const products = await Product.find(query)
       .sort(sortOptions)
       .skip(skip)
-      .limit(Number(limit));
+      .limit(pageLimit);
 
     res.json({
       success: true,
       count: products.length,
       total,
-      page: Number(page),
-      totalPages: Math.ceil(total / Number(limit)),
+      page: currentPage,
+      totalPages: Math.ceil(total / pageLimit),
       data: products
     });
   } catch (error) {
@@ -298,6 +325,54 @@ router.delete('/:id', protect, authorizeRoles('farmer'), async (req, res) => {
     res.json({
       success: true,
       message: 'Crop listing removed successfully'
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 8. UPDATE CROP INVENTORY STOCK (FARMER ONLY - OWNERSHIP ENFORCED)
+router.patch('/:id/stock', protect, authorizeRoles('farmer'), async (req, res) => {
+  try {
+    const { quantity } = req.body;
+
+    if (quantity === undefined || isNaN(Number(quantity))) {
+      return res.status(400).json({ error: 'Valid numeric quantity is required' });
+    }
+
+    const numQuantity = Number(quantity);
+    if (numQuantity < 0) {
+      return res.status(400).json({ error: 'Quantity cannot be negative' });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Ownership check
+    if (product.farmer.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        error: 'Forbidden: You do not have permission to modify another farmer\'s inventory'
+      });
+    }
+
+    product.quantity = numQuantity;
+    product.updatedAt = Date.now();
+    await product.save();
+
+    const isLowStock = product.quantity > 0 && product.quantity <= (product.lowStockThreshold || 10);
+    const isOutOfStock = product.quantity === 0;
+
+    res.json({
+      success: true,
+      message: isOutOfStock
+        ? `Crop marked as Sold Out (0 ${product.unit})`
+        : isLowStock
+        ? `Stock updated: Low stock warning (${product.quantity} ${product.unit} remaining)`
+        : `Stock updated successfully (${product.quantity} ${product.unit} available)`,
+      data: product,
+      inventoryStatus: isOutOfStock ? 'OUT_OF_STOCK' : isLowStock ? 'LOW_STOCK' : 'IN_STOCK'
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

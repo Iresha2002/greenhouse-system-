@@ -169,8 +169,12 @@ export const MarketplaceView = ({ currentUser }) => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [inStockOnly, setInStockOnly] = useState(false);
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [activeModalCrop, setActiveModalCrop] = useState(null);
   const [modalQuantity, setModalQuantity] = useState(1);
@@ -179,65 +183,95 @@ export const MarketplaceView = ({ currentUser }) => {
   // Farmer Studio view toggle
   const [isFarmerStudioOpen, setIsFarmerStudioOpen] = useState(false);
 
-  // Fetch real crops from MongoDB backend
-  const fetchMarketplaceCrops = async () => {
+  // Fetch real crops from MongoDB backend with live query params
+  const fetchMarketplaceCrops = async (params = {}) => {
     try {
       setLoading(true);
-      const res = await getProducts();
+      const queryParams = {
+        search: params.search !== undefined ? params.search : searchQuery,
+        category: (params.category !== undefined ? params.category : selectedCategory) !== 'all'
+          ? (params.category !== undefined ? params.category : selectedCategory)
+          : undefined,
+        location: (params.location !== undefined ? params.location : locationFilter) || undefined,
+        inStockOnly: (params.inStockOnly !== undefined ? params.inStockOnly : inStockOnly) ? true : undefined,
+        minPrice: (params.minPrice !== undefined ? params.minPrice : minPrice) || undefined,
+        maxPrice: (params.maxPrice !== undefined ? params.maxPrice : maxPrice) || undefined,
+        sortBy: params.sortBy !== undefined ? params.sortBy : sortBy,
+      };
+
+      const res = await getProducts(queryParams);
       if (res && res.data && res.data.length > 0) {
-        // Map backend products and harmonize fields
         const backendCrops = res.data.map(p => ({
           ...p,
           id: p._id,
           image: p.images && p.images.length > 0 ? p.images[0] : p.image
         }));
         setCrops(backendCrops);
+      } else if (res && res.success && Array.isArray(res.data)) {
+        // Database returned 0 items for these specific search/filters
+        setCrops([]);
       } else {
-        // Use fallback if database is empty initially
         setCrops(FALLBACK_CROPS);
       }
       setLoading(false);
     } catch (err) {
-      console.warn('Backend products not loaded, using verified catalog:', err.message);
+      console.warn('Backend products query failed, using verified fallback catalog:', err.message);
       setCrops(FALLBACK_CROPS);
       setLoading(false);
     }
   };
 
+  // Live debounced search & filter trigger
   useEffect(() => {
-    fetchMarketplaceCrops();
-  }, []);
-
-  // Filter & Sort Pipeline
-  const filteredCrops = useMemo(() => {
-    return crops
-      .filter((crop) => {
-        if (selectedCategory !== 'all' && crop.category !== selectedCategory) {
-          return false;
-        }
-        if (inStockOnly && crop.quantity <= 0) {
-          return false;
-        }
-        if (searchQuery.trim()) {
-          const q = searchQuery.toLowerCase();
-          const matchesName = (crop.name || '').toLowerCase().includes(q);
-          const matchesFarmer = (crop.farmerName || '').toLowerCase().includes(q);
-          const matchesLocation = (crop.location || '').toLowerCase().includes(q);
-          const matchesDesc = (crop.description || '').toLowerCase().includes(q);
-          return matchesName || matchesFarmer || matchesLocation || matchesDesc;
-        }
-        return true;
-      })
-      .sort((a, b) => {
-        if (sortBy === 'price-low') {
-          return a.price - b.price;
-        }
-        if (sortBy === 'price-high') {
-          return b.price - a.price;
-        }
-        return new Date(b.harvestDate || 0).getTime() - new Date(a.harvestDate || 0).getTime();
+    const timer = setTimeout(() => {
+      fetchMarketplaceCrops({
+        search: searchQuery,
+        category: selectedCategory,
+        location: locationFilter,
+        inStockOnly,
+        minPrice,
+        maxPrice,
+        sortBy,
       });
-  }, [crops, selectedCategory, inStockOnly, searchQuery, sortBy]);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedCategory, locationFilter, inStockOnly, minPrice, maxPrice, sortBy]);
+
+  // Client-side quick filter pipeline (instantaneous response)
+  const filteredCrops = useMemo(() => {
+    return crops.filter((crop) => {
+      if (selectedCategory !== 'all' && crop.category !== selectedCategory) {
+        return false;
+      }
+      if (inStockOnly && crop.quantity <= 0) {
+        return false;
+      }
+      if (locationFilter.trim() && !(crop.location || '').toLowerCase().includes(locationFilter.toLowerCase())) {
+        return false;
+      }
+      if (minPrice && crop.price < Number(minPrice)) {
+        return false;
+      }
+      if (maxPrice && crop.price > Number(maxPrice)) {
+        return false;
+      }
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchesName = (crop.name || '').toLowerCase().includes(q);
+        const matchesFarmer = (crop.farmerName || '').toLowerCase().includes(q);
+        const matchesLocation = (crop.location || '').toLowerCase().includes(q);
+        const matchesDesc = (crop.description || '').toLowerCase().includes(q);
+        return matchesName || matchesFarmer || matchesLocation || matchesDesc;
+      }
+      return true;
+    }).sort((a, b) => {
+      if (sortBy === 'price-low') return a.price - b.price;
+      if (sortBy === 'price-high') return b.price - a.price;
+      if (sortBy === 'stock-high') return (b.quantity || 0) - (a.quantity || 0);
+      if (sortBy === 'name-asc') return (a.name || '').localeCompare(b.name || '');
+      return new Date(b.harvestDate || 0).getTime() - new Date(a.harvestDate || 0).getTime();
+    });
+  }, [crops, selectedCategory, locationFilter, minPrice, maxPrice, inStockOnly, searchQuery, sortBy]);
 
   // Handle Add to Cart action
   const handleAddToCart = (crop, qty = 1) => {
@@ -351,7 +385,7 @@ export const MarketplaceView = ({ currentUser }) => {
 
       {/* Filter, Search & Categories Controls */}
       <div className="space-y-4">
-        {/* Search Input & Sort Options Bar */}
+        {/* Search Input, Filter Button & Sort Options Bar */}
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-white/[0.08] backdrop-blur-xl p-3 sm:p-4 rounded-3xl border border-white/15 shadow-xl">
           {/* Search Box */}
           <div className="relative flex-1">
@@ -373,8 +407,24 @@ export const MarketplaceView = ({ currentUser }) => {
             )}
           </div>
 
-          {/* Controls: Stock Toggle & Sort Dropdown */}
+          {/* Controls: Filter Drawer Toggle, Stock Toggle & Sort Dropdown */}
           <div className="flex items-center gap-2.5 flex-wrap">
+            {/* Advanced Filter Toggle Button */}
+            <button
+              onClick={() => setShowFilterPanel(!showFilterPanel)}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl border text-xs font-semibold transition-all cursor-pointer ${
+                showFilterPanel || locationFilter || minPrice || maxPrice
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40 shadow-md'
+                  : 'bg-white/[0.06] text-white/80 border-white/15 hover:bg-white/10'
+              }`}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>Filters</span>
+              {(locationFilter || minPrice || maxPrice) && (
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              )}
+            </button>
+
             {/* In-Stock Only Toggle */}
             <label className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/[0.06] border border-white/15 text-xs font-semibold text-white/80 cursor-pointer hover:bg-white/10 transition-colors select-none">
               <input
@@ -397,10 +447,105 @@ export const MarketplaceView = ({ currentUser }) => {
                 <option value="newest">Newest Harvests</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
+                <option value="stock-high">Highest Stock</option>
+                <option value="name-asc">Crop Name (A - Z)</option>
               </select>
             </div>
           </div>
         </div>
+
+        {/* Collapsible Advanced Filters (Location & Price Range) */}
+        {showFilterPanel && (
+          <div className="p-4 sm:p-5 rounded-3xl bg-white/[0.06] backdrop-blur-xl border border-white/15 shadow-xl space-y-4 animate-in slide-in-from-top-2 duration-200">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-300">
+                Advanced Crop Filters
+              </span>
+              <button
+                onClick={() => {
+                  setLocationFilter('');
+                  setMinPrice('');
+                  setMaxPrice('');
+                }}
+                className="text-xs text-white/50 hover:text-white underline cursor-pointer"
+              >
+                Clear Advanced
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Location Input & Quick Chips */}
+              <div>
+                <label className="block text-[11px] font-semibold text-white/70 mb-1.5">
+                  Farm Region / District
+                </label>
+                <div className="relative">
+                  <MapPin className="w-3.5 h-3.5 text-amber-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={locationFilter}
+                    onChange={(e) => setLocationFilter(e.target.value)}
+                    placeholder="e.g. Matara, Galle, Nuwara Eliya..."
+                    className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-white/[0.08] border border-white/15 text-white placeholder-white/40 text-xs focus:outline-none focus:border-emerald-400"
+                  />
+                </div>
+                <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                  {['Matara', 'Galle', 'Nuwara Eliya'].map((loc) => (
+                    <button
+                      key={loc}
+                      onClick={() => setLocationFilter(locationFilter === loc ? '' : loc)}
+                      className={`text-[10px] px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
+                        locationFilter.toLowerCase() === loc.toLowerCase()
+                          ? 'bg-amber-400 text-amber-950 font-bold border-amber-300'
+                          : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10'
+                      }`}
+                    >
+                      {loc}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Range */}
+              <div>
+                <label className="block text-[11px] font-semibold text-white/70 mb-1.5">
+                  Price Range per Unit ($)
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    placeholder="Min $"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
+                    className="w-1/2 px-3 py-1.5 rounded-xl bg-white/[0.08] border border-white/15 text-white placeholder-white/40 text-xs focus:outline-none focus:border-emerald-400"
+                  />
+                  <span className="text-white/40 text-xs">to</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    placeholder="Max $"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(e.target.value)}
+                    className="w-1/2 px-3 py-1.5 rounded-xl bg-white/[0.08] border border-white/15 text-white placeholder-white/40 text-xs focus:outline-none focus:border-emerald-400"
+                  />
+                </div>
+              </div>
+
+              {/* Quick Status / Stock Info */}
+              <div className="flex flex-col justify-end">
+                <span className="text-[11px] text-white/60 mb-2">
+                  Displaying certified smart greenhouse harvests with guaranteed direct pricing.
+                </span>
+                <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
+                  <CheckCircle className="w-3 h-3" /> Live Inventory Sync Active
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Category Pills Slider */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -431,17 +576,20 @@ export const MarketplaceView = ({ currentUser }) => {
           Showing <strong className="text-white font-bold">{filteredCrops.length}</strong> crop {filteredCrops.length === 1 ? 'batch' : 'batches'}
           {selectedCategory !== 'all' && ` in "${selectedCategory}"`}
         </span>
-        {(searchQuery || selectedCategory !== 'all' || inStockOnly) && (
+        {(searchQuery || selectedCategory !== 'all' || inStockOnly || locationFilter || minPrice || maxPrice) && (
           <button
             onClick={() => {
               setSearchQuery('');
               setSelectedCategory('all');
+              setLocationFilter('');
+              setMinPrice('');
+              setMaxPrice('');
               setInStockOnly(false);
               setSortBy('newest');
             }}
             className="text-emerald-300 hover:text-emerald-200 underline font-semibold cursor-pointer"
           >
-            Reset Filters
+            Reset All Filters
           </button>
         )}
       </div>
