@@ -20,6 +20,7 @@ app.get('/', (req, res) => {
 app.use('/api/devices', require('./routes/deviceRoutes'));
 app.use('/api/sensors', require('./routes/sensorRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/products', require('./routes/productRoutes'));
 
 // Database Connection & Server Listening
 const PORT = process.env.PORT || 5000;

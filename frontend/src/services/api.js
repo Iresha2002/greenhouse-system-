@@ -40,4 +40,47 @@ export const loginUser = async (credentials) => {
     return response.data;
 };
 
+// Helper for authenticated requests
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+};
+
+// 7. Crop Products Marketplace APIs
+export const getProducts = async (params = {}) => {
+    const response = await axios.get(`${API_URL}/products`, { params });
+    return response.data;
+};
+
+export const getProductById = async (id) => {
+    const response = await axios.get(`${API_URL}/products/${id}`);
+    return response.data;
+};
+
+export const getMyProducts = async () => {
+    const response = await axios.get(`${API_URL}/products/farmer/my-products`, getAuthHeaders());
+    return response.data;
+};
+
+export const createProduct = async (productData) => {
+    const response = await axios.post(`${API_URL}/products`, productData, getAuthHeaders());
+    return response.data;
+};
+
+export const updateProduct = async (id, productData) => {
+    const response = await axios.put(`${API_URL}/products/${id}`, productData, getAuthHeaders());
+    return response.data;
+};
+
+export const toggleProductStatus = async (id, status) => {
+    const response = await axios.patch(`${API_URL}/products/${id}/status`, { status }, getAuthHeaders());
+    return response.data;
+};
+
+export const deleteProduct = async (id) => {
+    const response = await axios.delete(`${API_URL}/products/${id}`, getAuthHeaders());
+    return response.data;
+};
+
+
 

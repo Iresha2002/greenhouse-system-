@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import CropCard from './CropCard';
+import FarmerProductManager from './FarmerProductManager';
 import {
   Search,
   Filter,
@@ -15,12 +16,17 @@ import {
   AlertCircle,
   Store,
   SlidersHorizontal,
+  Truck,
+  ShieldCheck,
+  Plus,
+  Minus,
 } from 'lucide-react';
+import { getProducts } from '../../services/api';
 
-// Initial verified crop batch data matching SmartGrow organic standards
-const INITIAL_CROPS = [
+// Initial fallback catalog matching SmartGrow high-standard organic produce
+const FALLBACK_CROPS = [
   {
-    id: 'crop-1',
+    _id: 'crop-1',
     name: 'Hydroponic Cherry Tomatoes',
     category: 'Vegetables',
     description: 'Vine-ripened sweet cherry tomatoes grown in closed-loop nutrient film hydroponic tables. 100% pesticide-free.',
@@ -33,9 +39,10 @@ const INITIAL_CROPS = [
     isOrganicVerified: true,
     minOrderQuantity: 1,
     image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80',
+    deliveryOptions: { homeDelivery: true, farmPickup: true },
   },
   {
-    id: 'crop-2',
+    _id: 'crop-2',
     name: 'Crisp Butterhead Lettuce',
     category: 'Leafy Greens',
     description: 'Tender, sweet hydroponic butterhead heads. Harvested with root ball intact for maximum freshness and shelf life.',
@@ -48,9 +55,10 @@ const INITIAL_CROPS = [
     isOrganicVerified: true,
     minOrderQuantity: 1,
     image: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=600&auto=format&fit=crop&q=80',
+    deliveryOptions: { homeDelivery: true, farmPickup: true },
   },
   {
-    id: 'crop-3',
+    _id: 'crop-3',
     name: 'Organic Bell Peppers (Mixed Trio)',
     category: 'Vegetables',
     description: 'Vibrant red, yellow, and green bell peppers packed with Vitamin C. Grown under controlled greenhouse spectrum LED lighting.',
@@ -63,9 +71,10 @@ const INITIAL_CROPS = [
     isOrganicVerified: true,
     minOrderQuantity: 1,
     image: 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=600&auto=format&fit=crop&q=80',
+    deliveryOptions: { homeDelivery: true, farmPickup: true },
   },
   {
-    id: 'crop-4',
+    _id: 'crop-4',
     name: 'Greenhouse Alpine Strawberries',
     category: 'Fruits',
     description: 'Intensely fragrant and sweet alpine strawberries cultivated with climate-optimized automated misting.',
@@ -78,9 +87,10 @@ const INITIAL_CROPS = [
     isOrganicVerified: true,
     minOrderQuantity: 1,
     image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=600&auto=format&fit=crop&q=80',
+    deliveryOptions: { homeDelivery: true, farmPickup: false },
   },
   {
-    id: 'crop-5',
+    _id: 'crop-5',
     name: 'Aromatic Sweet Basil',
     category: 'Herbs',
     description: 'Genovese sweet basil with lush, deep green leaves. Ideal for fresh pestos and Italian culinary dishes.',
@@ -93,9 +103,10 @@ const INITIAL_CROPS = [
     isOrganicVerified: true,
     minOrderQuantity: 2,
     image: 'https://images.unsplash.com/photo-1608686207856-001b95cf60ca?w=600&auto=format&fit=crop&q=80',
+    deliveryOptions: { homeDelivery: true, farmPickup: true },
   },
   {
-    id: 'crop-6',
+    _id: 'crop-6',
     name: 'English Seedless Cucumbers',
     category: 'Vegetables',
     description: 'Crisp, slender cucumbers with tender skin and refreshing flavor. Daily harvest from high-trellis greenhouse rows.',
@@ -108,24 +119,26 @@ const INITIAL_CROPS = [
     isOrganicVerified: true,
     minOrderQuantity: 1,
     image: 'https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=600&auto=format&fit=crop&q=80',
+    deliveryOptions: { homeDelivery: true, farmPickup: true },
   },
   {
-    id: 'crop-7',
+    _id: 'crop-7',
     name: 'Baby Leaf Spinach',
     category: 'Leafy Greens',
     description: 'Nutrient-rich young spinach leaves, gently washed and chilled immediately post-harvest.',
     price: 2.90,
     unit: 'pack',
-    quantity: 0, // Sold out test case
+    quantity: 0,
     farmerName: 'Central Highland Greens',
     location: 'Nuwara Eliya Polyhouse',
     harvestDate: '2026-10-12',
     isOrganicVerified: true,
     minOrderQuantity: 1,
     image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=600&auto=format&fit=crop&q=80',
+    deliveryOptions: { homeDelivery: true, farmPickup: true },
   },
   {
-    id: 'crop-8',
+    _id: 'crop-8',
     name: 'Fresh Spearmint & Peppermint',
     category: 'Herbs',
     description: 'Refreshing aromatic mint sprigs grown with biological pest control and clean groundwater irrigation.',
@@ -138,6 +151,7 @@ const INITIAL_CROPS = [
     isOrganicVerified: true,
     minOrderQuantity: 1,
     image: 'https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?w=600&auto=format&fit=crop&q=80',
+    deliveryOptions: { homeDelivery: true, farmPickup: true },
   },
 ];
 
@@ -150,40 +164,68 @@ const CATEGORIES = [
   { id: 'Other Produce', label: 'Other Produce', icon: Store },
 ];
 
-export const MarketplaceView = ({ currentUser, onSwitchToFarmerPortal }) => {
-  const [crops] = useState(INITIAL_CROPS);
+export const MarketplaceView = ({ currentUser }) => {
+  const [crops, setCrops] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
   const [inStockOnly, setInStockOnly] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [activeModalCrop, setActiveModalCrop] = useState(null);
+  const [modalQuantity, setModalQuantity] = useState(1);
   const [notification, setNotification] = useState(null);
+
+  // Farmer Studio view toggle
+  const [isFarmerStudioOpen, setIsFarmerStudioOpen] = useState(false);
+
+  // Fetch real crops from MongoDB backend
+  const fetchMarketplaceCrops = async () => {
+    try {
+      setLoading(true);
+      const res = await getProducts();
+      if (res && res.data && res.data.length > 0) {
+        // Map backend products and harmonize fields
+        const backendCrops = res.data.map(p => ({
+          ...p,
+          id: p._id,
+          image: p.images && p.images.length > 0 ? p.images[0] : p.image
+        }));
+        setCrops(backendCrops);
+      } else {
+        // Use fallback if database is empty initially
+        setCrops(FALLBACK_CROPS);
+      }
+      setLoading(false);
+    } catch (err) {
+      console.warn('Backend products not loaded, using verified catalog:', err.message);
+      setCrops(FALLBACK_CROPS);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMarketplaceCrops();
+  }, []);
 
   // Filter & Sort Pipeline
   const filteredCrops = useMemo(() => {
     return crops
       .filter((crop) => {
-        // Category Filter
         if (selectedCategory !== 'all' && crop.category !== selectedCategory) {
           return false;
         }
-
-        // In Stock Filter
         if (inStockOnly && crop.quantity <= 0) {
           return false;
         }
-
-        // Search Query Filter (Crop name, farmer name, location, description)
         if (searchQuery.trim()) {
           const q = searchQuery.toLowerCase();
-          const matchesName = crop.name.toLowerCase().includes(q);
+          const matchesName = (crop.name || '').toLowerCase().includes(q);
           const matchesFarmer = (crop.farmerName || '').toLowerCase().includes(q);
           const matchesLocation = (crop.location || '').toLowerCase().includes(q);
           const matchesDesc = (crop.description || '').toLowerCase().includes(q);
           return matchesName || matchesFarmer || matchesLocation || matchesDesc;
         }
-
         return true;
       })
       .sort((a, b) => {
@@ -193,20 +235,38 @@ export const MarketplaceView = ({ currentUser, onSwitchToFarmerPortal }) => {
         if (sortBy === 'price-high') {
           return b.price - a.price;
         }
-        // Default: newest
-        return new Date(b.harvestDate).getTime() - new Date(a.harvestDate).getTime();
+        return new Date(b.harvestDate || 0).getTime() - new Date(a.harvestDate || 0).getTime();
       });
   }, [crops, selectedCategory, inStockOnly, searchQuery, sortBy]);
 
   // Handle Add to Cart action
-  const handleAddToCart = (crop) => {
-    setCartCount((prev) => prev + 1);
+  const handleAddToCart = (crop, qty = 1) => {
+    setCartCount((prev) => prev + qty);
     setNotification({
       type: 'success',
-      message: `Added 1 ${crop.unit} of "${crop.name}" to cart!`,
+      message: `Added ${qty} ${crop.unit} of "${crop.name}" to cart!`,
     });
     setTimeout(() => setNotification(null), 3000);
   };
+
+  // Open details modal
+  const handleOpenDetails = (crop) => {
+    setActiveModalCrop(crop);
+    setModalQuantity(crop.minOrderQuantity || 1);
+  };
+
+  // If farmer opened their management studio, render it
+  if (isFarmerStudioOpen && currentUser?.role === 'farmer') {
+    return (
+      <FarmerProductManager
+        currentUser={currentUser}
+        onBackToMarketplace={() => {
+          setIsFarmerStudioOpen(false);
+          fetchMarketplaceCrops();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="w-full flex flex-col space-y-8 animate-in fade-in duration-300">
@@ -225,7 +285,7 @@ export const MarketplaceView = ({ currentUser, onSwitchToFarmerPortal }) => {
       )}
 
       {/* Hero Header Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/60 via-white/[0.07] to-emerald-900/40 backdrop-blur-2xl border border-white/20 p-6 sm:p-10 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/70 via-white/[0.08] to-emerald-900/50 backdrop-blur-2xl border border-white/20 p-6 sm:p-10 shadow-2xl">
         <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-emerald-400/15 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-orange-400/10 blur-3xl pointer-events-none" />
 
@@ -259,7 +319,7 @@ export const MarketplaceView = ({ currentUser, onSwitchToFarmerPortal }) => {
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/90">
                 <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                <span>Local Eco-Bay Delivery</span>
+                <span>Eco-Bay Local Delivery</span>
               </div>
             </div>
           </div>
@@ -275,14 +335,14 @@ export const MarketplaceView = ({ currentUser, onSwitchToFarmerPortal }) => {
               </span>
             </div>
 
-            {/* Farmer Listing Management Shortcut */}
+            {/* Farmer Listing Studio Shortcut */}
             {currentUser && currentUser.role === 'farmer' && (
               <button
-                onClick={onSwitchToFarmerPortal}
-                className="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/40 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-md hover:scale-105"
+                onClick={() => setIsFarmerStudioOpen(true)}
+                className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 text-xs font-extrabold transition-all flex items-center gap-2 cursor-pointer shadow-lg hover:scale-105"
               >
-                <Store className="w-3.5 h-3.5" />
-                <span>Farmer Portal • My Listings</span>
+                <Store className="w-4 h-4 stroke-[2.5]" />
+                <span>Farmer Studio • Manage Listings</span>
               </button>
             )}
           </div>
@@ -387,7 +447,14 @@ export const MarketplaceView = ({ currentUser, onSwitchToFarmerPortal }) => {
       </div>
 
       {/* Crops Grid */}
-      {filteredCrops.length === 0 ? (
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-10 h-10 border-4 border-emerald-400/20 border-t-emerald-400 rounded-full animate-spin mb-4" />
+          <p className="text-emerald-300 font-semibold tracking-wide text-sm">
+            Fetching Fresh Crop Harvests...
+          </p>
+        </div>
+      ) : filteredCrops.length === 0 ? (
         <div className="rounded-3xl bg-white/[0.05] border border-white/15 p-16 text-center shadow-xl">
           <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 text-white/40 flex items-center justify-center mx-auto mb-4 text-2xl">
             🌱
@@ -411,21 +478,21 @@ export const MarketplaceView = ({ currentUser, onSwitchToFarmerPortal }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredCrops.map((crop) => (
             <CropCard
-              key={crop.id}
+              key={crop.id || crop._id}
               crop={crop}
-              onViewDetails={(item) => setActiveModalCrop(item)}
-              onAddToCart={handleAddToCart}
+              onViewDetails={handleOpenDetails}
+              onAddToCart={(item) => handleAddToCart(item, 1)}
             />
           ))}
         </div>
       )}
 
-      {/* Crop Details Modal */}
+      {/* FULL CROP DETAILS MODAL (PAGE-GRADE VIEW) */}
       {activeModalCrop && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl bg-[#0f3824] border border-white/20 p-6 sm:p-8 shadow-2xl text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl bg-[#0f3824] border border-white/20 p-6 sm:p-10 shadow-2xl text-white max-h-[92vh] overflow-y-auto">
             {/* Ambient Modal Glow */}
-            <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-emerald-500/20 blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-emerald-500/20 blur-3xl pointer-events-none" />
 
             {/* Close Button */}
             <button
@@ -437,93 +504,185 @@ export const MarketplaceView = ({ currentUser, onSwitchToFarmerPortal }) => {
             </button>
 
             {/* Modal Body */}
-            <div className="flex flex-col md:flex-row gap-6">
-              {/* Image Preview */}
-              <div className="w-full md:w-1/2 aspect-4/3 rounded-2xl overflow-hidden bg-black/40 border border-white/15 shrink-0">
-                {activeModalCrop.image ? (
-                  <img
-                    src={activeModalCrop.image}
-                    alt={activeModalCrop.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-5xl">
-                    🌿
+            <div className="flex flex-col md:flex-row gap-8">
+              {/* Image Preview & Badges */}
+              <div className="w-full md:w-5/12 flex flex-col shrink-0">
+                <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-black/40 border border-white/15 mb-4 shadow-xl">
+                  {activeModalCrop.image ? (
+                    <img
+                      src={activeModalCrop.image}
+                      alt={activeModalCrop.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-6xl">
+                      🌿
+                    </div>
+                  )}
+
+                  <div className="absolute top-3 left-3">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-400/40 backdrop-blur-md">
+                      {activeModalCrop.category}
+                    </span>
                   </div>
-                )}
+                </div>
+
+                {/* Delivery & Fulfillment Info */}
+                <div className="p-4 rounded-2xl bg-white/[0.04] border border-white/10 space-y-2 text-xs">
+                  <div className="flex items-center gap-2 text-emerald-300 font-semibold">
+                    <Truck className="w-4 h-4" />
+                    <span>Fulfillment Options</span>
+                  </div>
+                  <div className="text-white/70 text-[11px] space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span>Home Delivery:</span>
+                      <span className="font-bold text-white">Available (1-2 Days)</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Farm Gate Pickup:</span>
+                      <span className="font-bold text-emerald-300">Free Collection</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Crop Details Info */}
               <div className="flex-1 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
-                      {activeModalCrop.category}
-                    </span>
+                  <div className="flex items-center gap-2 mb-2">
                     {activeModalCrop.isOrganicVerified && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-emerald-950">
-                        ✓ Verified Organic
+                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500 text-emerald-950 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" />
+                        Verified Organic Harvest
                       </span>
                     )}
+                    <span className="text-[10px] font-semibold text-white/50">
+                      ID: {String(activeModalCrop.id || activeModalCrop._id).slice(-6)}
+                    </span>
                   </div>
 
-                  <h2 className="text-2xl font-extrabold text-white tracking-tight mb-2">
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-3">
                     {activeModalCrop.name}
                   </h2>
 
-                  <p className="text-xs text-white/70 leading-relaxed mb-4">
+                  <p className="text-xs sm:text-sm text-white/75 leading-relaxed mb-5">
                     {activeModalCrop.description}
                   </p>
 
-                  <div className="space-y-1.5 text-xs text-white/80 pb-4 mb-4 border-b border-white/10">
-                    <div className="flex items-center gap-2">
-                      <Store className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Grower: <strong>{activeModalCrop.farmerName}</strong></span>
+                  {/* Metadata Matrix */}
+                  <div className="grid grid-cols-2 gap-3 pb-5 mb-5 border-b border-white/10 text-xs text-white/80">
+                    <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
+                      <span className="text-[10px] text-white/40 block">Grower / Producer</span>
+                      <div className="flex items-center gap-1.5 mt-0.5 font-bold text-white">
+                        <Store className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="truncate">{activeModalCrop.farmerName || 'Verified Farm'}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Farm Origin: {activeModalCrop.location}</span>
+
+                    <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
+                      <span className="text-[10px] text-white/40 block">Origin Location</span>
+                      <div className="flex items-center gap-1.5 mt-0.5 font-bold text-white">
+                        <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                        <span className="truncate">{activeModalCrop.location}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-sky-400" />
-                      <span>Harvest Date: {activeModalCrop.harvestDate}</span>
+
+                    <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
+                      <span className="text-[10px] text-white/40 block">Harvest Timestamp</span>
+                      <div className="flex items-center gap-1.5 mt-0.5 font-bold text-white">
+                        <Calendar className="w-3.5 h-3.5 text-sky-400" />
+                        <span>
+                          {activeModalCrop.harvestDate
+                            ? new Date(activeModalCrop.harvestDate).toLocaleDateString()
+                            : 'Fresh Daily'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
+                      <span className="text-[10px] text-white/40 block">Current Stock</span>
+                      <span className="mt-0.5 font-bold text-emerald-300 block">
+                        {activeModalCrop.quantity} {activeModalCrop.unit} available
+                      </span>
                     </div>
                   </div>
                 </div>
 
+                {/* Price, Quantity Selector & Action Area */}
                 <div>
                   <div className="flex items-baseline justify-between mb-4">
                     <div>
-                      <span className="text-xs text-white/50 block">Direct Farm Price</span>
+                      <span className="text-xs text-white/50 block">Unit Price</span>
                       <div className="flex items-baseline gap-1">
                         <span className="text-3xl font-extrabold text-white">
-                          ${activeModalCrop.price.toFixed(2)}
+                          ${typeof activeModalCrop.price === 'number' ? activeModalCrop.price.toFixed(2) : activeModalCrop.price}
                         </span>
                         <span className="text-sm font-semibold text-emerald-300">
                           / {activeModalCrop.unit}
                         </span>
                       </div>
                     </div>
-                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/10 border border-white/15 text-white/80">
-                      Stock: {activeModalCrop.quantity} {activeModalCrop.unit} available
-                    </span>
+
+                    {/* Quantity Selector */}
+                    {activeModalCrop.quantity > 0 && (
+                      <div className="flex flex-col items-end">
+                        <span className="text-xs text-white/50 mb-1">Select Order Quantity</span>
+                        <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-xl p-1">
+                          <button
+                            type="button"
+                            onClick={() => setModalQuantity((q) => Math.max(1, q - 1))}
+                            className="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="w-8 text-center text-xs font-bold text-white">
+                            {modalQuantity}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setModalQuantity((q) =>
+                                Math.min(activeModalCrop.quantity, q + 1)
+                              )
+                            }
+                            className="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  {/* Subtotal Calculation */}
+                  {activeModalCrop.quantity > 0 && (
+                    <div className="flex items-center justify-between py-2 px-3 rounded-xl bg-white/[0.04] border border-white/10 mb-4 text-xs">
+                      <span className="text-white/60">Estimated Total:</span>
+                      <span className="text-base font-extrabold text-emerald-300">
+                        ${(activeModalCrop.price * modalQuantity).toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3">
                     <button
                       onClick={() => {
-                        handleAddToCart(activeModalCrop);
+                        handleAddToCart(activeModalCrop, modalQuantity);
                         setActiveModalCrop(null);
                       }}
                       disabled={activeModalCrop.quantity <= 0}
-                      className="flex-1 py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:bg-white/10 disabled:text-white/30 text-emerald-950 font-extrabold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                      className="flex-1 py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:bg-white/10 disabled:text-white/30 text-emerald-950 font-extrabold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:scale-102"
                     >
                       <ShoppingBag className="w-4 h-4" />
-                      <span>{activeModalCrop.quantity <= 0 ? 'Out of Stock' : 'Add to Cart'}</span>
+                      <span>
+                        {activeModalCrop.quantity <= 0
+                          ? 'Out of Stock'
+                          : `Add ${modalQuantity} ${activeModalCrop.unit} to Cart`}
+                      </span>
                     </button>
                     <button
                       onClick={() => setActiveModalCrop(null)}
-                      className="py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold border border-white/15 transition-all cursor-pointer"
+                      className="py-3 px-5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold border border-white/15 transition-all cursor-pointer"
                     >
                       Close
                     </button>
