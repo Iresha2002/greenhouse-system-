@@ -154,35 +154,56 @@ export function App() {
   // Render Dashboard View
   if (currentView === 'dashboard' && currentUser) {
     return (
-      <div className="app-container min-h-screen bg-[#f4f7f6] text-gray-800">
+      <div className="relative min-h-screen w-full bg-[#184832] overflow-x-hidden flex flex-col font-sans antialiased text-white selection:bg-emerald-400 selection:text-[#0b2b1c]">
+        {/* Background Atmosphere & Glow */}
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute inset-0 bg-[radial-gradient(130%_105%_at_65%_35%,#286e4d_0%,#1e593d_28%,#15462f_62%,#0f3523_100%)]" />
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none bg-emerald-500/20" />
+          <div className="absolute bottom-10 left-12 w-[450px] h-[450px] bg-[#34a86b]/20 rounded-full blur-[130px] pointer-events-none" />
+        </div>
+
         <Navbar
           user={currentUser}
           onLogout={handleLogout}
           onNavigateHome={() => setCurrentView('home')}
         />
 
-        <main className="dashboard-main max-w-7xl mx-auto px-4 py-8 w-full">
-          {/* Back to Home Button */}
-          <div className="mb-6 flex justify-between items-center">
-            <button
-              onClick={() => setCurrentView('home')}
-              className="px-4 py-2 rounded-xl bg-emerald-800 text-white font-semibold text-sm hover:bg-emerald-900 transition-all flex items-center gap-2 cursor-pointer shadow-md"
-            >
-              ← Back to SmartGrow Home
-            </button>
-            <span className="text-xs uppercase tracking-wider font-bold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
-              {currentUser.role} portal
-            </span>
+        <main className="relative z-10 dashboard-main max-w-7xl mx-auto px-6 sm:px-12 py-8 w-full flex-1">
+          {/* Header Bar with Sub-heading & Status */}
+          <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                <span className="text-xs font-bold uppercase tracking-widest text-emerald-300">
+                  Live Greenhouse Control Matrix
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                Greenhouse Telemetry & Actuators
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="text-xs uppercase tracking-wider font-extrabold text-emerald-950 bg-emerald-400 px-3.5 py-1.5 rounded-full shadow-md">
+                {currentUser.role} portal
+              </span>
+              <button
+                onClick={() => setCurrentView('home')}
+                className="px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-all flex items-center gap-2 cursor-pointer border border-white/20"
+              >
+                ← Back to Home
+              </button>
+            </div>
           </div>
 
           {/* Module Navigation Tabs */}
-          <div className="flex flex-wrap items-center gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
+          <div className="flex flex-wrap items-center gap-2 mb-8 bg-white/[0.08] backdrop-blur-xl p-2 rounded-2xl border border-white/15 shadow-xl">
             <button
               onClick={() => setSelectedDashboardTab('greenhouse')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 selectedDashboardTab === 'greenhouse'
-                  ? 'bg-emerald-800 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-emerald-500 text-emerald-950 shadow-lg font-extrabold'
+                  : 'text-white/70 hover:bg-white/10 hover:text-white'
               }`}
             >
               🌱 Smart Greenhouse
@@ -191,8 +212,8 @@ export function App() {
               onClick={() => setSelectedDashboardTab('marketplace')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 selectedDashboardTab === 'marketplace'
-                  ? 'bg-orange-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-orange-500 text-white shadow-lg font-extrabold'
+                  : 'text-white/70 hover:bg-white/10 hover:text-white'
               }`}
             >
               🛍️ Crop Marketplace
@@ -201,8 +222,8 @@ export function App() {
               onClick={() => setSelectedDashboardTab('suppliers')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 selectedDashboardTab === 'suppliers'
-                  ? 'bg-sky-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-sky-500 text-white shadow-lg font-extrabold'
+                  : 'text-white/70 hover:bg-white/10 hover:text-white'
               }`}
             >
               ⚡ Agri Suppliers
@@ -211,8 +232,8 @@ export function App() {
               onClick={() => setSelectedDashboardTab('hydroponics')}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 selectedDashboardTab === 'hydroponics'
-                  ? 'bg-cyan-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-cyan-500 text-cyan-950 shadow-lg font-extrabold'
+                  : 'text-white/70 hover:bg-white/10 hover:text-white'
               }`}
             >
               💧 Hydroponic Bay
@@ -223,7 +244,10 @@ export function App() {
           {selectedDashboardTab === 'greenhouse' && (
             <>
               {loading ? (
-                <p className="loading-text text-center py-12 text-gray-500 font-medium">Loading Greenhouse Telemetry...</p>
+                <div className="flex flex-col items-center justify-center py-20 text-center">
+                  <div className="w-10 h-10 border-4 border-emerald-400/20 border-t-emerald-400 rounded-full animate-spin mb-4" />
+                  <p className="text-emerald-300 font-semibold tracking-wide text-sm">Synchronizing Greenhouse Telemetry...</p>
+                </div>
               ) : (
                 <>
                   <section className="sensor-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -272,15 +296,16 @@ export function App() {
 
           {/* TAB 2: CROP MARKETPLACE */}
           {selectedDashboardTab === 'marketplace' && (
-            <div className="role-portal-placeholder bg-white p-12 rounded-3xl text-center shadow-lg border border-gray-100">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-3xl">
+            <div className="relative overflow-hidden rounded-3xl bg-white/[0.08] backdrop-blur-xl border border-orange-400/30 p-12 text-center shadow-2xl">
+              <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-gradient-to-br from-orange-500/20 to-transparent blur-3xl pointer-events-none" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-orange-500/20 border border-orange-400/40 text-orange-300 flex items-center justify-center text-3xl shadow-inner">
                 🛍️
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Fresh Produce Marketplace</h2>
-              <p className="text-gray-600 max-w-md mx-auto mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Fresh Produce Marketplace</h2>
+              <p className="text-white/70 max-w-md mx-auto mb-6 text-sm">
                 Direct Farmer-to-Consumer portal for listing verified organic crops, setting wholesale/retail prices, and dispatching orders.
               </p>
-              <span className="px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-xs font-bold uppercase tracking-wide">
+              <span className="px-4 py-2 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-xs font-bold uppercase tracking-wider">
                 Sprint 5 Marketplace Core
               </span>
             </div>
@@ -288,15 +313,16 @@ export function App() {
 
           {/* TAB 3: AGRI SUPPLIERS */}
           {selectedDashboardTab === 'suppliers' && (
-            <div className="role-portal-placeholder bg-white p-12 rounded-3xl text-center shadow-lg border border-gray-100">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-3xl">
+            <div className="relative overflow-hidden rounded-3xl bg-white/[0.08] backdrop-blur-xl border border-sky-400/30 p-12 text-center shadow-2xl">
+              <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-gradient-to-br from-sky-500/20 to-transparent blur-3xl pointer-events-none" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-sky-500/20 border border-sky-400/40 text-sky-300 flex items-center justify-center text-3xl shadow-inner">
                 ⚡
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Agricultural Supplier Hub</h2>
-              <p className="text-gray-600 max-w-md mx-auto mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Agricultural Supplier Hub</h2>
+              <p className="text-white/70 max-w-md mx-auto mb-6 text-sm">
                 B2B catalog for ordering calibrated NPK fertilizers, certified organic seeds, solenoid valves, and IoT sensor kits.
               </p>
-              <span className="px-4 py-2 rounded-full bg-sky-100 text-sky-800 text-xs font-bold uppercase tracking-wide">
+              <span className="px-4 py-2 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider">
                 Sprint 4 Supplier Portal
               </span>
             </div>
@@ -304,15 +330,16 @@ export function App() {
 
           {/* TAB 4: HYDROPONIC BAY */}
           {selectedDashboardTab === 'hydroponics' && (
-            <div className="role-portal-placeholder bg-white p-12 rounded-3xl text-center shadow-lg border border-gray-100">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-cyan-100 text-cyan-600 flex items-center justify-center text-3xl">
+            <div className="relative overflow-hidden rounded-3xl bg-white/[0.08] backdrop-blur-xl border border-cyan-400/30 p-12 text-center shadow-2xl">
+              <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-gradient-to-br from-cyan-500/20 to-transparent blur-3xl pointer-events-none" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 flex items-center justify-center text-3xl shadow-inner">
                 💧
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Hydroponic Closed-Loop Bay</h2>
-              <p className="text-gray-600 max-w-md mx-auto mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Hydroponic Closed-Loop Bay</h2>
+              <p className="text-white/70 max-w-md mx-auto mb-6 text-sm">
                 Automated nutrient film telemetry: pH balance (6.2 target), dissolved oxygen (8.5 mg/L), and continuous pump recirculating cycles.
               </p>
-              <span className="px-4 py-2 rounded-full bg-cyan-100 text-cyan-800 text-xs font-bold uppercase tracking-wide">
+              <span className="px-4 py-2 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 text-xs font-bold uppercase tracking-wider">
                 IoT Advanced Telemetry
               </span>
             </div>
