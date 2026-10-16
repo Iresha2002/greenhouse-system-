@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import CropCard from './CropCard';
 import FarmerProductManager from './FarmerProductManager';
+import CartDrawer from './CartDrawer';
 import {
   Search,
   Filter,
@@ -175,10 +176,27 @@ export const MarketplaceView = ({ currentUser }) => {
   const [sortBy, setSortBy] = useState('newest');
   const [inStockOnly, setInStockOnly] = useState(false);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('smartgrow_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
   const [activeModalCrop, setActiveModalCrop] = useState(null);
   const [modalQuantity, setModalQuantity] = useState(1);
   const [notification, setNotification] = useState(null);
+
+  // Sync cartItems with localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('smartgrow_cart', JSON.stringify(cartItems));
+    } catch (e) {
+      console.warn('Could not persist cart to localStorage:', e);
+    }
+  }, [cartItems]);
 
   // Farmer Studio view toggle
   const [isFarmerStudioOpen, setIsFarmerStudioOpen] = useState(false);
@@ -273,14 +291,64 @@ export const MarketplaceView = ({ currentUser }) => {
     });
   }, [crops, selectedCategory, locationFilter, minPrice, maxPrice, inStockOnly, searchQuery, sortBy]);
 
-  // Handle Add to Cart action
+  // Handle Add to Cart action with quantity and stock bounds
   const handleAddToCart = (crop, qty = 1) => {
-    setCartCount((prev) => prev + qty);
+    const cropId = crop.id || crop._id;
+    setCartItems((prev) => {
+      const existingIdx = prev.findIndex((it) => (it.productId || it.id || it._id) === cropId);
+      if (existingIdx >= 0) {
+        const updated = [...prev];
+        const newQty = (updated[existingIdx].quantity || 1) + qty;
+        const maxAvail = crop.quantity !== undefined ? crop.quantity : 999;
+        updated[existingIdx] = {
+          ...updated[existingIdx],
+          quantity: Math.min(newQty, maxAvail),
+        };
+        return updated;
+      }
+      return [
+        ...prev,
+        {
+          productId: cropId,
+          id: cropId,
+          _id: cropId,
+          name: crop.name,
+          category: crop.category,
+          price: crop.price,
+          unit: crop.unit,
+          quantity: qty,
+          availableStock: crop.quantity,
+          farmerName: crop.farmerName || 'Verified Farm',
+          location: crop.location || 'Greenhouse Bay',
+          image: crop.image || (crop.images && crop.images[0]) || '',
+        },
+      ];
+    });
+
     setNotification({
       type: 'success',
-      message: `Added ${qty} ${crop.unit} of "${crop.name}" to cart!`,
+      message: `Added ${qty} ${crop.unit} of "${crop.name}" to your basket!`,
     });
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  // Update item quantity in basket
+  const handleUpdateCartQuantity = (productId, newQty) => {
+    setCartItems((prev) =>
+      prev.map((it) => {
+        if ((it.productId || it.id || it._id) === productId) {
+          return { ...it, quantity: newQty };
+        }
+        return it;
+      })
+    );
+  };
+
+  // Remove item from basket
+  const handleRemoveCartItem = (productId) => {
+    setCartItems((prev) =>
+      prev.filter((it) => (it.productId || it.id || it._id) !== productId)
+    );
   };
 
   // Open details modal
@@ -360,14 +428,18 @@ export const MarketplaceView = ({ currentUser }) => {
 
           {/* Right Action / Role Portal Access */}
           <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end gap-3 shrink-0">
-            {/* Cart Pill */}
-            <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-md shadow-lg">
-              <ShoppingBag className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs font-semibold text-white/80">Active Cart:</span>
-              <span className="text-xs font-extrabold px-2 py-0.5 rounded-full bg-emerald-400 text-emerald-950">
-                {cartCount} {cartCount === 1 ? 'item' : 'items'}
+            {/* Interactive Cart Button */}
+            <button
+              onClick={() => setIsCartDrawerOpen(true)}
+              className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md shadow-lg transition-all cursor-pointer hover:scale-105 active:scale-95 group"
+              title="Open shopping cart basket"
+            >
+              <ShoppingBag className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-semibold text-white/80">Active Basket:</span>
+              <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-400 text-emerald-950 shadow-sm">
+                {cartItems.reduce((acc, it) => acc + (it.quantity || 1), 0)} items
               </span>
-            </div>
+            </button>
 
             {/* Farmer Listing Studio Shortcut */}
             {currentUser && currentUser.role === 'farmer' && (
@@ -841,6 +913,22 @@ export const MarketplaceView = ({ currentUser }) => {
           </div>
         </div>
       )}
+
+      {/* Shopping Cart Drawer */}
+      <CartDrawer
+        isOpen={isCartDrawerOpen}
+        onClose={() => setIsCartDrawerOpen(false)}
+        cartItems={cartItems}
+        onUpdateQuantity={handleUpdateCartQuantity}
+        onRemoveItem={handleRemoveCartItem}
+        onProceedToCheckout={(cartData) => {
+          setIsCartDrawerOpen(false);
+          setNotification({
+            type: 'success',
+            message: `Proceeding to checkout with $${cartData.total.toFixed(2)} total!`,
+          });
+        }}
+      />
     </div>
   );
 };

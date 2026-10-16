@@ -87,5 +87,11 @@ export const updateProductStock = async (id, quantity) => {
     return response.data;
 };
 
+// 8. Shopping Cart APIs (Server-Side Price Verification & Stock Guard)
+export const calculateCart = async (items, deliveryMethod = 'delivery') => {
+    const response = await axios.post(`${API_URL}/cart/calculate`, { items, deliveryMethod });
+    return response.data;
+};
+
 
 
