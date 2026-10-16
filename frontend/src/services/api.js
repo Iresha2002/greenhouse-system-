@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base URL pointing to our Express backend
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://localhost:5001/api';
 
 // 1. Fetch latest sensor reading
 export const getLatestSensorReading = async () => {

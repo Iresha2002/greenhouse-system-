@@ -20,6 +20,7 @@ import './App.css';
 export function App() {
   // Navigation view: 'home' (Landing page) | 'dashboard' (Farmer IoT / Portals)
   const [currentView, setCurrentView] = useState('home');
+  const [selectedDashboardTab, setSelectedDashboardTab] = useState('greenhouse');
 
   // Auth & User state from localStorage
   const [currentUser, setCurrentUser] = useState(() => {
@@ -174,8 +175,52 @@ export function App() {
             </span>
           </div>
 
-          {/* FARMER DASHBOARD */}
-          {currentUser.role === 'farmer' && (
+          {/* Module Navigation Tabs */}
+          <div className="flex flex-wrap items-center gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
+            <button
+              onClick={() => setSelectedDashboardTab('greenhouse')}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                selectedDashboardTab === 'greenhouse'
+                  ? 'bg-emerald-800 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              🌱 Smart Greenhouse
+            </button>
+            <button
+              onClick={() => setSelectedDashboardTab('marketplace')}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                selectedDashboardTab === 'marketplace'
+                  ? 'bg-orange-600 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              🛍️ Crop Marketplace
+            </button>
+            <button
+              onClick={() => setSelectedDashboardTab('suppliers')}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                selectedDashboardTab === 'suppliers'
+                  ? 'bg-sky-600 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              ⚡ Agri Suppliers
+            </button>
+            <button
+              onClick={() => setSelectedDashboardTab('hydroponics')}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                selectedDashboardTab === 'hydroponics'
+                  ? 'bg-cyan-600 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              💧 Hydroponic Bay
+            </button>
+          </div>
+
+          {/* TAB 1: SMART GREENHOUSE */}
+          {selectedDashboardTab === 'greenhouse' && (
             <>
               {loading ? (
                 <p className="loading-text text-center py-12 text-gray-500 font-medium">Loading Greenhouse Telemetry...</p>
@@ -225,28 +270,50 @@ export function App() {
             </>
           )}
 
-          {/* SUPPLIER DASHBOARD */}
-          {currentUser.role === 'supplier' && (
+          {/* TAB 2: CROP MARKETPLACE */}
+          {selectedDashboardTab === 'marketplace' && (
             <div className="role-portal-placeholder bg-white p-12 rounded-3xl text-center shadow-lg border border-gray-100">
-              <h2 className="text-2xl font-bold text-emerald-900 mb-2">📦 Supplier Inventory Hub</h2>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-3xl">
+                🛍️
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Fresh Produce Marketplace</h2>
               <p className="text-gray-600 max-w-md mx-auto mb-6">
-                Welcome back, {currentUser.username}! Manage your agricultural supplies, seeds, fertilizers and incoming farm orders.
+                Direct Farmer-to-Consumer portal for listing verified organic crops, setting wholesale/retail prices, and dispatching orders.
               </p>
-              <span className="px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-xs font-bold uppercase tracking-wide">
-                Sprint 4 Ready
+              <span className="px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-xs font-bold uppercase tracking-wide">
+                Sprint 5 Marketplace Core
               </span>
             </div>
           )}
 
-          {/* CUSTOMER DASHBOARD */}
-          {currentUser.role === 'customer' && (
+          {/* TAB 3: AGRI SUPPLIERS */}
+          {selectedDashboardTab === 'suppliers' && (
             <div className="role-portal-placeholder bg-white p-12 rounded-3xl text-center shadow-lg border border-gray-100">
-              <h2 className="text-2xl font-bold text-emerald-900 mb-2">🛒 Fresh Produce Marketplace</h2>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-3xl">
+                ⚡
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Agricultural Supplier Hub</h2>
               <p className="text-gray-600 max-w-md mx-auto mb-6">
-                Welcome, {currentUser.username}! Browse verified harvests and place direct farm-to-table crop orders.
+                B2B catalog for ordering calibrated NPK fertilizers, certified organic seeds, solenoid valves, and IoT sensor kits.
               </p>
-              <span className="px-4 py-2 rounded-full bg-orange-100 text-orange-800 text-xs font-bold uppercase tracking-wide">
-                Sprint 5 Ready
+              <span className="px-4 py-2 rounded-full bg-sky-100 text-sky-800 text-xs font-bold uppercase tracking-wide">
+                Sprint 4 Supplier Portal
+              </span>
+            </div>
+          )}
+
+          {/* TAB 4: HYDROPONIC BAY */}
+          {selectedDashboardTab === 'hydroponics' && (
+            <div className="role-portal-placeholder bg-white p-12 rounded-3xl text-center shadow-lg border border-gray-100">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-cyan-100 text-cyan-600 flex items-center justify-center text-3xl">
+                💧
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Hydroponic Closed-Loop Bay</h2>
+              <p className="text-gray-600 max-w-md mx-auto mb-6">
+                Automated nutrient film telemetry: pH balance (6.2 target), dissolved oxygen (8.5 mg/L), and continuous pump recirculating cycles.
+              </p>
+              <span className="px-4 py-2 rounded-full bg-cyan-100 text-cyan-800 text-xs font-bold uppercase tracking-wide">
+                IoT Advanced Telemetry
               </span>
             </div>
           )}
@@ -281,6 +348,18 @@ export function App() {
           onOpenLogin={() => setIsAuthModalOpen(true)}
           onGoToDashboard={() => setCurrentView('dashboard')}
           onLogout={handleLogout}
+          onSelectModule={(moduleId) => {
+            if (moduleId === 'greenhouse' || moduleId === 'hydroponics') {
+              setSelectedDashboardTab(moduleId === 'hydroponics' ? 'hydroponics' : 'greenhouse');
+              setCurrentView('dashboard');
+            } else if (moduleId === 'marketplace') {
+              setSelectedDashboardTab('marketplace');
+              setCurrentView('dashboard');
+            } else if (moduleId === 'suppliers') {
+              setSelectedDashboardTab('suppliers');
+              setCurrentView('dashboard');
+            }
+          }}
         />
 
         <main className="relative z-10 flex-1 flex items-center w-full min-h-0">

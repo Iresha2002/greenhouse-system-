@@ -18,6 +18,7 @@ interface HeaderProps {
   onOpenLogin?: () => void;
   onGoToDashboard?: () => void;
   onLogout?: () => void;
+  onSelectModule?: (moduleId: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -27,6 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenLogin,
   onGoToDashboard,
   onLogout,
+  onSelectModule,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -173,11 +175,27 @@ export const Header: React.FC<HeaderProps> = ({
                             <span className="text-xs font-bold text-white tracking-tight">
                               {item.title}
                             </span>
-                            {isCurrent && (
-                              <span className="text-[9.5px] px-1.5 py-0.5 rounded-md bg-[#4ade80]/20 text-[#4ade80] font-semibold border border-[#4ade80]/40">
-                                Active
+                            <div className="flex items-center gap-1.5">
+                              {isCurrent && (
+                                <span className="text-[9.5px] px-1.5 py-0.5 rounded-md bg-[#4ade80]/20 text-[#4ade80] font-semibold border border-[#4ade80]/40">
+                                  Slide
+                                </span>
+                              )}
+                              <span
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setIsDropdownOpen(false);
+                                  if (onSelectModule) {
+                                    onSelectModule(item.id);
+                                  } else {
+                                    onSelectSlide(item.index);
+                                  }
+                                }}
+                                className="text-[9.5px] px-2 py-0.5 rounded-md bg-white/15 hover:bg-emerald-400 hover:text-emerald-950 font-bold transition-all text-white/90"
+                              >
+                                View Portal →
                               </span>
-                            )}
+                            </div>
                           </div>
                           <span className="text-[10.5px] text-white/60 truncate mt-0.5">
                             {item.desc}
