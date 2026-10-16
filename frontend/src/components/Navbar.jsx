@@ -1,7 +1,7 @@
 import React from 'react';
 import { LogOut, User, Sprout, ArrowLeft } from 'lucide-react';
 
-const Navbar = ({ user, onLogout, onNavigateHome }) => {
+const Navbar = ({ user, onLogout, onNavigateHome, onOpenLogin }) => {
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-[#0f3824]/90 border-b border-white/15 px-6 sm:px-12 py-3.5 transition-all shadow-lg">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -51,9 +51,19 @@ const Navbar = ({ user, onLogout, onNavigateHome }) => {
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Telemetry Connected</span>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Guest Browsing</span>
+              </div>
+              {onOpenLogin && (
+                <button
+                  onClick={onOpenLogin}
+                  className="px-4 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold text-xs shadow-md transition-all cursor-pointer"
+                >
+                  Sign In
+                </button>
+              )}
             </div>
           )}
         </div>

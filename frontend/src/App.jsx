@@ -12,6 +12,7 @@ import Navbar from './components/Navbar';
 import SensorCard from './components/SensorCard';
 import DeviceControl from './components/DeviceControl';
 import AuthModal from './components/AuthModel';
+import MarketplaceView from './components/marketplace/MarketplaceView';
 import { getLatestSensorReading, getDevices, updateDevice, deleteDevice } from './services/api';
 
 import { Play, Pause, Thermometer, Droplets, Sprout, Sun } from 'lucide-react';
@@ -151,8 +152,8 @@ export function App() {
     setCurrentView('home');
   };
 
-  // Render Dashboard View
-  if (currentView === 'dashboard' && currentUser) {
+  // Render Dashboard / Portal View
+  if (currentView === 'dashboard') {
     return (
       <div className="relative min-h-screen w-full bg-[#184832] overflow-x-hidden flex flex-col font-sans antialiased text-white selection:bg-emerald-400 selection:text-[#0b2b1c]">
         {/* Background Atmosphere & Glow */}
@@ -166,6 +167,7 @@ export function App() {
           user={currentUser}
           onLogout={handleLogout}
           onNavigateHome={() => setCurrentView('home')}
+          onOpenLogin={() => setIsAuthModalOpen(true)}
         />
 
         <main className="relative z-10 dashboard-main max-w-7xl mx-auto px-6 sm:px-12 py-8 w-full flex-1">
@@ -175,17 +177,21 @@ export function App() {
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
                 <span className="text-xs font-bold uppercase tracking-widest text-emerald-300">
-                  Live Greenhouse Control Matrix
+                  {selectedDashboardTab === 'marketplace'
+                    ? 'Agricultural Produce Exchange'
+                    : 'Live Greenhouse Control Matrix'}
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                Greenhouse Telemetry & Actuators
+                {selectedDashboardTab === 'marketplace'
+                  ? 'SmartGrow Crop Marketplace'
+                  : 'Greenhouse Telemetry & Actuators'}
               </h1>
             </div>
 
             <div className="flex items-center gap-3">
               <span className="text-xs uppercase tracking-wider font-extrabold text-emerald-950 bg-emerald-400 px-3.5 py-1.5 rounded-full shadow-md">
-                {currentUser.role} portal
+                {currentUser ? `${currentUser.role} portal` : 'Guest Shopper'}
               </span>
               <button
                 onClick={() => setCurrentView('home')}
@@ -296,19 +302,10 @@ export function App() {
 
           {/* TAB 2: CROP MARKETPLACE */}
           {selectedDashboardTab === 'marketplace' && (
-            <div className="relative overflow-hidden rounded-3xl bg-white/[0.08] backdrop-blur-xl border border-orange-400/30 p-12 text-center shadow-2xl">
-              <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-gradient-to-br from-orange-500/20 to-transparent blur-3xl pointer-events-none" />
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-orange-500/20 border border-orange-400/40 text-orange-300 flex items-center justify-center text-3xl shadow-inner">
-                🛍️
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Fresh Produce Marketplace</h2>
-              <p className="text-white/70 max-w-md mx-auto mb-6 text-sm">
-                Direct Farmer-to-Consumer portal for listing verified organic crops, setting wholesale/retail prices, and dispatching orders.
-              </p>
-              <span className="px-4 py-2 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-xs font-bold uppercase tracking-wider">
-                Sprint 5 Marketplace Core
-              </span>
-            </div>
+            <MarketplaceView
+              currentUser={currentUser}
+              onSwitchToFarmerPortal={() => setSelectedDashboardTab('greenhouse')}
+            />
           )}
 
           {/* TAB 3: AGRI SUPPLIERS */}
@@ -343,6 +340,14 @@ export function App() {
                 IoT Advanced Telemetry
               </span>
             </div>
+          )}
+
+          {/* Auth Modal inside Dashboard View */}
+          {isAuthModalOpen && (
+            <AuthModal
+              onLoginSuccess={handleLoginSuccess}
+              onClose={() => setIsAuthModalOpen(false)}
+            />
           )}
         </main>
       </div>
