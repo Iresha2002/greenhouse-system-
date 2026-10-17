@@ -4,6 +4,7 @@ import FarmerProductManager from './FarmerProductManager';
 import CartDrawer from './CartDrawer';
 import CheckoutModal from './CheckoutModal';
 import OrderConfirmationModal from './OrderConfirmationModal';
+import CustomerOrdersModal from './CustomerOrdersModal';
 import {
   Search,
   Filter,
@@ -23,6 +24,7 @@ import {
   ShieldCheck,
   Plus,
   Minus,
+  Package,
 } from 'lucide-react';
 import { getProducts, createOrder } from '../../services/api';
 
@@ -192,6 +194,7 @@ export const MarketplaceView = ({ currentUser }) => {
   const [cartCalculationData, setCartCalculationData] = useState(null);
   const [confirmedOrder, setConfirmedOrder] = useState(null);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const [isOrdersModalOpen, setIsOrdersModalOpen] = useState(false);
   const [activeModalCrop, setActiveModalCrop] = useState(null);
   const [modalQuantity, setModalQuantity] = useState(1);
   const [notification, setNotification] = useState(null);
@@ -467,18 +470,30 @@ export const MarketplaceView = ({ currentUser }) => {
 
           {/* Right Action / Role Portal Access */}
           <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end gap-3 shrink-0">
-            {/* Interactive Cart Button */}
-            <button
-              onClick={() => setIsCartDrawerOpen(true)}
-              className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md shadow-lg transition-all cursor-pointer hover:scale-105 active:scale-95 group"
-              title="Open shopping cart basket"
-            >
-              <ShoppingBag className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-semibold text-white/80">Active Basket:</span>
-              <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-400 text-emerald-950 shadow-sm">
-                {cartItems.reduce((acc, it) => acc + (it.quantity || 1), 0)} items
-              </span>
-            </button>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {/* My Orders / Tracking Button */}
+              <button
+                onClick={() => setIsOrdersModalOpen(true)}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md shadow-lg transition-all cursor-pointer hover:scale-105 active:scale-95 group text-white"
+                title="Track order status and history"
+              >
+                <Package className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-semibold text-white/90">My Orders</span>
+              </button>
+
+              {/* Interactive Cart Button */}
+              <button
+                onClick={() => setIsCartDrawerOpen(true)}
+                className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md shadow-lg transition-all cursor-pointer hover:scale-105 active:scale-95 group"
+                title="Open shopping cart basket"
+              >
+                <ShoppingBag className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-semibold text-white/80">Basket:</span>
+                <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-400 text-emerald-950 shadow-sm">
+                  {cartItems.reduce((acc, it) => acc + (it.quantity || 1), 0)} items
+                </span>
+              </button>
+            </div>
 
             {/* Farmer Listing Studio Shortcut */}
             {currentUser && currentUser.role === 'farmer' && (
@@ -985,11 +1000,16 @@ export const MarketplaceView = ({ currentUser }) => {
         }}
         onViewMyOrders={() => {
           setIsConfirmationOpen(false);
-          setNotification({
-            type: 'success',
-            message: `Order #${confirmedOrder?.orderNumber} is now active under My Orders!`,
-          });
+          setIsOrdersModalOpen(true);
         }}
+      />
+
+      {/* Customer Orders & Tracking Modal */}
+      <CustomerOrdersModal
+        isOpen={isOrdersModalOpen}
+        onClose={() => setIsOrdersModalOpen(false)}
+        currentUser={currentUser}
+        onBrowseProduce={() => setIsOrdersModalOpen(false)}
       />
     </div>
   );

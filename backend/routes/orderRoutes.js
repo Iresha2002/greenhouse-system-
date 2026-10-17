@@ -201,12 +201,42 @@ router.post('/', async (req, res) => {
 });
 
 // @route   GET /api/orders/my-orders
-// @desc    Get order history for authenticated customer
-// @access  Private
-router.get('/my-orders', protect, async (req, res) => {
+// @desc    Get order history for customer (authenticated or by phone)
+// @access  Public / Private
+router.get('/my-orders', async (req, res) => {
   try {
-    const orders = await Order.find({ customer: req.user._id })
-      .sort({ createdAt: -1 });
+    const user = await getOptionalUser(req);
+    const { phone, status } = req.query;
+
+    let queryConditions = [];
+
+    if (user) {
+      queryConditions.push({ customer: user._id });
+      if (user.phoneNumber) {
+        queryConditions.push({ 'customerInfo.phone': user.phoneNumber });
+      }
+      if (user.email) {
+        queryConditions.push({ 'customerInfo.email': user.email });
+      }
+    }
+
+    if (phone) {
+      queryConditions.push({ 'customerInfo.phone': phone.trim() });
+    }
+
+    if (queryConditions.length === 0) {
+      return res.status(401).json({
+        success: false,
+        error: 'Please sign in or provide your registered phone number to view order history'
+      });
+    }
+
+    const filter = { $or: queryConditions };
+    if (status && status !== 'all') {
+      filter.orderStatus = status;
+    }
+
+    const orders = await Order.find(filter).sort({ createdAt: -1 });
 
     return res.status(200).json({
       success: true,

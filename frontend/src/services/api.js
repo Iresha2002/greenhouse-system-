@@ -99,8 +99,10 @@ export const createOrder = async (orderData) => {
     return response.data;
 };
 
-export const getMyOrders = async () => {
-    const response = await axios.get(`${API_URL}/orders/my-orders`, getAuthHeaders());
+export const getMyOrders = async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const url = query ? `${API_URL}/orders/my-orders?${query}` : `${API_URL}/orders/my-orders`;
+    const response = await axios.get(url, getAuthHeaders());
     return response.data;
 };
 
