@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import CropCard from './CropCard';
 import FarmerProductManager from './FarmerProductManager';
 import CartDrawer from './CartDrawer';
+import CheckoutModal from './CheckoutModal';
+import OrderConfirmationModal from './OrderConfirmationModal';
 import {
   Search,
   Filter,
@@ -22,7 +24,7 @@ import {
   Plus,
   Minus,
 } from 'lucide-react';
-import { getProducts } from '../../services/api';
+import { getProducts, createOrder } from '../../services/api';
 
 // Initial fallback catalog matching SmartGrow high-standard organic produce
 const FALLBACK_CROPS = [
@@ -185,6 +187,11 @@ export const MarketplaceView = ({ currentUser }) => {
     }
   });
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [checkoutFulfillmentMethod, setCheckoutFulfillmentMethod] = useState('delivery');
+  const [cartCalculationData, setCartCalculationData] = useState(null);
+  const [confirmedOrder, setConfirmedOrder] = useState(null);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [activeModalCrop, setActiveModalCrop] = useState(null);
   const [modalQuantity, setModalQuantity] = useState(1);
   const [notification, setNotification] = useState(null);
@@ -349,6 +356,38 @@ export const MarketplaceView = ({ currentUser }) => {
     setCartItems((prev) =>
       prev.filter((it) => (it.productId || it.id || it._id) !== productId)
     );
+  };
+
+  // Proceed from Cart Drawer to Checkout Modal
+  const handleProceedToCheckout = (calcData) => {
+    setIsCartDrawerOpen(false);
+    setCartCalculationData(calcData);
+    setCheckoutFulfillmentMethod(calcData?.deliveryMethod || 'delivery');
+    setIsCheckoutOpen(true);
+  };
+
+  // Submit Order to backend and process response
+  const handlePlaceOrder = async (orderPayload) => {
+    const res = await createOrder(orderPayload);
+    if (res && res.success && res.order) {
+      setConfirmedOrder(res.order);
+      setCartItems([]);
+      try {
+        localStorage.removeItem('smartgrow_cart');
+      } catch (e) {
+        console.warn('Failed to clear cart storage:', e);
+      }
+      setIsCheckoutOpen(false);
+      setIsConfirmationOpen(true);
+      fetchMarketplaceCrops();
+      setNotification({
+        type: 'success',
+        message: `Order #${res.order.orderNumber} successfully placed!`,
+      });
+      setTimeout(() => setNotification(null), 4000);
+    } else {
+      throw new Error(res?.error || 'Failed to place order');
+    }
   };
 
   // Open details modal
@@ -921,11 +960,34 @@ export const MarketplaceView = ({ currentUser }) => {
         cartItems={cartItems}
         onUpdateQuantity={handleUpdateCartQuantity}
         onRemoveItem={handleRemoveCartItem}
-        onProceedToCheckout={(cartData) => {
-          setIsCartDrawerOpen(false);
+        onProceedToCheckout={handleProceedToCheckout}
+      />
+
+      {/* Checkout Modal */}
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        cartItems={cartItems}
+        fulfillmentMethod={checkoutFulfillmentMethod}
+        onChangeFulfillmentMethod={setCheckoutFulfillmentMethod}
+        cartCalculation={cartCalculationData}
+        currentUser={currentUser}
+        onOrderSuccess={handlePlaceOrder}
+      />
+
+      {/* Order Confirmation Modal */}
+      <OrderConfirmationModal
+        isOpen={isConfirmationOpen}
+        order={confirmedOrder}
+        onClose={() => {
+          setIsConfirmationOpen(false);
+          setConfirmedOrder(null);
+        }}
+        onViewMyOrders={() => {
+          setIsConfirmationOpen(false);
           setNotification({
             type: 'success',
-            message: `Proceeding to checkout with $${cartData.total.toFixed(2)} total!`,
+            message: `Order #${confirmedOrder?.orderNumber} is now active under My Orders!`,
           });
         }}
       />

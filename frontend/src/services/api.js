@@ -93,5 +93,27 @@ export const calculateCart = async (items, deliveryMethod = 'delivery') => {
     return response.data;
 };
 
+// 9. Order Management APIs
+export const createOrder = async (orderData) => {
+    const response = await axios.post(`${API_URL}/orders`, orderData, getAuthHeaders());
+    return response.data;
+};
+
+export const getMyOrders = async () => {
+    const response = await axios.get(`${API_URL}/orders/my-orders`, getAuthHeaders());
+    return response.data;
+};
+
+export const getOrderById = async (id) => {
+    const response = await axios.get(`${API_URL}/orders/${id}`, getAuthHeaders());
+    return response.data;
+};
+
+export const cancelOrder = async (id, reason) => {
+    const response = await axios.patch(`${API_URL}/orders/${id}/cancel`, { reason }, getAuthHeaders());
+    return response.data;
+};
+
+
 
 
