@@ -26,11 +26,13 @@ import {
   deleteProduct,
   updateProductStock,
 } from '../../services/api';
+import FarmerOrdersManager from './FarmerOrdersManager';
 
 const CATEGORIES = ['Vegetables', 'Fruits', 'Leafy Greens', 'Herbs', 'Other Produce'];
 const UNITS = ['kg', 'g', 'pack', 'bundle', 'head', 'piece'];
 
 export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
+  const [activeTab, setActiveTab] = useState('listings');
   const [myProducts, setMyProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -233,14 +235,16 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-xs font-bold uppercase tracking-widest text-emerald-300">
-                Farmer Listing Studio • Portal
+                {activeTab === 'orders' ? 'Farmer Orders & Fulfillment • Portal' : 'Farmer Listing Studio • Portal'}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Manage Crop Listings
+              {activeTab === 'orders' ? 'Harvest Orders & Fulfillment' : 'Manage Crop Listings'}
             </h1>
             <p className="text-xs sm:text-sm text-white/70 max-w-xl mt-1">
-              Publish fresh harvests, calibrate market prices, track real-time stock levels, and toggle listing visibility in the SmartGrow Marketplace.
+              {activeTab === 'orders'
+                ? 'Review customer harvest orders, track live fulfillment stages, coordinate dispatches, and monitor sales revenue.'
+                : 'Publish fresh harvests, calibrate market prices, track real-time stock levels, and toggle listing visibility in the SmartGrow Marketplace.'}
             </p>
           </div>
 
@@ -253,16 +257,50 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
               <span>Back to Marketplace</span>
             </button>
 
-            <button
-              onClick={handleOpenAddModal}
-              className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-lg hover:scale-105"
-            >
-              <Plus className="w-4 h-4 stroke-[3]" />
-              <span>Add New Crop</span>
-            </button>
+            {activeTab === 'listings' && (
+              <button
+                onClick={handleOpenAddModal}
+                className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-lg hover:scale-105"
+              >
+                <Plus className="w-4 h-4 stroke-[3]" />
+                <span>Add New Crop</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Studio Navigation Tabs */}
+      <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-white/[0.08] backdrop-blur-xl border border-white/15 shadow-xl w-fit">
+        <button
+          onClick={() => setActiveTab('listings')}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
+            activeTab === 'listings'
+              ? 'bg-emerald-500 text-emerald-950 shadow-lg font-extrabold'
+              : 'text-white/70 hover:bg-white/10 hover:text-white'
+          }`}
+        >
+          <Layers className="w-4 h-4" />
+          <span>Crop Listings & Stock ({myProducts.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('orders')}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
+            activeTab === 'orders'
+              ? 'bg-amber-500 text-amber-950 shadow-lg font-extrabold'
+              : 'text-white/70 hover:bg-white/10 hover:text-white'
+          }`}
+        >
+          <Package className="w-4 h-4" />
+          <span>Harvest Orders & Fulfillment</span>
+        </button>
+      </div>
+
+      {activeTab === 'orders' ? (
+        <FarmerOrdersManager currentUser={currentUser} />
+      ) : (
+        <>
 
       {/* Error Banner */}
       {error && (
@@ -463,6 +501,8 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
             );
           })}
         </div>
+      )}
+        </>
       )}
 
       {/* ADD / EDIT CROP MODAL */}

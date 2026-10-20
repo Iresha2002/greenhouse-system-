@@ -200,6 +200,180 @@ router.post('/', async (req, res) => {
   }
 });
 
+// @route   GET /api/orders/farmer/my-orders
+// @desc    Get orders and sales metrics for authenticated farmer
+// @access  Private (Farmer)
+router.get('/farmer/my-orders', protect, async (req, res) => {
+  try {
+    const farmerId = req.user._id;
+    const { status } = req.query;
+
+    // Find all orders that have at least one crop from this farmer
+    const allFarmerOrders = await Order.find({
+      'items.farmer': farmerId
+    }).sort({ createdAt: -1 });
+
+    // Calculate farmer-specific financials and counts
+    let totalRevenue = 0;
+    let pendingCount = 0;
+    let activeCount = 0;
+    let completedCount = 0;
+
+    const formattedOrders = allFarmerOrders.map(order => {
+      // Isolate only the items grown by this farmer
+      const myItems = order.items.filter(
+        item => item.farmer.toString() === farmerId.toString()
+      );
+
+      const farmerSubtotal = myItems.reduce((acc, it) => acc + (it.itemTotal || (it.price * it.quantity)), 0);
+
+      // Determine farmer's operational status
+      const myStatus = myItems[0]?.farmerStatus || order.orderStatus;
+
+      if (myStatus === 'pending') pendingCount++;
+      else if (['accepted', 'preparing', 'ready_for_dispatch', 'dispatched'].includes(myStatus)) activeCount++;
+      else if (myStatus === 'delivered') {
+        completedCount++;
+        totalRevenue += farmerSubtotal;
+      }
+
+      return {
+        _id: order._id,
+        orderNumber: order.orderNumber,
+        customerInfo: order.customerInfo,
+        fulfillmentMethod: order.fulfillmentMethod,
+        paymentMethod: order.paymentMethod,
+        paymentStatus: order.paymentStatus,
+        orderStatus: order.orderStatus,
+        farmerStatus: myStatus,
+        createdAt: order.createdAt,
+        statusHistory: order.statusHistory,
+        myItems,
+        farmerSubtotal: parseFloat(farmerSubtotal.toFixed(2)),
+        totalOrderAmount: order.total
+      };
+    });
+
+    // Apply status filter if provided
+    let filteredOrders = formattedOrders;
+    if (status && status !== 'all') {
+      filteredOrders = formattedOrders.filter(o => o.farmerStatus === status);
+    }
+
+    return res.status(200).json({
+      success: true,
+      metrics: {
+        totalOrders: formattedOrders.length,
+        pendingOrders: pendingCount,
+        activeOrders: activeCount,
+        completedOrders: completedCount,
+        totalRevenue: parseFloat(totalRevenue.toFixed(2))
+      },
+      count: filteredOrders.length,
+      orders: filteredOrders
+    });
+  } catch (error) {
+    console.error('Fetch farmer orders error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve farmer order records'
+    });
+  }
+});
+
+// @route   PATCH /api/orders/:id/farmer-status
+// @desc    Update order lifecycle stage for farmer crops
+// @access  Private (Farmer)
+router.patch('/:id/farmer-status', protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status: nextStatus, note } = req.body;
+    const farmerId = req.user._id;
+
+    const allowedTransitions = [
+      'accepted',
+      'preparing',
+      'ready_for_dispatch',
+      'dispatched',
+      'delivered',
+      'rejected'
+    ];
+
+    if (!allowedTransitions.includes(nextStatus)) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid status transition: "${nextStatus}"`
+      });
+    }
+
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: 'Order not found'
+      });
+    }
+
+    // Verify farmer has items in this order
+    const farmerItems = order.items.filter(
+      item => item.farmer.toString() === farmerId.toString()
+    );
+
+    if (farmerItems.length === 0) {
+      return res.status(403).json({
+        success: false,
+        error: 'You do not have crop items in this order'
+      });
+    }
+
+    // If rejecting, restore the inventory for this farmer's rejected items
+    if (nextStatus === 'rejected') {
+      for (const item of farmerItems) {
+        if (item.product) {
+          await Product.findByIdAndUpdate(item.product, {
+            $inc: { quantity: item.quantity },
+            $set: { updatedAt: Date.now() }
+          });
+        }
+      }
+    }
+
+    // Update farmerStatus on items belonging to this farmer
+    order.items.forEach(item => {
+      if (item.farmer.toString() === farmerId.toString()) {
+        item.farmerStatus = nextStatus;
+      }
+    });
+
+    // Update overall orderStatus
+    order.orderStatus = nextStatus;
+    if (nextStatus === 'delivered') {
+      order.paymentStatus = 'paid';
+    }
+
+    order.statusHistory.push({
+      status: nextStatus,
+      changedAt: new Date(),
+      note: note || `Status updated to ${nextStatus} by grower ${req.user.username || ''}`
+    });
+
+    order.updatedAt = Date.now();
+    const updatedOrder = await order.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Order status updated to "${nextStatus}"`,
+      order: updatedOrder
+    });
+  } catch (error) {
+    console.error('Update farmer order status error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to update order status'
+    });
+  }
+});
+
 // @route   GET /api/orders/my-orders
 // @desc    Get order history for customer (authenticated or by phone)
 // @access  Public / Private

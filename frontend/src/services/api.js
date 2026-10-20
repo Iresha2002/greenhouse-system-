@@ -119,3 +119,16 @@ export const cancelOrder = async (id, reason) => {
 
 
 
+
+// 10. Farmer Fulfillment & Lifecycle APIs
+export const getFarmerOrders = async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const url = query ? `${API_URL}/orders/farmer/my-orders?${query}` : `${API_URL}/orders/farmer/my-orders`;
+    const response = await axios.get(url, getAuthHeaders());
+    return response.data;
+};
+
+export const updateFarmerOrderStatus = async (id, data) => {
+    const response = await axios.patch(`${API_URL}/orders/${id}/farmer-status`, data, getAuthHeaders());
+    return response.data;
+};
