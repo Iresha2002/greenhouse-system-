@@ -304,18 +304,38 @@ export const MarketplaceView = ({ currentUser }) => {
   // Handle Add to Cart action with quantity and stock bounds
   const handleAddToCart = (crop, qty = 1) => {
     const cropId = crop.id || crop._id;
+
+    if (crop.quantity <= 0) {
+      setNotification({
+        type: 'error',
+        message: `"${crop.name}" is currently sold out and cannot be added to cart.`,
+      });
+      setTimeout(() => setNotification(null), 3000);
+      return;
+    }
+
+    const maxAvail = crop.quantity !== undefined ? crop.quantity : 999;
+    let clamped = false;
+
     setCartItems((prev) => {
       const existingIdx = prev.findIndex((it) => (it.productId || it.id || it._id) === cropId);
       if (existingIdx >= 0) {
         const updated = [...prev];
-        const newQty = (updated[existingIdx].quantity || 1) + qty;
-        const maxAvail = crop.quantity !== undefined ? crop.quantity : 999;
+        const requestedTotal = (updated[existingIdx].quantity || 1) + qty;
+        if (requestedTotal > maxAvail) {
+          clamped = true;
+        }
         updated[existingIdx] = {
           ...updated[existingIdx],
-          quantity: Math.min(newQty, maxAvail),
+          quantity: Math.min(requestedTotal, maxAvail),
         };
         return updated;
       }
+
+      if (qty > maxAvail) {
+        clamped = true;
+      }
+
       return [
         ...prev,
         {
@@ -326,7 +346,7 @@ export const MarketplaceView = ({ currentUser }) => {
           category: crop.category,
           price: crop.price,
           unit: crop.unit,
-          quantity: qty,
+          quantity: Math.min(qty, maxAvail),
           availableStock: crop.quantity,
           farmerName: crop.farmerName || 'Verified Farm',
           location: crop.location || 'Greenhouse Bay',
@@ -335,11 +355,18 @@ export const MarketplaceView = ({ currentUser }) => {
       ];
     });
 
-    setNotification({
-      type: 'success',
-      message: `Added ${qty} ${crop.unit} of "${crop.name}" to your basket!`,
-    });
-    setTimeout(() => setNotification(null), 3000);
+    if (clamped) {
+      setNotification({
+        type: 'warning',
+        message: `Cart clamped to maximum available stock (${maxAvail} ${crop.unit}) for "${crop.name}".`,
+      });
+    } else {
+      setNotification({
+        type: 'success',
+        message: `Added ${qty} ${crop.unit} of "${crop.name}" to your basket!`,
+      });
+    }
+    setTimeout(() => setNotification(null), 3500);
   };
 
   // Update item quantity in basket

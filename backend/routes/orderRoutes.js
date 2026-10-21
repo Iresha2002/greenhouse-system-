@@ -38,6 +38,15 @@ router.post('/', async (req, res) => {
       });
     }
 
+    // Phone format validation (clean digits, at least 9 digits)
+    const cleanPhone = customerInfo.phone.replace(/[\s\-\(\)]/g, '');
+    if (!/^\+?[0-9]{9,15}$/.test(cleanPhone)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please enter a valid phone number (at least 9 to 10 digits)'
+      });
+    }
+
     const method = fulfillmentMethod === 'pickup' ? 'pickup' : 'delivery';
 
     if (method === 'delivery' && (!customerInfo.address || customerInfo.address.trim().length === 0)) {
@@ -71,12 +80,12 @@ router.post('/', async (req, res) => {
 
     for (const item of items) {
       const productId = item.productId || item.id || item._id;
-      const requestedQty = parseInt(item.quantity, 10);
+      const requestedQty = Number(item.quantity);
 
-      if (!productId || isNaN(requestedQty) || requestedQty <= 0) {
+      if (!productId || isNaN(requestedQty) || !Number.isInteger(requestedQty) || requestedQty <= 0) {
         return res.status(400).json({
           success: false,
-          error: 'Invalid product item format in cart'
+          error: 'Product quantities must be positive whole numbers'
         });
       }
 
@@ -129,16 +138,55 @@ router.post('/', async (req, res) => {
       });
 
       productsToUpdate.push({
-        productDoc: product,
-        deductQty: requestedQty
+        productId: product._id,
+        deductQty: requestedQty,
+        productName: product.name,
+        unit: product.unit
       });
     }
 
-    // 3. Apply atomic inventory deduction
-    for (const { productDoc, deductQty } of productsToUpdate) {
-      productDoc.quantity = Math.max(0, productDoc.quantity - deductQty);
-      productDoc.updatedAt = Date.now();
-      await productDoc.save();
+    // 3. Apply atomic inventory deduction with condition check and rollback
+    const successfullyDeducted = [];
+    let deductionFailed = false;
+    let failedReason = '';
+
+    for (const { productId, deductQty, productName, unit } of productsToUpdate) {
+      // Atomic query condition: product must exist, be active, and have quantity >= deductQty
+      const updated = await Product.findOneAndUpdate(
+        {
+          _id: productId,
+          quantity: { $gte: deductQty },
+          status: 'active'
+        },
+        {
+          $inc: { quantity: -deductQty },
+          $set: { updatedAt: Date.now() }
+        },
+        { new: true }
+      );
+
+      if (!updated) {
+        deductionFailed = true;
+        failedReason = `Could not secure harvest inventory for "${productName}". The requested stock was claimed by another customer.`;
+        break;
+      }
+
+      successfullyDeducted.push({ productId, deductQty });
+    }
+
+    // Rollback phase: if any item failed atomic deduction, restore deducted items
+    if (deductionFailed) {
+      for (const rollback of successfullyDeducted) {
+        await Product.findByIdAndUpdate(rollback.productId, {
+          $inc: { quantity: rollback.deductQty },
+          $set: { updatedAt: Date.now() }
+        });
+      }
+
+      return res.status(409).json({
+        success: false,
+        error: failedReason
+      });
     }
 
     // 4. Calculate final financial figures
