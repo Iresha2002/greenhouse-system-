@@ -54,7 +54,7 @@ export const CartDrawer = ({
   if (!isOpen) return null;
 
   const displayItems = validatedCart?.items || cartItems;
-  const subtotal = validatedCart?.subtotal ?? cartItems.reduce((acc, it) => acc + (it.price * it.quantity), 0);
+  const subtotal = validatedCart?.subtotal ?? cartItems.reduce((acc, it) => acc + ((typeof it.price === 'number' ? it.price : (it.unitPrice || 0)) * (it.quantity || 1)), 0);
   const deliveryFee = deliveryMethod === 'pickup' || subtotal === 0 ? 0 : 2.50;
   const total = Number((subtotal + deliveryFee).toFixed(2));
   const uniqueFarmers = validatedCart?.farmers || [];
@@ -124,6 +124,9 @@ export const CartDrawer = ({
                   {displayItems.map((item) => {
                     const id = item.productId || item.id || item._id;
                     const isOutOfStock = item.availableStock !== undefined && item.availableStock <= 0;
+                    const unitPrice = typeof item.unitPrice === 'number' ? item.unitPrice : (typeof item.price === 'number' ? item.price : 0);
+                    const quantity = Number(item.validQuantity || item.quantity || 1);
+                    const itemTotal = typeof item.itemTotal === 'number' ? item.itemTotal : (unitPrice * quantity);
 
                     return (
                       <div
@@ -157,7 +160,7 @@ export const CartDrawer = ({
                                 {item.name}
                               </h4>
                               <span className="text-xs font-extrabold text-emerald-300 shrink-0">
-                                ${(item.unitPrice * (item.validQuantity || item.quantity)).toFixed(2)}
+                                ${itemTotal.toFixed(2)}
                               </span>
                             </div>
 
@@ -165,7 +168,7 @@ export const CartDrawer = ({
                               <Store className="w-3 h-3 text-emerald-400" />
                               <span className="truncate">{item.farmerName || 'Grower'}</span>
                               <span>•</span>
-                              <span>${item.unitPrice.toFixed(2)} / {item.unit}</span>
+                              <span>${unitPrice.toFixed(2)} / {item.unit || 'kg'}</span>
                             </div>
 
                             {/* Stock Warning Banner */}
