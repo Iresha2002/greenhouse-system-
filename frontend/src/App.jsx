@@ -13,6 +13,7 @@ import SensorCard from './components/SensorCard';
 import DeviceControl from './components/DeviceControl';
 import AuthModal from './components/AuthModel';
 import MarketplaceView from './components/marketplace/MarketplaceView';
+import SuppliersMarketplaceView from './components/suppliers/SuppliersMarketplaceView';
 import { getLatestSensorReading, getDevices, updateDevice, deleteDevice } from './services/api';
 
 import { Play, Pause, Thermometer, Droplets, Sprout, Sun } from 'lucide-react';
@@ -179,12 +180,16 @@ export function App() {
                 <span className="text-xs font-bold uppercase tracking-widest text-emerald-300">
                   {selectedDashboardTab === 'marketplace'
                     ? 'Agricultural Produce Exchange'
+                    : selectedDashboardTab === 'suppliers'
+                    ? 'Agricultural Supplier Hub'
                     : 'Live Greenhouse Control Matrix'}
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
                 {selectedDashboardTab === 'marketplace'
                   ? 'SmartGrow Crop Marketplace'
+                  : selectedDashboardTab === 'suppliers'
+                  ? 'Agricultural Supplies Marketplace'
                   : 'Greenhouse Telemetry & Actuators'}
               </h1>
             </div>
@@ -310,19 +315,7 @@ export function App() {
 
           {/* TAB 3: AGRI SUPPLIERS */}
           {selectedDashboardTab === 'suppliers' && (
-            <div className="relative overflow-hidden rounded-3xl bg-white/[0.08] backdrop-blur-xl border border-sky-400/30 p-12 text-center shadow-2xl">
-              <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-gradient-to-br from-sky-500/20 to-transparent blur-3xl pointer-events-none" />
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-sky-500/20 border border-sky-400/40 text-sky-300 flex items-center justify-center text-3xl shadow-inner">
-                ⚡
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Agricultural Supplier Hub</h2>
-              <p className="text-white/70 max-w-md mx-auto mb-6 text-sm">
-                B2B catalog for ordering calibrated NPK fertilizers, certified organic seeds, solenoid valves, and IoT sensor kits.
-              </p>
-              <span className="px-4 py-2 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider">
-                Sprint 4 Supplier Portal
-              </span>
-            </div>
+            <SuppliersMarketplaceView currentUser={currentUser} />
           )}
 
           {/* TAB 4: HYDROPONIC BAY */}
