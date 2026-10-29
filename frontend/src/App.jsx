@@ -14,6 +14,7 @@ import DeviceControl from './components/DeviceControl';
 import AuthModal from './components/AuthModel';
 import MarketplaceView from './components/marketplace/MarketplaceView';
 import SuppliersMarketplaceView from './components/suppliers/SuppliersMarketplaceView';
+import ExpertConnectView from './components/expertconnect/ExpertConnectView';
 import { getLatestSensorReading, getDevices, updateDevice, deleteDevice } from './services/api';
 
 import { Play, Pause, Thermometer, Droplets, Sprout, Sun } from 'lucide-react';
@@ -182,6 +183,8 @@ export function App() {
                     ? 'Agricultural Produce Exchange'
                     : selectedDashboardTab === 'suppliers'
                     ? 'Agricultural Supplier Hub'
+                    : selectedDashboardTab === 'hydroponics'
+                    ? 'Greenhouse Agricultural Consultation'
                     : 'Live Greenhouse Control Matrix'}
                 </span>
               </div>
@@ -190,6 +193,8 @@ export function App() {
                   ? 'SmartGrow Crop Marketplace'
                   : selectedDashboardTab === 'suppliers'
                   ? 'Agricultural Supplies Marketplace'
+                  : selectedDashboardTab === 'hydroponics'
+                  ? 'SmartGrow ExpertConnect'
                   : 'Greenhouse Telemetry & Actuators'}
               </h1>
             </div>
@@ -318,21 +323,12 @@ export function App() {
             <SuppliersMarketplaceView currentUser={currentUser} />
           )}
 
-          {/* TAB 4: HYDROPONIC BAY */}
+          {/* TAB 4: SMARTGROW EXPERTCONNECT (CONSULTATION PLATFORM) */}
           {selectedDashboardTab === 'hydroponics' && (
-            <div className="relative overflow-hidden rounded-3xl bg-white/[0.08] backdrop-blur-xl border border-cyan-400/30 p-12 text-center shadow-2xl">
-              <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-gradient-to-br from-cyan-500/20 to-transparent blur-3xl pointer-events-none" />
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 flex items-center justify-center text-3xl shadow-inner">
-                💧
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Hydroponic Closed-Loop Bay</h2>
-              <p className="text-white/70 max-w-md mx-auto mb-6 text-sm">
-                Automated nutrient film telemetry: pH balance (6.2 target), dissolved oxygen (8.5 mg/L), and continuous pump recirculating cycles.
-              </p>
-              <span className="px-4 py-2 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 text-xs font-bold uppercase tracking-wider">
-                IoT Advanced Telemetry
-              </span>
-            </div>
+            <ExpertConnectView
+              currentUser={currentUser}
+              onOpenLogin={() => setIsAuthModalOpen(true)}
+            />
           )}
 
           {/* Auth Modal inside Dashboard View */}
