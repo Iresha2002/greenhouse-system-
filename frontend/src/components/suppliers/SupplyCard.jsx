@@ -15,6 +15,9 @@ export const SupplyCard = ({ supply, onViewDetails, onAddToCart }) => {
   const isOutOfStock = supply.quantity <= 0;
   const isLowStock =
     supply.quantity > 0 && supply.quantity <= (supply.lowStockThreshold || 5);
+  const displayImage =
+    supply.image ||
+    (Array.isArray(supply.images) && supply.images.length > 0 ? supply.images[0] : '');
 
   // Category badge styling tailored to the 10 agricultural supply categories
   const categoryColors = {
@@ -54,9 +57,9 @@ export const SupplyCard = ({ supply, onViewDetails, onAddToCart }) => {
 
       {/* Top Media / Thumbnail Section */}
       <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl bg-black/30 border border-white/10 mb-4">
-        {supply.image ? (
+        {displayImage ? (
           <img
-            src={supply.image}
+            src={displayImage}
             alt={supply.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={(e) => {

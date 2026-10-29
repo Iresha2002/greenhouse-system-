@@ -132,3 +132,19 @@ export const updateFarmerOrderStatus = async (id, data) => {
     const response = await axios.patch(`${API_URL}/orders/${id}/farmer-status`, data, getAuthHeaders());
     return response.data;
 };
+
+// 11. Agricultural Supplies Marketplace Public APIs
+export const getSupplyProducts = async (params = {}) => {
+    const response = await axios.get(`${API_URL}/supplies`, { params });
+    return response.data;
+};
+
+export const getSupplyProductById = async (id) => {
+    const response = await axios.get(`${API_URL}/supplies/${id}`);
+    return response.data;
+};
+
+export const getSupplyCategories = async () => {
+    const response = await axios.get(`${API_URL}/supplies/categories`);
+    return response.data;
+};

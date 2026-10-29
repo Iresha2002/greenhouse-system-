@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import SupplyCard from './SupplyCard';
+import { getSupplyProducts } from '../../services/api';
 import {
   Search,
   Filter,
@@ -24,6 +25,7 @@ import {
   Droplets,
   FlaskConical,
   Tag,
+  RefreshCw,
 } from 'lucide-react';
 
 // Configurable Agricultural Supply Categories (Section 4.1)
@@ -273,8 +275,10 @@ const SAMPLE_SUPPLIES_CATALOG = [
 ];
 
 export const SuppliersMarketplaceView = ({ currentUser }) => {
-  // Catalog state (using clearly identified sample data for Stage 2; Stage 3 connects MongoDB API)
-  const [supplies] = useState(SAMPLE_SUPPLIES_CATALOG);
+  // Catalog state backed by MongoDB /api/supplies with graceful offline fallback
+  const [supplies, setSupplies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isUsingFallback, setIsUsingFallback] = useState(false);
 
   // Filter & Search States (Section 4.1 & 4.2)
   const [searchQuery, setSearchQuery] = useState('');
@@ -298,6 +302,38 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
       setToastMessage(null);
     }, 3200);
   };
+
+  // Fetch active supply products from MongoDB backend
+  const fetchSuppliesCatalog = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await getSupplyProducts({ limit: 100 });
+      if (response && response.success && Array.isArray(response.data) && response.data.length > 0) {
+        const normalized = response.data.map((item, idx) => ({
+          ...item,
+          image:
+            item.image ||
+            (Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : ''),
+          isNewArrival: item.isNewArrival !== undefined ? item.isNewArrival : idx < 4,
+        }));
+        setSupplies(normalized);
+        setIsUsingFallback(false);
+      } else {
+        setSupplies(SAMPLE_SUPPLIES_CATALOG);
+        setIsUsingFallback(true);
+      }
+    } catch (err) {
+      console.warn('Backend /api/supplies unreachable, falling back to local sample catalog:', err.message);
+      setSupplies(SAMPLE_SUPPLIES_CATALOG);
+      setIsUsingFallback(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSuppliesCatalog();
+  }, [fetchSuppliesCatalog]);
 
   // Extract unique suppliers & brands from actual catalog data
   const uniqueSuppliers = useMemo(() => {
@@ -471,15 +507,37 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
           </div>
         </div>
 
-        {/* Development Stage Notice Banner */}
+        {/* Database Connection & Stage Status Banner */}
         <div className="relative z-10 mt-6 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-white/60">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-400/30 text-amber-300 font-bold uppercase text-[10px]">
-              Sample Data Mode (Stage 2 UI)
-            </span>
-            <span>
-              Displaying clearly identified development sample supplies. Database-backed API & real-time stock sync in Stage 3.
-            </span>
+            {isUsingFallback ? (
+              <>
+                <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-400/30 text-amber-300 font-bold uppercase text-[10px]">
+                  Offline Sample Fallback
+                </span>
+                <span>
+                  Backend API unreachable — displaying fallback sample catalog.
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 font-bold uppercase text-[10px]">
+                  Live MongoDB Catalog
+                </span>
+                <span>
+                  Connected to /api/supplies — displaying real-time database inventory & technical specifications.
+                </span>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={fetchSuppliesCatalog}
+              className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-[11px] font-semibold transition-all cursor-pointer"
+              title="Refresh supply catalog from MongoDB"
+            >
+              <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin text-sky-300' : ''}`} />
+              <span>Sync</span>
+            </button>
           </div>
           {currentUser && (
             <span className="text-sky-300 font-semibold">
@@ -690,8 +748,15 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
         </div>
       </div>
 
-      {/* Product Grid or Empty State */}
-      {filteredSupplies.length === 0 ? (
+      {/* Product Grid, Loading State, or Empty State */}
+      {loading ? (
+        <div className="rounded-3xl bg-white/[0.06] border border-white/15 p-16 text-center max-w-xl mx-auto my-8">
+          <div className="w-10 h-10 border-4 border-sky-400/20 border-t-sky-400 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sky-300 font-bold text-sm tracking-wide">
+            Loading Agricultural Supplies Catalog from MongoDB...
+          </p>
+        </div>
+      ) : filteredSupplies.length === 0 ? (
         <div className="rounded-3xl bg-white/[0.06] border border-white/15 p-12 text-center max-w-xl mx-auto my-8">
           <AlertCircle className="w-12 h-12 text-sky-400 mx-auto mb-3 opacity-80" />
           <h3 className="text-xl font-bold text-white mb-2">
@@ -743,7 +808,12 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
               <div className="space-y-4">
                 <div className="aspect-4/3 w-full rounded-2xl overflow-hidden bg-black/40 border border-white/15">
                   <img
-                    src={selectedSupply.image}
+                    src={
+                      selectedSupply.image ||
+                      (Array.isArray(selectedSupply.images) && selectedSupply.images.length > 0
+                        ? selectedSupply.images[0]
+                        : '')
+                    }
                     alt={selectedSupply.name}
                     className="w-full h-full object-cover"
                   />
