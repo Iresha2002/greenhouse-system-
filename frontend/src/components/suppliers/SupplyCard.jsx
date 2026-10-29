@@ -107,13 +107,19 @@ export const SupplyCard = ({ supply, onViewDetails, onAddToCart }) => {
           )}
         </div>
 
-        {/* Bottom Overlay Badges: Verified Supplier or Warranty */}
+        {/* Bottom Overlay Badges: Verified Supplier, Genuine Order Count, or Warranty */}
         <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-1 pointer-events-none">
-          {supply.isSupplierVerified && (
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/90 border border-sky-400/40 text-[10px] font-bold text-sky-300 backdrop-blur-md">
-              <CheckCircle className="w-3 h-3 text-sky-400" />
-              <span>Verified Supplier</span>
+          {supply.totalUnitsSold > 0 ? (
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-950/90 border border-amber-400/40 text-[10px] font-bold text-amber-300 backdrop-blur-md">
+              <span>🔥 {supply.totalUnitsSold} {supply.unit} sold</span>
             </div>
+          ) : (
+            supply.isSupplierVerified && (
+              <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/90 border border-sky-400/40 text-[10px] font-bold text-sky-300 backdrop-blur-md">
+                <CheckCircle className="w-3 h-3 text-sky-400" />
+                <span>Verified Supplier</span>
+              </div>
+            )
           )}
           {supply.warranty && (
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/90 border border-emerald-400/30 text-[10px] font-semibold text-emerald-300 backdrop-blur-md ml-auto">

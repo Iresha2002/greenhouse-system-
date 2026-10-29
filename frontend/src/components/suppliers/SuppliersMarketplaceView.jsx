@@ -447,6 +447,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
       .filter((item) => {
         if (activeCollectionTab === 'featured' && !item.isFeatured) return false;
         if (activeCollectionTab === 'newArrivals' && !item.isNewArrival) return false;
+        if (activeCollectionTab === 'bestSelling' && !(item.totalUnitsSold > 0)) return false;
         if (selectedCategory !== 'All' && item.category !== selectedCategory) return false;
         if (selectedSupplier !== 'All' && item.supplierName !== selectedSupplier) return false;
         if (selectedBrand !== 'All' && item.brand !== selectedBrand) return false;
@@ -477,6 +478,9 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
       .sort((a, b) => {
         if (sortBy === 'priceAsc') return a.price - b.price;
         if (sortBy === 'priceDesc') return b.price - a.price;
+        if (sortBy === 'popular' || activeCollectionTab === 'bestSelling') {
+          return (b.totalUnitsSold || 0) - (a.totalUnitsSold || 0);
+        }
         if (sortBy === 'newest') return (b.isNewArrival ? 1 : 0) - (a.isNewArrival ? 1 : 0);
         return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
       });
@@ -716,12 +720,13 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
         </div>
       </div>
 
-      {/* Collection Tabs: All Supplies | Featured Supplies | New Arrivals */}
+      {/* Collection Tabs: All Supplies | Featured Supplies | Best-Selling (Order-Backed) | New Arrivals */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2 bg-white/[0.06] p-1.5 rounded-2xl border border-white/10">
           {[
             { id: 'all', label: 'All Agricultural Supplies' },
             { id: 'featured', label: '⭐ Featured Supplies' },
+            { id: 'bestSelling', label: '🔥 Best-Selling (Order Backed)' },
             { id: 'newArrivals', label: '🆕 New Arrivals' },
           ].map((tab) => (
             <button
@@ -852,6 +857,9 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
               >
                 <option value="featured" className="bg-slate-900 text-white">
                   Sort: Featured
+                </option>
+                <option value="popular" className="bg-slate-900 text-white">
+                  Sort: Best-Selling
                 </option>
                 <option value="newest" className="bg-slate-900 text-white">
                   Sort: Newest

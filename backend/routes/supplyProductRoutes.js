@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const SupplyProduct = require('../models/SupplyProduct');
+const SupplyOrder = require('../models/SupplyOrder');
 const { protect, authorizeRoles } = require('../middleware/authMiddleware');
 
 // Helper to escape user regex input safely
@@ -169,10 +170,55 @@ router.get('/', async (req, res) => {
     const skip = (currentPage - 1) * pageLimit;
 
     const total = await SupplyProduct.countDocuments(query);
-    const supplies = await SupplyProduct.find(query)
+    const suppliesDocs = await SupplyProduct.find(query)
       .sort(sortOptions)
       .skip(skip)
-      .limit(pageLimit);
+      .limit(pageLimit)
+      .lean();
+
+    // Stage 11 (Section 4.1 & 4.2): Compute genuine order counts per supply product from SupplyOrder collection
+    const salesAggregation = await SupplyOrder.aggregate([
+      {
+        $match: {
+          orderStatus: { $nin: ['cancelled', 'rejected'] }
+        }
+      },
+      { $unwind: '$items' },
+      {
+        $group: {
+          _id: '$items.supply',
+          totalUnitsSold: { $sum: '$items.quantity' },
+          orderCount: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const salesMap = {};
+    for (const row of salesAggregation) {
+      if (row._id) {
+        salesMap[row._id.toString()] = {
+          totalUnitsSold: row.totalUnitsSold || 0,
+          orderCount: row.orderCount || 0
+        };
+      }
+    }
+
+    let supplies = suppliesDocs.map((item) => {
+      const stats = salesMap[item._id.toString()] || { totalUnitsSold: 0, orderCount: 0 };
+      return {
+        ...item,
+        totalUnitsSold: stats.totalUnitsSold,
+        orderCount: stats.orderCount
+      };
+    });
+
+    if (sortBy === 'popular' || sortBy === 'bestSelling') {
+      supplies = supplies.sort(
+        (a, b) =>
+          (b.totalUnitsSold || 0) - (a.totalUnitsSold || 0) ||
+          (b.orderCount || 0) - (a.orderCount || 0)
+      );
+    }
 
     res.json({
       success: true,
