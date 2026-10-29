@@ -541,14 +541,34 @@ router.get('/:id', async (req, res) => {
 router.patch('/:id/cancel', async (req, res) => {
   try {
     const { id } = req.params;
-    const { reason } = req.body;
-
     const order = await SupplyOrder.findById(id);
     if (!order) {
       return res.status(404).json({
         success: false,
         error: 'Supply order not found'
       });
+    }
+
+    // Stage 10 Security Check: If order is linked to a registered customer account,
+    // verify that the requester is the order owner or verified via matching contact phone
+    const user = await getOptionalUser(req);
+    const { reason, phone } = req.body;
+
+    if (order.customer) {
+      const isAuthenticatedOwner =
+        user && order.customer.toString() === user._id.toString();
+      const isPhoneVerified =
+        phone &&
+        order.customerInfo?.phone &&
+        phone.replace(/[\s\-()]/g, '') ===
+          order.customerInfo.phone.replace(/[\s\-()]/g, '');
+
+      if (!isAuthenticatedOwner && !isPhoneVerified) {
+        return res.status(403).json({
+          success: false,
+          error: 'Forbidden: You are not authorized to cancel another customer\'s order'
+        });
+      }
     }
 
     if (order.orderStatus !== 'pending') {

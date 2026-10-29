@@ -6,6 +6,7 @@ import SupplyCartDrawer from './SupplyCartDrawer';
 import SupplyCheckoutModal from './SupplyCheckoutModal';
 import SupplyOrderConfirmationModal from './SupplyOrderConfirmationModal';
 import CustomerSupplyOrdersModal from './CustomerSupplyOrdersModal';
+import { CustomerSupplyProfileModal } from './CustomerSupplyProfileModal';
 import { getSupplyProducts, getSupplyFacets, createSupplyOrder } from '../../services/api';
 import {
   Search,
@@ -32,6 +33,7 @@ import {
   FlaskConical,
   Tag,
   RefreshCw,
+  User,
 } from 'lucide-react';
 
 // Configurable Agricultural Supply Categories (Section 4.1)
@@ -312,6 +314,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
   const [checkoutData, setCheckoutData] = useState(null);
   const [confirmedSupplyOrder, setConfirmedSupplyOrder] = useState(null);
   const [isCustomerOrdersOpen, setIsCustomerOrdersOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [cartItems, setCartItems] = useState(() => {
     try {
       const saved = localStorage.getItem('smartgrow_supplies_cart');
@@ -640,6 +643,15 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
                 <span>Supplier Studio</span>
               </button>
             )}
+
+            <button
+              type="button"
+              onClick={() => setIsProfileModalOpen(true)}
+              className="px-4 py-3.5 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 text-white font-extrabold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <User className="w-4 h-4 text-emerald-300" />
+              <span>Account Profile</span>
+            </button>
 
             <button
               type="button"
@@ -1097,6 +1109,14 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
         onClose={() => setIsCustomerOrdersOpen(false)}
         currentUser={currentUser}
         onOrderCancelled={fetchSuppliesCatalog}
+      />
+
+      {/* Stage 10: Customer Account Profile & Delivery Address Modal (Section 4.8) */}
+      <CustomerSupplyProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        currentUser={currentUser}
+        onOpenOrderHistory={() => setIsCustomerOrdersOpen(true)}
       />
     </div>
   );

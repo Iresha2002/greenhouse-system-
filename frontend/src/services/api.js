@@ -229,3 +229,17 @@ export const updateSupplierOrderStatus = async (id, data) => {
     const response = await axios.patch(`${API_URL}/supply-orders/${id}/supplier-status`, data, getAuthHeaders());
     return response.data;
 };
+
+// 16. Customer Account Profile & Delivery Address Management APIs (Stage 10 - Section 4.8)
+export const getAccountProfile = async () => {
+    const response = await axios.get(`${API_URL}/auth/profile`, getAuthHeaders());
+    return response.data;
+};
+
+export const updateAccountProfile = async (profileData) => {
+    const response = await axios.put(`${API_URL}/auth/profile`, profileData, getAuthHeaders());
+    if (response.data && response.data.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+    return response.data;
+};
