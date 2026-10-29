@@ -153,3 +153,29 @@ export const getSupplyFacets = async () => {
     const response = await axios.get(`${API_URL}/supplies/facets`);
     return response.data;
 };
+
+// 12. Supplier Portal Product Management APIs (Protected - Supplier Role Only)
+export const getMySupplyProducts = async () => {
+    const response = await axios.get(`${API_URL}/supplies/supplier/my-supplies`, getAuthHeaders());
+    return response.data;
+};
+
+export const createSupplyProduct = async (supplyData) => {
+    const response = await axios.post(`${API_URL}/supplies`, supplyData, getAuthHeaders());
+    return response.data;
+};
+
+export const updateSupplyProduct = async (id, supplyData) => {
+    const response = await axios.put(`${API_URL}/supplies/${id}`, supplyData, getAuthHeaders());
+    return response.data;
+};
+
+export const toggleSupplyProductStatus = async (id, status) => {
+    const response = await axios.patch(`${API_URL}/supplies/${id}/status`, { status }, getAuthHeaders());
+    return response.data;
+};
+
+export const deleteSupplyProduct = async (id) => {
+    const response = await axios.delete(`${API_URL}/supplies/${id}`, getAuthHeaders());
+    return response.data;
+};

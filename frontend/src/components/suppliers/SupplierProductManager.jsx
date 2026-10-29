@@ -1,0 +1,1059 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Plus,
+  Edit3,
+  Trash2,
+  Eye,
+  EyeOff,
+  Package,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  X,
+  Save,
+  Cpu,
+  FlaskConical,
+  Building2,
+  ArrowLeft,
+  RefreshCw,
+  ShieldCheck,
+  Layers,
+  Tag,
+} from 'lucide-react';
+import {
+  getMySupplyProducts,
+  createSupplyProduct,
+  updateSupplyProduct,
+  toggleSupplyProductStatus,
+  deleteSupplyProduct,
+} from '../../services/api';
+
+const CATEGORIES = [
+  'Seeds',
+  'Fertilizers',
+  'Crop Protection Products',
+  'Irrigation Equipment',
+  'Greenhouse Equipment',
+  'Smart Farming Devices',
+  'IoT Components',
+  'Farming Tools',
+  'Growing Supplies',
+  'Hydroponic Equipment',
+];
+
+const INITIAL_FORM = {
+  name: '',
+  category: 'Fertilizers',
+  brand: '',
+  model: '',
+  sku: '',
+  description: '',
+  image: '',
+  price: '',
+  unit: 'piece',
+  quantity: '',
+  lowStockThreshold: 5,
+  minOrderQuantity: 1,
+  location: '',
+  warranty: '',
+  isFeatured: false,
+  status: 'active',
+  islandwideDelivery: true,
+  warehousePickup: true,
+  // Specifications
+  composition: '',
+  packageSize: '',
+  voltage: '',
+  powerRequirements: '',
+  communicationProtocol: '',
+  supportedInterfaces: '',
+  operatingConditions: '',
+  compatibility: '',
+  applicationInstructions: '',
+  safetyPrecautions: '',
+};
+
+export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCatalogChanged }) => {
+  const [mySupplies, setMySupplies] = useState([]);
+  const [metrics, setMetrics] = useState({
+    totalListed: 0,
+    activeCount: 0,
+    outOfStockCount: 0,
+    lowStockCount: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+
+  // Form Modal State
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState(INITIAL_FORM);
+
+  // Delete Confirmation Modal State
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const notifySuccess = (msg) => {
+    setSuccessMsg(msg);
+    setTimeout(() => setSuccessMsg(''), 3500);
+  };
+
+  const fetchSupplierData = useCallback(async () => {
+    setLoading(true);
+    setErrorMsg('');
+    try {
+      const res = await getMySupplyProducts();
+      if (res && res.success) {
+        setMySupplies(res.data || []);
+        if (res.metrics) setMetrics(res.metrics);
+      }
+    } catch (err) {
+      setErrorMsg(
+        err.response?.data?.error || 'Failed to load your supplier catalog. Ensure you are signed in as a Supplier.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSupplierData();
+  }, [fetchSupplierData]);
+
+  const handleOpenCreate = () => {
+    setEditingId(null);
+    setFormData({
+      ...INITIAL_FORM,
+      location: currentUser?.location || 'Colombo Supply Hub',
+    });
+    setErrorMsg('');
+    setIsFormOpen(true);
+  };
+
+  const handleOpenEdit = (supply) => {
+    setEditingId(supply._id);
+    const primaryImage =
+      supply.image ||
+      (Array.isArray(supply.images) && supply.images.length > 0 ? supply.images[0] : '');
+
+    setFormData({
+      name: supply.name || '',
+      category: supply.category || 'Fertilizers',
+      brand: supply.brand || '',
+      model: supply.model || '',
+      sku: supply.sku || '',
+      description: supply.description || '',
+      image: primaryImage,
+      price: supply.price ?? '',
+      unit: supply.unit || 'piece',
+      quantity: supply.quantity ?? '',
+      lowStockThreshold: supply.lowStockThreshold ?? 5,
+      minOrderQuantity: supply.minOrderQuantity ?? 1,
+      location: supply.location || currentUser?.location || '',
+      warranty: supply.warranty || '',
+      isFeatured: Boolean(supply.isFeatured),
+      status: supply.status || 'active',
+      islandwideDelivery: supply.deliveryOptions?.islandwideDelivery ?? true,
+      warehousePickup: supply.deliveryOptions?.warehousePickup ?? true,
+      composition: supply.specifications?.composition || '',
+      packageSize: supply.specifications?.packageSize || '',
+      voltage: supply.specifications?.voltage || '',
+      powerRequirements: supply.specifications?.powerRequirements || '',
+      communicationProtocol: supply.specifications?.communicationProtocol || '',
+      supportedInterfaces: supply.specifications?.supportedInterfaces || '',
+      operatingConditions: supply.specifications?.operatingConditions || '',
+      compatibility: supply.specifications?.compatibility || '',
+      applicationInstructions: supply.specifications?.applicationInstructions || '',
+      safetyPrecautions: supply.specifications?.safetyPrecautions || '',
+    });
+    setErrorMsg('');
+    setIsFormOpen(true);
+  };
+
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    // Frontend Validation
+    if (!formData.name.trim()) {
+      return setErrorMsg('Product name is required.');
+    }
+    const numPrice = Number(formData.price);
+    if (isNaN(numPrice) || numPrice <= 0) {
+      return setErrorMsg('Unit price must be a number greater than 0.');
+    }
+    const numQty = Number(formData.quantity);
+    if (formData.quantity === '' || isNaN(numQty) || numQty < 0) {
+      return setErrorMsg('Stock quantity must be 0 or greater.');
+    }
+
+    const payload = {
+      name: formData.name.trim(),
+      category: formData.category,
+      brand: formData.brand.trim(),
+      model: formData.model.trim(),
+      sku: formData.sku.trim(),
+      description: formData.description.trim(),
+      images: formData.image.trim() ? [formData.image.trim()] : [],
+      price: numPrice,
+      unit: formData.unit.trim() || 'piece',
+      quantity: numQty,
+      lowStockThreshold: Number(formData.lowStockThreshold) || 5,
+      minOrderQuantity: Math.max(1, Number(formData.minOrderQuantity) || 1),
+      location: formData.location.trim(),
+      warranty: formData.warranty.trim(),
+      isFeatured: Boolean(formData.isFeatured),
+      status: formData.status,
+      deliveryOptions: {
+        islandwideDelivery: Boolean(formData.islandwideDelivery),
+        warehousePickup: Boolean(formData.warehousePickup),
+      },
+      specifications: {
+        composition: formData.composition.trim(),
+        packageSize: formData.packageSize.trim(),
+        voltage: formData.voltage.trim(),
+        powerRequirements: formData.powerRequirements.trim(),
+        communicationProtocol: formData.communicationProtocol.trim(),
+        supportedInterfaces: formData.supportedInterfaces.trim(),
+        operatingConditions: formData.operatingConditions.trim(),
+        compatibility: formData.compatibility.trim(),
+        applicationInstructions: formData.applicationInstructions.trim(),
+        safetyPrecautions: formData.safetyPrecautions.trim(),
+      },
+    };
+
+    setSubmitting(true);
+    try {
+      if (editingId) {
+        await updateSupplyProduct(editingId, payload);
+        notifySuccess(`Updated "${payload.name}" successfully!`);
+      } else {
+        await createSupplyProduct(payload);
+        notifySuccess(`Listed new supply "${payload.name}" in the marketplace!`);
+      }
+      setIsFormOpen(false);
+      await fetchSupplierData();
+      if (onCatalogChanged) onCatalogChanged();
+    } catch (err) {
+      setErrorMsg(err.response?.data?.error || 'Failed to save agricultural supply listing.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleToggleStatus = async (supply) => {
+    const nextStatus = supply.status === 'active' ? 'inactive' : 'active';
+    try {
+      await toggleSupplyProductStatus(supply._id, nextStatus);
+      notifySuccess(
+        `"${supply.name}" is now ${nextStatus === 'active' ? 'Active (Visible to customers)' : 'Inactive (Hidden)'}`
+      );
+      await fetchSupplierData();
+      if (onCatalogChanged) onCatalogChanged();
+    } catch (err) {
+      setErrorMsg(err.response?.data?.error || 'Failed to update product status.');
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setSubmitting(true);
+    try {
+      await deleteSupplyProduct(deleteTarget._id);
+      notifySuccess(`Deleted "${deleteTarget.name}" permanently.`);
+      setDeleteTarget(null);
+      await fetchSupplierData();
+      if (onCatalogChanged) onCatalogChanged();
+    } catch (err) {
+      setErrorMsg(err.response?.data?.error || 'Failed to delete supply product.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-8 pb-16">
+      {/* Top Notification Banners */}
+      {successMsg && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-emerald-950/95 border border-emerald-400/50 text-white shadow-2xl backdrop-blur-xl">
+          <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
+          <span className="text-xs sm:text-sm font-bold">{successMsg}</span>
+        </div>
+      )}
+
+      {/* Supplier Studio Header Bar */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0d342b] via-[#113d33] to-[#0c2938] border border-sky-400/35 p-6 sm:p-8 shadow-2xl">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-extrabold uppercase tracking-wider mb-2">
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Authorized Supplier Portal</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              {currentUser?.username || 'Supplier'} — Catalog & Specification Studio
+            </h2>
+            <p className="text-xs sm:text-sm text-white/70 mt-1">
+              Manage your agricultural inputs, greenhouse hardware, technical datasheets, and live stock availability.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={onBackToMarketplace}
+              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Customer Storefront</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleOpenCreate}
+              className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs sm:text-sm font-extrabold flex items-center gap-2 shadow-lg shadow-sky-500/25 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add New Supply Product</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Supplier Dashboard KPI Cards (Section 5.1) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="rounded-2xl bg-white/[0.07] border border-white/15 p-5 backdrop-blur-xl">
+          <div className="flex items-center justify-between text-white/60 text-xs font-bold uppercase mb-1">
+            <span>Total Listed Supplies</span>
+            <Package className="w-4 h-4 text-sky-400" />
+          </div>
+          <p className="text-3xl font-extrabold text-white">{metrics.totalListed}</p>
+          <span className="text-[11px] text-white/50">Owned by your supplier account</span>
+        </div>
+
+        <div className="rounded-2xl bg-white/[0.07] border border-emerald-400/25 p-5 backdrop-blur-xl">
+          <div className="flex items-center justify-between text-emerald-300/80 text-xs font-bold uppercase mb-1">
+            <span>Active in Storefront</span>
+            <CheckCircle className="w-4 h-4 text-emerald-400" />
+          </div>
+          <p className="text-3xl font-extrabold text-emerald-300">{metrics.activeCount}</p>
+          <span className="text-[11px] text-white/50">Publicly visible to farmers</span>
+        </div>
+
+        <div className="rounded-2xl bg-white/[0.07] border border-amber-400/25 p-5 backdrop-blur-xl">
+          <div className="flex items-center justify-between text-amber-300/80 text-xs font-bold uppercase mb-1">
+            <span>Low-Stock Alerts</span>
+            <AlertTriangle className="w-4 h-4 text-amber-400" />
+          </div>
+          <p className="text-3xl font-extrabold text-amber-300">{metrics.lowStockCount}</p>
+          <span className="text-[11px] text-white/50">At or below alert threshold</span>
+        </div>
+
+        <div className="rounded-2xl bg-white/[0.07] border border-red-400/25 p-5 backdrop-blur-xl">
+          <div className="flex items-center justify-between text-red-300/80 text-xs font-bold uppercase mb-1">
+            <span>Out of Stock</span>
+            <XCircle className="w-4 h-4 text-red-400" />
+          </div>
+          <p className="text-3xl font-extrabold text-red-300">{metrics.outOfStockCount}</p>
+          <span className="text-[11px] text-white/50">Requires restocking</span>
+        </div>
+      </div>
+
+      {errorMsg && !isFormOpen && (
+        <div className="p-4 rounded-2xl bg-red-500/20 border border-red-400/40 text-red-200 text-xs sm:text-sm font-semibold">
+          {errorMsg}
+        </div>
+      )}
+
+      {/* Supplier Product Listings Table */}
+      <div className="rounded-3xl bg-white/[0.07] border border-white/15 backdrop-blur-xl overflow-hidden shadow-2xl">
+        <div className="p-5 border-b border-white/10 flex items-center justify-between">
+          <div>
+            <h3 className="text-base sm:text-lg font-extrabold text-white">
+              Your Agricultural Supply Listings ({mySupplies.length})
+            </h3>
+            <p className="text-xs text-white/60">
+              Only products created by your supplier account ({currentUser?.email}) are shown here.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={fetchSupplierData}
+            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white cursor-pointer"
+            title="Refresh supplier listings"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-sky-400' : ''}`} />
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="p-14 text-center">
+            <div className="w-9 h-9 border-4 border-sky-400/20 border-t-sky-400 rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-xs font-bold text-sky-300">Loading your supplier listings...</p>
+          </div>
+        ) : mySupplies.length === 0 ? (
+          <div className="p-12 text-center space-y-4">
+            <Package className="w-12 h-12 text-sky-400/70 mx-auto" />
+            <div>
+              <h4 className="text-lg font-bold text-white">No Supply Products Listed Yet</h4>
+              <p className="text-xs text-white/60 max-w-md mx-auto mt-1">
+                Start building your B2B/farmer agricultural catalog by adding seeds, fertilizers, irrigation valves, or IoT sensor kits.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleOpenCreate}
+              className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider cursor-pointer"
+            >
+              + Create First Supply Listing
+            </button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-white/10 text-[11px] uppercase tracking-wider text-white/50 bg-black/20">
+                  <th className="py-3.5 px-4">Product & Brand</th>
+                  <th className="py-3.5 px-4">Category</th>
+                  <th className="py-3.5 px-4">Unit Price</th>
+                  <th className="py-3.5 px-4">Stock Level</th>
+                  <th className="py-3.5 px-4">Visibility</th>
+                  <th className="py-3.5 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/10 text-xs sm:text-sm">
+                {mySupplies.map((item) => {
+                  const thumb =
+                    item.image ||
+                    (Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : '');
+                  const isOut = item.quantity <= 0;
+                  const isLow = item.quantity > 0 && item.quantity <= (item.lowStockThreshold || 5);
+
+                  return (
+                    <tr key={item._id} className="hover:bg-white/[0.04] transition-colors">
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden bg-black/40 border border-white/10 shrink-0 flex items-center justify-center">
+                            {thumb ? (
+                              <img src={thumb} alt={item.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <span>⚙️</span>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-white line-clamp-1">{item.name}</p>
+                            <p className="text-[11px] text-sky-300/80">
+                              {[item.brand, item.model, item.sku ? `SKU: ${item.sku}` : '']
+                                .filter(Boolean)
+                                .join(' • ') || 'Standard Supply'}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        <span className="px-2.5 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-white/90">
+                          {item.category}
+                        </span>
+                      </td>
+
+                      <td className="py-3.5 px-4 font-extrabold text-white">
+                        ${Number(item.price).toFixed(2)}{' '}
+                        <span className="text-xs font-normal text-white/60">/ {item.unit}</span>
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        {isOut ? (
+                          <span className="px-2.5 py-1 rounded-full bg-red-500/20 border border-red-400/40 text-red-300 text-xs font-bold">
+                            Out of Stock (0)
+                          </span>
+                        ) : isLow ? (
+                          <span className="px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold">
+                            Low: {item.quantity} {item.unit}
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold">
+                            {item.quantity} {item.unit}
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleStatus(item)}
+                          className={`px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 cursor-pointer transition-all ${
+                            item.status === 'active'
+                              ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
+                              : 'bg-white/10 border-white/20 text-white/50'
+                          }`}
+                          title="Click to toggle Active / Inactive visibility"
+                        >
+                          {item.status === 'active' ? (
+                            <>
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>Active</span>
+                            </>
+                          ) : (
+                            <>
+                              <EyeOff className="w-3.5 h-3.5" />
+                              <span>Hidden</span>
+                            </>
+                          )}
+                        </button>
+                      </td>
+
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="inline-flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEdit(item)}
+                            className="p-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/35 border border-sky-400/30 text-sky-300 cursor-pointer"
+                            title="Edit product & specifications"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDeleteTarget(item)}
+                            className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500/35 border border-red-400/30 text-red-300 cursor-pointer"
+                            title="Delete product"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Create / Edit Supply Product Modal */}
+      {isFormOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto"
+          onClick={() => setIsFormOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-4xl rounded-3xl bg-[#0e3327] border border-sky-400/40 p-6 sm:p-8 text-white shadow-2xl my-8 max-h-[92vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setIsFormOpen(false)}
+              className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="text-xl sm:text-2xl font-extrabold text-white mb-1">
+              {editingId ? 'Edit Agricultural Supply Listing' : 'Create New Agricultural Supply Listing'}
+            </h3>
+            <p className="text-xs text-white/65 mb-6">
+              Provide accurate pricing, stock levels, and technical or composition specifications.
+            </p>
+
+            {errorMsg && (
+              <div className="mb-4 p-3.5 rounded-xl bg-red-500/20 border border-red-400/40 text-red-200 text-xs font-bold">
+                {errorMsg}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmitForm} className="space-y-6">
+              {/* Section 1: Core Product Information */}
+              <div className="rounded-2xl bg-black/25 border border-white/10 p-4 sm:p-5 space-y-4">
+                <h4 className="text-xs font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                  <Layers className="w-4 h-4" />
+                  1. Core Product & Inventory Details
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                  <div className="sm:col-span-8">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Product Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="e.g., Industrial Brass Solenoid Valve (12V DC)"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-4">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Category *
+                    </label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    >
+                      {CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat} className="bg-slate-900 text-white">
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="sm:col-span-4">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Brand / Manufacturer
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.brand}
+                      onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                      placeholder="e.g., SenseCrop Telemetry"
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-4">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Model Number
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.model}
+                      onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                      placeholder="e.g., SC-RS485-3IN1"
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-4">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      SKU / Catalog Code
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.sku}
+                      onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                      placeholder="e.g., SCT-RS485-01"
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Unit Price ($) *
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0.01"
+                      required
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                      placeholder="24.50"
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Unit of Sale *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.unit}
+                      onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                      placeholder="piece, bag (5kg), kit"
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Stock Qty *
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      required
+                      value={formData.quantity}
+                      onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Low Alert Qty
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.lowStockThreshold}
+                      onChange={(e) =>
+                        setFormData({ ...formData, lowStockThreshold: e.target.value })
+                      }
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Min Order Qty
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={formData.minOrderQuantity}
+                      onChange={(e) =>
+                        setFormData({ ...formData, minOrderQuantity: e.target.value })
+                      }
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-6">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Product Image URL
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.image}
+                      onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                      placeholder="https://images.unsplash.com/..."
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Warranty / Guarantee
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.warranty}
+                      onChange={(e) => setFormData({ ...formData, warranty: e.target.value })}
+                      placeholder="e.g., 1 Year Warranty"
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Dispatch Location
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.location}
+                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      placeholder="e.g., Kandy Tech Park"
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-12">
+                    <label className="block text-xs font-semibold text-white/80 mb-1">
+                      Product Description *
+                    </label>
+                    <textarea
+                      rows="2"
+                      required
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      placeholder="Describe key features, greenhouse applications, and benefits..."
+                      className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 2: Technical & Agricultural Specifications */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Hardware / IoT Specs */}
+                <div className="rounded-2xl bg-sky-950/30 border border-sky-400/25 p-4 space-y-3">
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                    <Cpu className="w-4 h-4" />
+                    2A. Technical / Hardware Specs (Optional)
+                  </h4>
+
+                  <div>
+                    <label className="block text-[11px] text-white/70 mb-1">Operating Voltage</label>
+                    <input
+                      type="text"
+                      value={formData.voltage}
+                      onChange={(e) => setFormData({ ...formData, voltage: e.target.value })}
+                      placeholder="e.g., 12V DC or 5V - 24V DC"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-white/70 mb-1">Power Requirements</label>
+                    <input
+                      type="text"
+                      value={formData.powerRequirements}
+                      onChange={(e) =>
+                        setFormData({ ...formData, powerRequirements: e.target.value })
+                      }
+                      placeholder="e.g., 15W / 1.25A peak hold"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-white/70 mb-1">
+                      Communication Protocol
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.communicationProtocol}
+                      onChange={(e) =>
+                        setFormData({ ...formData, communicationProtocol: e.target.value })
+                      }
+                      placeholder="e.g., RS485 Modbus-RTU / Wi-Fi MQTT"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-white/70 mb-1">
+                      Supported Interfaces & Connectors
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.supportedInterfaces}
+                      onChange={(e) =>
+                        setFormData({ ...formData, supportedInterfaces: e.target.value })
+                      }
+                      placeholder="e.g., G 3/4 BSP Port, IP68 4-pin cable"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-white/70 mb-1">
+                      Compatibility Information
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.compatibility}
+                      onChange={(e) => setFormData({ ...formData, compatibility: e.target.value })}
+                      placeholder="e.g., SmartGrow Relay Node v2, ESP32"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs text-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Fertilizer / Seed / Bio-Input Specs */}
+                <div className="rounded-2xl bg-emerald-950/30 border border-emerald-400/25 p-4 space-y-3">
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
+                    <FlaskConical className="w-4 h-4" />
+                    2B. Composition & Usage Specs (Optional)
+                  </h4>
+
+                  <div>
+                    <label className="block text-[11px] text-white/70 mb-1">
+                      Chemical Composition / Seed Variety
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.composition}
+                      onChange={(e) => setFormData({ ...formData, composition: e.target.value })}
+                      placeholder="e.g., NPK 19-19-19 + Chelated Micro-nutrients"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-white/70 mb-1">Packaging Size</label>
+                    <input
+                      type="text"
+                      value={formData.packageSize}
+                      onChange={(e) => setFormData({ ...formData, packageSize: e.target.value })}
+                      placeholder="e.g., 5 kg moisture-lock foil bag"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-white/70 mb-1">
+                      Operating / Environmental Conditions
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.operatingConditions}
+                      onChange={(e) =>
+                        setFormData({ ...formData, operatingConditions: e.target.value })
+                      }
+                      placeholder="e.g., -10°C to +60°C, 0.02 - 0.8 MPa"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-white/70 mb-1">
+                      Application / Usage Instructions
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.applicationInstructions}
+                      onChange={(e) =>
+                        setFormData({ ...formData, applicationInstructions: e.target.value })
+                      }
+                      placeholder="e.g., Dissolve 1.5g - 2.0g per liter of water"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-white/70 mb-1">
+                      Safety & Storage Precautions
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.safetyPrecautions}
+                      onChange={(e) =>
+                        setFormData({ ...formData, safetyPrecautions: e.target.value })
+                      }
+                      placeholder="e.g., Store below 30°C in dry shade"
+                      className="w-full px-3 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Delivery Options & Visibility Flags */}
+              <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-black/25 border border-white/10 text-xs">
+                <div className="flex flex-wrap items-center gap-5">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.islandwideDelivery}
+                      onChange={(e) =>
+                        setFormData({ ...formData, islandwideDelivery: e.target.checked })
+                      }
+                      className="accent-sky-400"
+                    />
+                    <span>Islandwide Delivery Available</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.warehousePickup}
+                      onChange={(e) =>
+                        setFormData({ ...formData, warehousePickup: e.target.checked })
+                      }
+                      className="accent-sky-400"
+                    />
+                    <span>Warehouse Pickup Supported</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer text-amber-300 font-bold">
+                    <input
+                      type="checkbox"
+                      checked={formData.isFeatured}
+                      onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                      className="accent-amber-400"
+                    />
+                    <span>⭐ Highlight as Featured Supply</span>
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-white/60 font-semibold">Listing Status:</span>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    className="px-3 py-1.5 rounded-lg bg-black/40 border border-white/15 text-white font-bold"
+                  >
+                    <option value="active" className="bg-slate-900">
+                      Active (Public)
+                    </option>
+                    <option value="inactive" className="bg-slate-900">
+                      Inactive (Hidden)
+                    </option>
+                    <option value="draft" className="bg-slate-900">
+                      Draft
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsFormOpen(false)}
+                  className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs sm:text-sm font-extrabold flex items-center gap-2 shadow-lg cursor-pointer"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>
+                    {submitting
+                      ? 'Saving...'
+                      : editingId
+                      ? 'Save Supply Changes'
+                      : 'Publish Supply Listing'}
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Dialog for Destructive Delete Action (Section 3) */}
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+          onClick={() => setDeleteTarget(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-3xl bg-[#132a24] border border-red-400/40 p-6 text-white shadow-2xl space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 text-red-400">
+              <AlertTriangle className="w-7 h-7 shrink-0" />
+              <h4 className="text-lg font-extrabold text-white">Delete Supply Listing?</h4>
+            </div>
+            <p className="text-xs sm:text-sm text-white/75 leading-relaxed">
+              Are you sure you want to permanently remove{' '}
+              <span className="font-bold text-white">&ldquo;{deleteTarget.name}&rdquo;</span> from
+              your supplier catalog? This action cannot be undone.
+            </p>
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={handleConfirmDelete}
+                className="px-5 py-2 rounded-xl bg-red-500 hover:bg-red-400 text-white text-xs font-extrabold cursor-pointer"
+              >
+                {submitting ? 'Deleting...' : 'Yes, Delete Permanently'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SupplierProductManager;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import SupplyCard from './SupplyCard';
 import SupplyDetailsModal from './SupplyDetailsModal';
+import SupplierProductManager from './SupplierProductManager';
 import { getSupplyProducts, getSupplyFacets } from '../../services/api';
 import {
   Search,
@@ -299,8 +300,9 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
   const [sortBy, setSortBy] = useState('featured'); // 'featured' | 'newest' | 'priceAsc' | 'priceDesc'
   const [activeCollectionTab, setActiveCollectionTab] = useState('all'); // 'all' | 'featured' | 'newArrivals'
 
-  // Product Details Modal & Cart Preview Toast
+  // Product Details Modal, Supplier Studio View & Cart Preview Toast
   const [selectedSupply, setSelectedSupply] = useState(null);
+  const [isSupplierStudioOpen, setIsSupplierStudioOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [toastMessage, setToastMessage] = useState(null);
 
@@ -509,6 +511,17 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
 
   const totalBasketItems = cartItems.reduce((sum, item) => sum + item.cartQuantity, 0);
 
+  // If user is a supplier and opened the Supplier Studio Portal
+  if (isSupplierStudioOpen && currentUser?.role === 'supplier') {
+    return (
+      <SupplierProductManager
+        currentUser={currentUser}
+        onBackToMarketplace={() => setIsSupplierStudioOpen(false)}
+        onCatalogChanged={fetchSuppliesCatalog}
+      />
+    );
+  }
+
   return (
     <div className="space-y-8 pb-16">
       {/* Toast Notification */}
@@ -556,6 +569,17 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
                 {supplies.length} Products
               </span>
             </div>
+
+            {currentUser?.role === 'supplier' && (
+              <button
+                type="button"
+                onClick={() => setIsSupplierStudioOpen(true)}
+                className="px-5 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold text-xs sm:text-sm transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/25 cursor-pointer"
+              >
+                <Building2 className="w-4 h-4" />
+                <span>Supplier Studio</span>
+              </button>
+            )}
 
             <button
               onClick={() =>

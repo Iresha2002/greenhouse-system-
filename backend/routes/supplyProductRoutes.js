@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const SupplyProduct = require('../models/SupplyProduct');
+const { protect, authorizeRoles } = require('../middleware/authMiddleware');
 
 // Helper to escape user regex input safely
 const escapeRegex = (text = '') => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -186,7 +187,41 @@ router.get('/', async (req, res) => {
   }
 });
 
-// 3. GET SINGLE SUPPLY PRODUCT BY ID (PUBLIC)
+// ==========================================
+// SUPPLIER PORTAL PRODUCT MANAGEMENT APIS (PROTECTED)
+// ==========================================
+
+// 3. GET LOGGED-IN SUPPLIER'S OWN SUPPLY LISTINGS + DASHBOARD METRICS
+router.get('/supplier/my-supplies', protect, authorizeRoles('supplier'), async (req, res) => {
+  try {
+    const mySupplies = await SupplyProduct.find({ supplier: req.user._id }).sort({
+      createdAt: -1
+    });
+
+    const totalListed = mySupplies.length;
+    const activeCount = mySupplies.filter((s) => s.status === 'active').length;
+    const outOfStockCount = mySupplies.filter((s) => s.quantity <= 0).length;
+    const lowStockCount = mySupplies.filter(
+      (s) => s.quantity > 0 && s.quantity <= (s.lowStockThreshold || 5)
+    ).length;
+
+    res.json({
+      success: true,
+      count: totalListed,
+      metrics: {
+        totalListed,
+        activeCount,
+        outOfStockCount,
+        lowStockCount
+      },
+      data: mySupplies
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 4. GET SINGLE SUPPLY PRODUCT BY ID (PUBLIC)
 router.get('/:id', async (req, res) => {
   try {
     const supply = await SupplyProduct.findById(req.params.id);
@@ -199,6 +234,295 @@ router.get('/:id', async (req, res) => {
     });
   } catch (error) {
     res.status(400).json({ error: 'Invalid supply product ID format' });
+  }
+});
+
+// 5. CREATE NEW AGRICULTURAL SUPPLY LISTING (SUPPLIER ONLY)
+router.post('/', protect, authorizeRoles('supplier'), async (req, res) => {
+  try {
+    const {
+      name,
+      category,
+      brand,
+      model,
+      sku,
+      description,
+      images,
+      image,
+      price,
+      unit,
+      quantity,
+      lowStockThreshold,
+      minOrderQuantity,
+      location,
+      warranty,
+      specifications,
+      deliveryOptions,
+      isFeatured,
+      status
+    } = req.body;
+
+    if (!name || price === undefined || !unit || quantity === undefined) {
+      return res.status(400).json({
+        error: 'Missing required fields: name, price, unit, and quantity are mandatory'
+      });
+    }
+
+    if (category && !SupplyProduct.SUPPLY_CATEGORIES.includes(category)) {
+      return res.status(400).json({ error: `Invalid supply category: ${category}` });
+    }
+
+    const numPrice = Number(price);
+    const numQty = Number(quantity);
+    if (isNaN(numPrice) || numPrice <= 0) {
+      return res.status(400).json({ error: 'Unit price must be greater than zero' });
+    }
+    if (isNaN(numQty) || numQty < 0) {
+      return res.status(400).json({ error: 'Stock quantity cannot be negative' });
+    }
+
+    const imagesList = [];
+    if (Array.isArray(images) && images.length > 0) {
+      imagesList.push(...images.filter((img) => typeof img === 'string' && img.trim()));
+    } else if (image && typeof image === 'string' && image.trim()) {
+      imagesList.push(image.trim());
+    }
+
+    const supply = new SupplyProduct({
+      name: name.trim(),
+      category: category || 'Fertilizers',
+      brand: brand ? brand.trim() : '',
+      model: model ? model.trim() : '',
+      sku: sku ? sku.trim() : '',
+      description: description
+        ? description.trim()
+        : 'Commercial agricultural supply for SmartGrow greenhouse operations.',
+      images: imagesList,
+      price: numPrice,
+      unit: unit.trim(),
+      quantity: numQty,
+      lowStockThreshold: lowStockThreshold !== undefined ? Number(lowStockThreshold) : 5,
+      minOrderQuantity: minOrderQuantity !== undefined ? Math.max(1, Number(minOrderQuantity)) : 1,
+      supplier: req.user._id,
+      supplierName: req.user.username,
+      location: location && location.trim() ? location.trim() : req.user.location,
+      warranty: warranty ? warranty.trim() : '',
+      specifications: {
+        composition: specifications?.composition?.trim() || '',
+        packageSize: specifications?.packageSize?.trim() || '',
+        voltage: specifications?.voltage?.trim() || '',
+        powerRequirements: specifications?.powerRequirements?.trim() || '',
+        communicationProtocol: specifications?.communicationProtocol?.trim() || '',
+        supportedInterfaces: specifications?.supportedInterfaces?.trim() || '',
+        operatingConditions: specifications?.operatingConditions?.trim() || '',
+        compatibility: specifications?.compatibility?.trim() || '',
+        applicationInstructions: specifications?.applicationInstructions?.trim() || '',
+        safetyPrecautions: specifications?.safetyPrecautions?.trim() || ''
+      },
+      deliveryOptions: deliveryOptions || {
+        islandwideDelivery: true,
+        warehousePickup: true
+      },
+      isFeatured: Boolean(isFeatured),
+      status: status && ['active', 'inactive', 'draft'].includes(status) ? status : 'active'
+    });
+
+    const savedSupply = await supply.save();
+    res.status(201).json({
+      success: true,
+      message: 'Agricultural supply product listed successfully',
+      data: savedSupply
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// 6. UPDATE EXISTING SUPPLY LISTING (SUPPLIER ONLY - STRICT OWNERSHIP ENFORCED)
+router.put('/:id', protect, authorizeRoles('supplier'), async (req, res) => {
+  try {
+    const supply = await SupplyProduct.findById(req.params.id);
+    if (!supply) {
+      return res.status(404).json({ error: 'Agricultural supply product not found' });
+    }
+
+    if (supply.supplier.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        error: "Forbidden: You do not have permission to edit another supplier's product listing"
+      });
+    }
+
+    const {
+      name,
+      category,
+      brand,
+      model,
+      sku,
+      description,
+      images,
+      image,
+      price,
+      unit,
+      quantity,
+      lowStockThreshold,
+      minOrderQuantity,
+      location,
+      warranty,
+      specifications,
+      deliveryOptions,
+      isFeatured,
+      status
+    } = req.body;
+
+    if (name !== undefined) supply.name = name.trim();
+    if (category !== undefined) {
+      if (!SupplyProduct.SUPPLY_CATEGORIES.includes(category)) {
+        return res.status(400).json({ error: `Invalid supply category: ${category}` });
+      }
+      supply.category = category;
+    }
+    if (brand !== undefined) supply.brand = brand.trim();
+    if (model !== undefined) supply.model = model.trim();
+    if (sku !== undefined) supply.sku = sku.trim();
+    if (description !== undefined) supply.description = description.trim();
+    if (price !== undefined) {
+      const numPrice = Number(price);
+      if (isNaN(numPrice) || numPrice <= 0) {
+        return res.status(400).json({ error: 'Unit price must be greater than zero' });
+      }
+      supply.price = numPrice;
+    }
+    if (unit !== undefined) supply.unit = unit.trim();
+    if (quantity !== undefined) {
+      const numQty = Number(quantity);
+      if (isNaN(numQty) || numQty < 0) {
+        return res.status(400).json({ error: 'Stock quantity cannot be negative' });
+      }
+      supply.quantity = numQty;
+    }
+    if (lowStockThreshold !== undefined) supply.lowStockThreshold = Number(lowStockThreshold);
+    if (minOrderQuantity !== undefined) {
+      supply.minOrderQuantity = Math.max(1, Number(minOrderQuantity));
+    }
+    if (location !== undefined) supply.location = location.trim();
+    if (warranty !== undefined) supply.warranty = warranty.trim();
+    if (isFeatured !== undefined) supply.isFeatured = Boolean(isFeatured);
+    if (status && ['active', 'inactive', 'draft'].includes(status)) {
+      supply.status = status;
+    }
+    if (deliveryOptions) {
+      supply.deliveryOptions = {
+        islandwideDelivery: Boolean(deliveryOptions.islandwideDelivery),
+        warehousePickup: Boolean(deliveryOptions.warehousePickup)
+      };
+    }
+    if (specifications) {
+      supply.specifications = {
+        composition: specifications.composition?.trim() ?? supply.specifications?.composition ?? '',
+        packageSize: specifications.packageSize?.trim() ?? supply.specifications?.packageSize ?? '',
+        voltage: specifications.voltage?.trim() ?? supply.specifications?.voltage ?? '',
+        powerRequirements:
+          specifications.powerRequirements?.trim() ?? supply.specifications?.powerRequirements ?? '',
+        communicationProtocol:
+          specifications.communicationProtocol?.trim() ??
+          supply.specifications?.communicationProtocol ??
+          '',
+        supportedInterfaces:
+          specifications.supportedInterfaces?.trim() ??
+          supply.specifications?.supportedInterfaces ??
+          '',
+        operatingConditions:
+          specifications.operatingConditions?.trim() ??
+          supply.specifications?.operatingConditions ??
+          '',
+        compatibility:
+          specifications.compatibility?.trim() ?? supply.specifications?.compatibility ?? '',
+        applicationInstructions:
+          specifications.applicationInstructions?.trim() ??
+          supply.specifications?.applicationInstructions ??
+          '',
+        safetyPrecautions:
+          specifications.safetyPrecautions?.trim() ??
+          supply.specifications?.safetyPrecautions ??
+          ''
+      };
+    }
+
+    if (Array.isArray(images)) {
+      supply.images = images.filter((img) => typeof img === 'string' && img.trim());
+    } else if (image !== undefined) {
+      supply.images = image && image.trim() ? [image.trim()] : [];
+    }
+
+    supply.updatedAt = Date.now();
+    const updated = await supply.save();
+
+    res.json({
+      success: true,
+      message: 'Supply product updated successfully',
+      data: updated
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// 7. TOGGLE LISTING STATUS (ACTIVE / INACTIVE / DRAFT) (SUPPLIER ONLY - OWNERSHIP ENFORCED)
+router.patch('/:id/status', protect, authorizeRoles('supplier'), async (req, res) => {
+  try {
+    const supply = await SupplyProduct.findById(req.params.id);
+    if (!supply) {
+      return res.status(404).json({ error: 'Agricultural supply product not found' });
+    }
+
+    if (supply.supplier.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        error: "Forbidden: You do not have permission to change another supplier's listing status"
+      });
+    }
+
+    const { status } = req.body;
+    if (!status || !['active', 'inactive', 'draft'].includes(status)) {
+      return res
+        .status(400)
+        .json({ error: 'Invalid status. Must be active, inactive, or draft' });
+    }
+
+    supply.status = status;
+    supply.updatedAt = Date.now();
+    await supply.save();
+
+    res.json({
+      success: true,
+      message: `Supply listing status updated to ${status}`,
+      data: supply
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// 8. DELETE SUPPLY PRODUCT LISTING (SUPPLIER ONLY - OWNERSHIP ENFORCED)
+router.delete('/:id', protect, authorizeRoles('supplier'), async (req, res) => {
+  try {
+    const supply = await SupplyProduct.findById(req.params.id);
+    if (!supply) {
+      return res.status(404).json({ error: 'Agricultural supply product not found' });
+    }
+
+    if (supply.supplier.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        error: "Forbidden: You do not have permission to delete another supplier's listing"
+      });
+    }
+
+    await SupplyProduct.findByIdAndDelete(req.params.id);
+    res.json({
+      success: true,
+      message: 'Supply product listing deleted permanently'
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
