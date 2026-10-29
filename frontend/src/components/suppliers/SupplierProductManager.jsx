@@ -20,6 +20,13 @@ import {
   ShieldCheck,
   Layers,
   Tag,
+  Truck,
+  ClipboardList,
+  DollarSign,
+  Clock,
+  MapPin,
+  Phone,
+  User,
 } from 'lucide-react';
 import {
   getMySupplyProducts,
@@ -28,6 +35,8 @@ import {
   toggleSupplyProductStatus,
   deleteSupplyProduct,
   updateSupplyProductStock,
+  getSupplierIncomingOrders,
+  updateSupplierOrderStatus,
 } from '../../services/api';
 
 const CATEGORIES = [
@@ -103,6 +112,19 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
   const [thresholdEditValue, setThresholdEditValue] = useState('');
   const [stockUpdatingId, setStockUpdatingId] = useState(null);
 
+  // Stage 9: Supplier Portal Tab ('catalog' | 'orders') & Order Fulfilment State
+  const [portalTab, setPortalTab] = useState('catalog');
+  const [supplierOrders, setSupplierOrders] = useState([]);
+  const [orderMetrics, setOrderMetrics] = useState({
+    totalOrders: 0,
+    pendingOrders: 0,
+    activeOrders: 0,
+    completedOrders: 0,
+    totalRevenue: 0,
+  });
+  const [orderFilter, setOrderFilter] = useState('all');
+  const [updatingOrderId, setUpdatingOrderId] = useState(null);
+
   const notifySuccess = (msg) => {
     setSuccessMsg(msg);
     setTimeout(() => setSuccessMsg(''), 3500);
@@ -112,10 +134,19 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
     setLoading(true);
     setErrorMsg('');
     try {
-      const res = await getMySupplyProducts();
-      if (res && res.success) {
-        setMySupplies(res.data || []);
-        if (res.metrics) setMetrics(res.metrics);
+      const [suppliesRes, ordersRes] = await Promise.all([
+        getMySupplyProducts(),
+        getSupplierIncomingOrders().catch(() => null),
+      ]);
+
+      if (suppliesRes && suppliesRes.success) {
+        setMySupplies(suppliesRes.data || []);
+        if (suppliesRes.metrics) setMetrics(suppliesRes.metrics);
+      }
+
+      if (ordersRes && ordersRes.success) {
+        setSupplierOrders(ordersRes.orders || []);
+        if (ordersRes.metrics) setOrderMetrics(ordersRes.metrics);
       }
     } catch (err) {
       setErrorMsg(
@@ -304,10 +335,42 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
     setThresholdEditValue(String(supply.lowStockThreshold ?? 5));
   };
 
+  // Stage 9: Supplier Order Fulfilment & Status Lifecycle Update
+  const handleUpdateOrderStatus = async (orderId, nextStatus, statusLabel) => {
+    setUpdatingOrderId(orderId);
+    setErrorMsg('');
+    try {
+      const res = await updateSupplierOrderStatus(orderId, { status: nextStatus });
+      notifySuccess(res.message || `Order updated to "${statusLabel}".`);
+      await fetchSupplierData();
+      if (onCatalogChanged) onCatalogChanged();
+    } catch (err) {
+      setErrorMsg(
+        err.response?.data?.error || `Failed to update order status to "${statusLabel}".`
+      );
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
+
   const filteredSupplierItems = mySupplies.filter((item) => {
     if (stockFilter === 'outOfStock') return item.quantity <= 0;
     if (stockFilter === 'lowStock') {
       return item.quantity > 0 && item.quantity <= (item.lowStockThreshold || 5);
+    }
+    return true;
+  });
+
+  const filteredSupplierOrders = supplierOrders.filter((ord) => {
+    if (orderFilter === 'pending') return ord.supplierStatus === 'pending';
+    if (orderFilter === 'active') {
+      return ['accepted', 'preparing', 'ready_for_dispatch', 'dispatched'].includes(
+        ord.supplierStatus
+      );
+    }
+    if (orderFilter === 'completed') return ord.supplierStatus === 'delivered';
+    if (orderFilter === 'cancelled') {
+      return ['cancelled', 'rejected'].includes(ord.supplierStatus);
     }
     return true;
   });
@@ -401,6 +464,108 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
           <p className="text-3xl font-extrabold text-red-300">{metrics.outOfStockCount}</p>
           <span className="text-[11px] text-white/50">Requires restocking</span>
         </div>
+
+        {/* Stage 9: Order Fulfilment & Sales KPI Row */}
+        <div
+          onClick={() => {
+            setPortalTab('orders');
+            setOrderFilter('pending');
+          }}
+          className="rounded-2xl bg-white/[0.07] border border-amber-400/30 p-5 backdrop-blur-xl cursor-pointer hover:bg-white/[0.11] transition-all"
+        >
+          <div className="flex items-center justify-between text-amber-300/80 text-xs font-bold uppercase mb-1">
+            <span>Pending Orders</span>
+            <Clock className="w-4 h-4 text-amber-400" />
+          </div>
+          <p className="text-3xl font-extrabold text-amber-300">{orderMetrics.pendingOrders}</p>
+          <span className="text-[11px] text-white/50">Awaiting supplier acceptance</span>
+        </div>
+
+        <div
+          onClick={() => {
+            setPortalTab('orders');
+            setOrderFilter('active');
+          }}
+          className="rounded-2xl bg-white/[0.07] border border-sky-400/30 p-5 backdrop-blur-xl cursor-pointer hover:bg-white/[0.11] transition-all"
+        >
+          <div className="flex items-center justify-between text-sky-300/80 text-xs font-bold uppercase mb-1">
+            <span>Active Fulfilment</span>
+            <Truck className="w-4 h-4 text-sky-400" />
+          </div>
+          <p className="text-3xl font-extrabold text-sky-300">{orderMetrics.activeOrders}</p>
+          <span className="text-[11px] text-white/50">Accepted / Preparing / Dispatched</span>
+        </div>
+
+        <div
+          onClick={() => {
+            setPortalTab('orders');
+            setOrderFilter('completed');
+          }}
+          className="rounded-2xl bg-white/[0.07] border border-emerald-400/30 p-5 backdrop-blur-xl cursor-pointer hover:bg-white/[0.11] transition-all"
+        >
+          <div className="flex items-center justify-between text-emerald-300/80 text-xs font-bold uppercase mb-1">
+            <span>Completed Orders</span>
+            <ClipboardList className="w-4 h-4 text-emerald-400" />
+          </div>
+          <p className="text-3xl font-extrabold text-emerald-300">{orderMetrics.completedOrders}</p>
+          <span className="text-[11px] text-white/50">Successfully delivered</span>
+        </div>
+
+        <div className="rounded-2xl bg-white/[0.07] border border-emerald-400/35 p-5 backdrop-blur-xl">
+          <div className="flex items-center justify-between text-emerald-300/80 text-xs font-bold uppercase mb-1">
+            <span>Delivered Revenue</span>
+            <DollarSign className="w-4 h-4 text-emerald-400" />
+          </div>
+          <p className="text-3xl font-extrabold text-emerald-300">
+            ${Number(orderMetrics.totalRevenue || 0).toFixed(2)}
+          </p>
+          <span className="text-[11px] text-white/50">Verified supplier sales total</span>
+        </div>
+      </div>
+
+      {/* Stage 9: Supplier Portal Section Switcher Tabs */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/15 pb-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setPortalTab('catalog')}
+            className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all cursor-pointer ${
+              portalTab === 'catalog'
+                ? 'bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/25'
+                : 'bg-white/10 hover:bg-white/20 text-white/80'
+            }`}
+          >
+            <Package className="w-4 h-4" />
+            <span>Supply Catalog & Inventory ({mySupplies.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPortalTab('orders')}
+            className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all cursor-pointer ${
+              portalTab === 'orders'
+                ? 'bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-400/25'
+                : 'bg-white/10 hover:bg-white/20 text-white/80'
+            }`}
+          >
+            <Truck className="w-4 h-4" />
+            <span>Incoming Supply Orders ({orderMetrics.totalOrders})</span>
+            {orderMetrics.pendingOrders > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black">
+                {orderMetrics.pendingOrders} New
+              </span>
+            )}
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={fetchSupplierData}
+          className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-sky-400' : ''}`} />
+          <span>Sync Live Data</span>
+        </button>
       </div>
 
       {errorMsg && !isFormOpen && (
@@ -410,7 +575,7 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
       )}
 
       {/* Stage 6: Low-Stock & Out-of-Stock Alert Banner */}
-      {lowOrOutItems.length > 0 && (
+      {portalTab === 'catalog' && lowOrOutItems.length > 0 && (
         <div className="rounded-3xl bg-amber-500/10 border border-amber-400/35 p-5 backdrop-blur-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-6 h-6 text-amber-400 shrink-0 mt-0.5" />
@@ -450,8 +615,303 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
         </div>
       )}
 
-      {/* Supplier Product Listings Table */}
-      <div className="rounded-3xl bg-white/[0.07] border border-white/15 backdrop-blur-xl overflow-hidden shadow-2xl">
+      {/* TAB 2 (Stage 9): Incoming Supply Orders & Fulfilment Lifecycle */}
+      {portalTab === 'orders' ? (
+        <div className="rounded-3xl bg-white/[0.07] border border-white/15 backdrop-blur-xl overflow-hidden shadow-2xl">
+          <div className="p-5 border-b border-white/10 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h3 className="text-base sm:text-lg font-extrabold text-white">
+                Incoming Customer Supply Orders ({filteredSupplierOrders.length})
+              </h3>
+              <p className="text-xs text-white/60">
+                Manage order acceptance, warehouse preparation, islandwide dispatch, and final delivery confirmation for items supplied by {currentUser?.username}.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { id: 'all', label: `All (${supplierOrders.length})` },
+                { id: 'pending', label: `Pending (${orderMetrics.pendingOrders})` },
+                { id: 'active', label: `Active (${orderMetrics.activeOrders})` },
+                { id: 'completed', label: `Delivered (${orderMetrics.completedOrders})` },
+                { id: 'cancelled', label: 'Cancelled / Rejected' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setOrderFilter(tab.id)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    orderFilter === tab.id
+                      ? 'bg-emerald-400 text-slate-950 font-extrabold'
+                      : 'bg-white/10 hover:bg-white/20 text-white/75'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="p-14 text-center">
+              <div className="w-9 h-9 border-4 border-emerald-400/20 border-t-emerald-400 rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-xs font-bold text-emerald-300">Loading incoming supply orders...</p>
+            </div>
+          ) : filteredSupplierOrders.length === 0 ? (
+            <div className="p-12 text-center space-y-3">
+              <Truck className="w-12 h-12 text-emerald-400/60 mx-auto" />
+              <h4 className="text-lg font-bold text-white">No Incoming Supply Orders Found</h4>
+              <p className="text-xs text-white/60 max-w-md mx-auto">
+                When farmers or greenhouse operators purchase your agricultural supplies, their orders and delivery addresses will appear here for fulfilment.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-white/10">
+              {filteredSupplierOrders.map((order) => {
+                const status = order.supplierStatus || order.orderStatus || 'pending';
+                const isUpdating = updatingOrderId === order._id;
+
+                const statusStyles = {
+                  pending: 'bg-amber-500/20 border-amber-400/40 text-amber-300',
+                  accepted: 'bg-sky-500/20 border-sky-400/40 text-sky-300',
+                  preparing: 'bg-indigo-500/20 border-indigo-400/40 text-indigo-300',
+                  ready_for_dispatch: 'bg-purple-500/20 border-purple-400/40 text-purple-300',
+                  dispatched: 'bg-cyan-500/20 border-cyan-400/40 text-cyan-300',
+                  delivered: 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300',
+                  cancelled: 'bg-red-500/20 border-red-400/40 text-red-300',
+                  rejected: 'bg-red-500/20 border-red-400/40 text-red-300',
+                };
+
+                const statusLabels = {
+                  pending: 'Pending Acceptance',
+                  accepted: 'Accepted',
+                  preparing: 'Preparing in Warehouse',
+                  ready_for_dispatch: 'Ready for Dispatch / Pickup',
+                  dispatched: 'Dispatched / Out for Delivery',
+                  delivered: 'Delivered & Completed',
+                  cancelled: 'Cancelled by Customer',
+                  rejected: 'Rejected by Supplier',
+                };
+
+                return (
+                  <div key={order._id} className="p-5 sm:p-6 hover:bg-white/[0.03] transition-colors space-y-4">
+                    {/* Top Row: Order Number, Date, Fulfilment Status, Supplier Revenue */}
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className="px-3 py-1 rounded-xl bg-black/40 border border-white/15 font-mono text-xs sm:text-sm font-extrabold text-emerald-300">
+                          {order.orderNumber}
+                        </span>
+                        <span className="text-xs text-white/60">
+                          Placed {new Date(order.createdAt).toLocaleString()}
+                        </span>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-extrabold border ${
+                            statusStyles[status] || statusStyles.pending
+                          }`}
+                        >
+                          {statusLabels[status] || status}
+                        </span>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-[11px] text-white/50 block">Your Supplier Allocation</span>
+                        <span className="text-lg font-extrabold text-emerald-300">
+                          ${Number(order.supplierSubtotal || 0).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Middle Grid: Customer Delivery Info + Ordered Items for this Supplier */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                      {/* Customer & Delivery Details */}
+                      <div className="lg:col-span-5 rounded-2xl bg-black/30 border border-white/10 p-4 space-y-2 text-xs">
+                        <p className="text-[11px] font-extrabold uppercase tracking-wider text-sky-300 mb-1">
+                          Customer & Fulfilment Details
+                        </p>
+                        <div className="flex items-center gap-2 text-white/90 font-semibold">
+                          <User className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                          <span>{order.customerInfo?.name || order.customerName || 'Customer'}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-white/80">
+                          <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <span>{order.customerInfo?.phone || order.contactPhone || 'N/A'}</span>
+                        </div>
+                        <div className="flex items-start gap-2 text-white/80">
+                          <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                          <span>
+                            {order.fulfillmentMethod === 'pickup' ||
+                            order.deliveryMethod === 'warehouse_pickup'
+                              ? `Warehouse Collection (${order.customerInfo?.district || order.district || ''})`
+                              : `${order.customerInfo?.address || order.deliveryAddress || ''}, ${
+                                  order.customerInfo?.district || order.district || ''
+                                }`}
+                          </span>
+                        </div>
+                        <div className="pt-1 flex flex-wrap items-center gap-2 text-[11px]">
+                          <span className="px-2.5 py-0.5 rounded-lg bg-white/10 text-white/80 font-semibold">
+                            {order.fulfillmentMethod === 'pickup' ||
+                            order.deliveryMethod === 'warehouse_pickup'
+                              ? '🏢 Warehouse Pickup'
+                              : '🚚 Islandwide Delivery'}
+                          </span>
+                          <span className="px-2.5 py-0.5 rounded-lg bg-white/10 text-white/80 font-semibold">
+                            💳{' '}
+                            {order.paymentMethod === 'pay_on_pickup' ||
+                            order.paymentMethod === 'pay_on_collection'
+                              ? 'Pay on Collection'
+                              : 'Cash on Delivery'}
+                          </span>
+                        </div>
+                        {(order.customerInfo?.notes || order.notes) && (
+                          <p className="text-[11px] text-amber-200/90 bg-amber-500/10 border border-amber-400/20 rounded-xl p-2 mt-2">
+                            <strong>Note:</strong> {order.customerInfo?.notes || order.notes}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Ordered Items Owned by This Supplier */}
+                      <div className="lg:col-span-7 rounded-2xl bg-black/30 border border-white/10 p-4 space-y-2.5">
+                        <p className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-300">
+                          Items Ordered From Your Catalog ({(order.myItems || []).length})
+                        </p>
+                        <div className="divide-y divide-white/10">
+                          {(order.myItems || []).map((item, idx) => (
+                            <div key={idx} className="py-2 flex items-center justify-between gap-3 text-xs">
+                              <div className="flex items-center gap-3 min-w-0">
+                                {item.image ? (
+                                  <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="w-10 h-10 rounded-lg object-cover border border-white/10 shrink-0"
+                                  />
+                                ) : (
+                                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                                    📦
+                                  </div>
+                                )}
+                                <div className="min-w-0">
+                                  <p className="font-bold text-white truncate">{item.name}</p>
+                                  <p className="text-[11px] text-white/60">
+                                    {item.category} • ${Number(item.price || item.unitPrice || 0).toFixed(2)} / {item.unit}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 font-extrabold">
+                                  Qty: {item.quantity} {item.unit}
+                                </span>
+                                <p className="text-xs font-extrabold text-white mt-1">
+                                  ${Number(item.itemTotal || item.lineTotal || (item.price || 0) * item.quantity).toFixed(2)}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom Action Bar: Order Status Lifecycle Transitions */}
+                    {status !== 'cancelled' && status !== 'rejected' && status !== 'delivered' && (
+                      <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
+                        <span className="text-xs text-white/60">
+                          Update Fulfilment Stage:
+                        </span>
+
+                        <div className="flex flex-wrap items-center gap-2">
+                          {status === 'pending' && (
+                            <>
+                              <button
+                                type="button"
+                                disabled={isUpdating}
+                                onClick={() =>
+                                  handleUpdateOrderStatus(order._id, 'accepted', 'Accepted')
+                                }
+                                className="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-40 text-slate-950 text-xs font-extrabold cursor-pointer transition-all"
+                              >
+                                ✓ Accept Order
+                              </button>
+                              <button
+                                type="button"
+                                disabled={isUpdating}
+                                onClick={() =>
+                                  handleUpdateOrderStatus(order._id, 'rejected', 'Rejected')
+                                }
+                                className="px-3.5 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/35 border border-red-400/40 disabled:opacity-40 text-red-300 text-xs font-bold cursor-pointer transition-all"
+                              >
+                                ✕ Reject & Restore Stock
+                              </button>
+                            </>
+                          )}
+
+                          {(status === 'accepted' || status === 'pending') && (
+                            <button
+                              type="button"
+                              disabled={isUpdating}
+                              onClick={() =>
+                                handleUpdateOrderStatus(order._id, 'preparing', 'Preparing')
+                              }
+                              className="px-3.5 py-2 rounded-xl bg-indigo-500/25 hover:bg-indigo-500/40 border border-indigo-400/40 disabled:opacity-40 text-indigo-200 text-xs font-bold cursor-pointer transition-all"
+                            >
+                              ⚙️ Mark Preparing
+                            </button>
+                          )}
+
+                          {(status === 'accepted' || status === 'preparing') && (
+                            <button
+                              type="button"
+                              disabled={isUpdating}
+                              onClick={() =>
+                                handleUpdateOrderStatus(
+                                  order._id,
+                                  'ready_for_dispatch',
+                                  'Ready for Dispatch'
+                                )
+                              }
+                              className="px-3.5 py-2 rounded-xl bg-purple-500/25 hover:bg-purple-500/40 border border-purple-400/40 disabled:opacity-40 text-purple-200 text-xs font-bold cursor-pointer transition-all"
+                            >
+                              📦 Ready for Dispatch
+                            </button>
+                          )}
+
+                          {(status === 'accepted' ||
+                            status === 'preparing' ||
+                            status === 'ready_for_dispatch') && (
+                            <button
+                              type="button"
+                              disabled={isUpdating}
+                              onClick={() =>
+                                handleUpdateOrderStatus(order._id, 'dispatched', 'Dispatched')
+                              }
+                              className="px-3.5 py-2 rounded-xl bg-cyan-500/25 hover:bg-cyan-500/40 border border-cyan-400/40 disabled:opacity-40 text-cyan-200 text-xs font-bold cursor-pointer transition-all"
+                            >
+                              🚚 Mark Dispatched
+                            </button>
+                          )}
+
+                          {(status === 'ready_for_dispatch' || status === 'dispatched') && (
+                            <button
+                              type="button"
+                              disabled={isUpdating}
+                              onClick={() =>
+                                handleUpdateOrderStatus(order._id, 'delivered', 'Delivered')
+                              }
+                              className="px-4 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 disabled:opacity-40 text-slate-950 text-xs font-extrabold cursor-pointer shadow-lg shadow-emerald-500/20 transition-all"
+                            >
+                              ✓ Confirm Delivered
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* TAB 1: Supplier Product Listings Table */
+        <div className="rounded-3xl bg-white/[0.07] border border-white/15 backdrop-blur-xl overflow-hidden shadow-2xl">
         <div className="p-5 border-b border-white/10 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h3 className="text-base sm:text-lg font-extrabold text-white">
@@ -736,7 +1196,8 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
             </table>
           </div>
         )}
-      </div>
+        </div>
+      )}
 
       {/* Create / Edit Supply Product Modal */}
       {isFormOpen && (

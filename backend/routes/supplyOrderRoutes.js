@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const SupplyOrder = require('../models/SupplyOrder');
 const SupplyProduct = require('../models/SupplyProduct');
 const User = require('../models/User');
+const { protect, authorizeRoles } = require('../middleware/authMiddleware');
 
 // Helper to optionally resolve authenticated user from Bearer token
 const getOptionalUser = async (req) => {
@@ -258,7 +259,199 @@ router.post('/', async (req, res) => {
   }
 });
 
-// 2. GET /api/supply-orders/my-orders — Retrieve Customer's Own Supply Orders
+// 2. GET /api/supply-orders/supplier/my-orders — Get Supplier's Incoming Orders & Sales Analytics
+router.get(
+  '/supplier/my-orders',
+  protect,
+  authorizeRoles('supplier'),
+  async (req, res) => {
+    try {
+      const supplierId = req.user._id;
+      const { status } = req.query;
+
+      const allSupplierOrders = await SupplyOrder.find({
+        'items.supplier': supplierId
+      }).sort({ createdAt: -1 });
+
+      let totalRevenue = 0;
+      let pendingOrdersCount = 0;
+      let activeOrdersCount = 0;
+      let completedOrdersCount = 0;
+
+      const formattedOrders = allSupplierOrders.map((order) => {
+        const myItems = order.items.filter(
+          (item) => item.supplier.toString() === supplierId.toString()
+        );
+
+        const supplierSubtotal = myItems.reduce(
+          (acc, it) => acc + (it.itemTotal || it.price * it.quantity),
+          0
+        );
+
+        const myStatus = myItems[0]?.supplierStatus || order.orderStatus;
+
+        if (myStatus === 'pending') {
+          pendingOrdersCount++;
+        } else if (
+          ['accepted', 'preparing', 'ready_for_dispatch', 'dispatched'].includes(myStatus)
+        ) {
+          activeOrdersCount++;
+        } else if (myStatus === 'delivered') {
+          completedOrdersCount++;
+          totalRevenue += supplierSubtotal;
+        }
+
+        return {
+          _id: order._id,
+          orderNumber: order.orderNumber,
+          customerInfo: order.customerInfo,
+          fulfillmentMethod: order.fulfillmentMethod,
+          paymentMethod: order.paymentMethod,
+          paymentStatus: order.paymentStatus,
+          orderStatus: order.orderStatus,
+          supplierStatus: myStatus,
+          createdAt: order.createdAt,
+          statusHistory: order.statusHistory,
+          myItems,
+          supplierSubtotal: parseFloat(supplierSubtotal.toFixed(2)),
+          totalOrderAmount: order.total
+        };
+      });
+
+      let filteredOrders = formattedOrders;
+      if (status && status !== 'all') {
+        filteredOrders = formattedOrders.filter((o) => o.supplierStatus === status);
+      }
+
+      return res.status(200).json({
+        success: true,
+        metrics: {
+          totalOrders: formattedOrders.length,
+          pendingOrders: pendingOrdersCount,
+          activeOrders: activeOrdersCount,
+          completedOrders: completedOrdersCount,
+          totalRevenue: parseFloat(totalRevenue.toFixed(2))
+        },
+        count: filteredOrders.length,
+        orders: filteredOrders
+      });
+    } catch (error) {
+      console.error('Get supplier orders error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve supplier incoming orders'
+      });
+    }
+  }
+);
+
+// 2B. PATCH /api/supply-orders/:id/supplier-status — Supplier Updates Order Fulfilment Status
+router.patch(
+  '/:id/supplier-status',
+  protect,
+  authorizeRoles('supplier'),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status: nextStatus, note } = req.body;
+      const supplierId = req.user._id;
+
+      const allowedTransitions = [
+        'accepted',
+        'preparing',
+        'ready_for_dispatch',
+        'dispatched',
+        'delivered',
+        'rejected'
+      ];
+
+      if (!allowedTransitions.includes(nextStatus)) {
+        return res.status(400).json({
+          success: false,
+          error: `Invalid supplier status transition: "${nextStatus}"`
+        });
+      }
+
+      const order = await SupplyOrder.findById(id);
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          error: 'Supply order not found'
+        });
+      }
+
+      if (order.orderStatus === 'cancelled') {
+        return res.status(400).json({
+          success: false,
+          error: 'Cannot update an order that has already been cancelled'
+        });
+      }
+
+      const supplierItems = order.items.filter(
+        (item) => item.supplier.toString() === supplierId.toString()
+      );
+
+      if (supplierItems.length === 0) {
+        return res.status(403).json({
+          success: false,
+          error: 'Forbidden: You do not have any supply items in this order'
+        });
+      }
+
+      // If supplier rejects their items, restore warehouse stock for those items
+      if (nextStatus === 'rejected') {
+        for (const item of supplierItems) {
+          if (item.supply && item.supplierStatus !== 'rejected') {
+            await SupplyProduct.findByIdAndUpdate(item.supply, {
+              $inc: { quantity: item.quantity },
+              $set: { updatedAt: Date.now() }
+            });
+          }
+        }
+      }
+
+      // Update supplierStatus on items owned by this supplier
+      order.items.forEach((item) => {
+        if (item.supplier.toString() === supplierId.toString()) {
+          item.supplierStatus = nextStatus;
+        }
+      });
+
+      // Synchronize overall orderStatus
+      order.orderStatus = nextStatus;
+      if (nextStatus === 'delivered') {
+        order.paymentStatus = 'paid';
+      }
+
+      order.statusHistory.push({
+        status: nextStatus,
+        changedAt: new Date(),
+        note:
+          note ||
+          `Fulfilment status updated to "${nextStatus}" by supplier ${
+            req.user.username || ''
+          }`
+      });
+
+      order.updatedAt = Date.now();
+      const updatedOrder = await order.save();
+
+      return res.status(200).json({
+        success: true,
+        message: `Supply order status updated to "${nextStatus}"`,
+        order: updatedOrder
+      });
+    } catch (error) {
+      console.error('Update supplier order status error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to update supplier order status'
+      });
+    }
+  }
+);
+
+// 3. GET /api/supply-orders/my-orders — Retrieve Customer's Own Supply Orders
 router.get('/my-orders', async (req, res) => {
   try {
     const user = await getOptionalUser(req);

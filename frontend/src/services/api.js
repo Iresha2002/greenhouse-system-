@@ -214,3 +214,18 @@ export const cancelSupplyOrder = async (id, reason) => {
     const response = await axios.patch(`${API_URL}/supply-orders/${id}/cancel`, { reason }, getAuthHeaders());
     return response.data;
 };
+
+// 15. Supplier Order Fulfilment & Lifecycle APIs (Protected - Supplier Role Only)
+export const getSupplierIncomingOrders = async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const url = query
+        ? `${API_URL}/supply-orders/supplier/my-orders?${query}`
+        : `${API_URL}/supply-orders/supplier/my-orders`;
+    const response = await axios.get(url, getAuthHeaders());
+    return response.data;
+};
+
+export const updateSupplierOrderStatus = async (id, data) => {
+    const response = await axios.patch(`${API_URL}/supply-orders/${id}/supplier-status`, data, getAuthHeaders());
+    return response.data;
+};
