@@ -191,3 +191,26 @@ export const calculateSuppliesCart = async (items, deliveryMethod = 'delivery') 
     const response = await axios.post(`${API_URL}/cart/calculate-supplies`, { items, deliveryMethod });
     return response.data;
 };
+
+// 14. Agricultural Supply Orders APIs (Create, Customer History & Cancellation)
+export const createSupplyOrder = async (orderData) => {
+    const response = await axios.post(`${API_URL}/supply-orders`, orderData, getAuthHeaders());
+    return response.data;
+};
+
+export const getMySupplyOrders = async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const url = query ? `${API_URL}/supply-orders/my-orders?${query}` : `${API_URL}/supply-orders/my-orders`;
+    const response = await axios.get(url, getAuthHeaders());
+    return response.data;
+};
+
+export const getSupplyOrderById = async (id) => {
+    const response = await axios.get(`${API_URL}/supply-orders/${id}`, getAuthHeaders());
+    return response.data;
+};
+
+export const cancelSupplyOrder = async (id, reason) => {
+    const response = await axios.patch(`${API_URL}/supply-orders/${id}/cancel`, { reason }, getAuthHeaders());
+    return response.data;
+};

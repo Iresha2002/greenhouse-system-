@@ -4,7 +4,9 @@ import SupplyDetailsModal from './SupplyDetailsModal';
 import SupplierProductManager from './SupplierProductManager';
 import SupplyCartDrawer from './SupplyCartDrawer';
 import SupplyCheckoutModal from './SupplyCheckoutModal';
-import { getSupplyProducts, getSupplyFacets } from '../../services/api';
+import SupplyOrderConfirmationModal from './SupplyOrderConfirmationModal';
+import CustomerSupplyOrdersModal from './CustomerSupplyOrdersModal';
+import { getSupplyProducts, getSupplyFacets, createSupplyOrder } from '../../services/api';
 import {
   Search,
   Filter,
@@ -302,12 +304,14 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
   const [sortBy, setSortBy] = useState('featured'); // 'featured' | 'newest' | 'priceAsc' | 'priceDesc'
   const [activeCollectionTab, setActiveCollectionTab] = useState('all'); // 'all' | 'featured' | 'newArrivals'
 
-  // Product Details Modal, Supplier Studio View, Cart Drawer & Checkout Modal
+  // Product Details Modal, Supplier Studio View, Cart Drawer, Checkout & Order History Modals
   const [selectedSupply, setSelectedSupply] = useState(null);
   const [isSupplierStudioOpen, setIsSupplierStudioOpen] = useState(false);
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [checkoutData, setCheckoutData] = useState(null);
+  const [confirmedSupplyOrder, setConfirmedSupplyOrder] = useState(null);
+  const [isCustomerOrdersOpen, setIsCustomerOrdersOpen] = useState(false);
   const [cartItems, setCartItems] = useState(() => {
     try {
       const saved = localStorage.getItem('smartgrow_supplies_cart');
@@ -556,15 +560,13 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
   };
 
   const handlePlaceSupplyOrder = async (orderPayload) => {
-    // Stage 7 validates & prepares order; Stage 8 persists SupplyOrder in MongoDB with order history
-    const tempOrderRef = `SUP-${Date.now().toString().slice(-6)}`;
-    setCartItems([]);
-    setIsCheckoutModalOpen(false);
-    showToast(
-      `Order ${tempOrderRef} validated ($${orderPayload.total.toFixed(
-        2
-      )})! Full MongoDB order history & confirmation modal activates in Stage 8.`
-    );
+    const res = await createSupplyOrder(orderPayload);
+    if (res && res.success && res.order) {
+      setCartItems([]);
+      setIsCheckoutModalOpen(false);
+      setConfirmedSupplyOrder(res.order);
+      await fetchSuppliesCatalog();
+    }
   };
 
   const totalBasketItems = cartItems.reduce((sum, item) => sum + item.cartQuantity, 0);
@@ -638,6 +640,15 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
                 <span>Supplier Studio</span>
               </button>
             )}
+
+            <button
+              type="button"
+              onClick={() => setIsCustomerOrdersOpen(true)}
+              className="px-4 py-3.5 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 text-white font-extrabold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <Package className="w-4 h-4 text-sky-300" />
+              <span>My Supply Orders</span>
+            </button>
 
             <button
               type="button"
@@ -1067,6 +1078,25 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
         validatedCart={checkoutData?.validatedCart || null}
         currentUser={currentUser}
         onPlaceSupplyOrder={handlePlaceSupplyOrder}
+      />
+
+      {/* Stage 8: Supply Order Confirmation Modal (Section 4.6) */}
+      <SupplyOrderConfirmationModal
+        isOpen={Boolean(confirmedSupplyOrder)}
+        order={confirmedSupplyOrder}
+        onClose={() => setConfirmedSupplyOrder(null)}
+        onViewOrderHistory={() => {
+          setConfirmedSupplyOrder(null);
+          setIsCustomerOrdersOpen(true);
+        }}
+      />
+
+      {/* Stage 8: Customer Supply Order History Modal (Section 4.7) */}
+      <CustomerSupplyOrdersModal
+        isOpen={isCustomerOrdersOpen}
+        onClose={() => setIsCustomerOrdersOpen(false)}
+        currentUser={currentUser}
+        onOrderCancelled={fetchSuppliesCatalog}
       />
     </div>
   );

@@ -22,6 +22,7 @@ app.use('/api/sensors', require('./routes/sensorRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/supplies', require('./routes/supplyProductRoutes'));
+app.use('/api/supply-orders', require('./routes/supplyOrderRoutes'));
 app.use('/api/cart', require('./routes/cartRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 
