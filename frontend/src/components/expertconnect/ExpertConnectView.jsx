@@ -30,6 +30,7 @@ import {
 import { getExpertsDirectory } from '../../services/api';
 import ExpertCard from './ExpertCard';
 import ExpertProfileModal from './ExpertProfileModal';
+import ExpertApplicationPortal from './ExpertApplicationPortal';
 
 // 14 Configurable Expert Specializations (Section 5.1)
 export const EXPERT_SPECIALIZATIONS = [
@@ -986,29 +987,14 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 5: BECOME AN EXPERT (Stage 4 Next)                   */}
+      {/* VIEW 5: BECOME AN EXPERT & ADMIN VERIFICATION (Stage 4)   */}
       {/* ========================================================= */}
       {activeSubTab === 'apply' && (
-        <div className="rounded-3xl bg-white/[0.07] border border-white/15 p-8 sm:p-12 text-center space-y-4 backdrop-blur-xl">
-          <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-400/35 text-amber-300 flex items-center justify-center mx-auto">
-            <Award className="w-8 h-8" />
-          </div>
-          <h3 className="text-xl sm:text-2xl font-extrabold text-white">
-            Apply to Become a Verified SmartGrow Expert
-          </h3>
-          <p className="text-xs sm:text-sm text-white/70 max-w-lg mx-auto leading-relaxed">
-            Agricultural graduates, greenhouse agronomists, plant pathologists, and IoT irrigation engineers can submit their qualifications and experience for Administrator verification in Stage 4.
-          </p>
-          <div className="pt-2">
-            <button
-              type="button"
-              onClick={() => setActiveSubTab('overview')}
-              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold cursor-pointer"
-            >
-              ← Back to Overview
-            </button>
-          </div>
-        </div>
+        <ExpertApplicationPortal
+          currentUser={currentUser}
+          onOpenLogin={onOpenLogin}
+          onDirectoryUpdated={fetchExperts}
+        />
       )}
 
       {/* Detailed Expert Profile Modal (Section 6) */}

@@ -259,3 +259,37 @@ export const getExpertSpecializations = async () => {
     const response = await axios.get(`${API_URL}/experts/specializations`);
     return response.data;
 };
+
+// 18. ExpertConnect — Expert Application, Profile & Admin Verification APIs (Stage 4)
+export const submitExpertApplication = async (applicationData) => {
+    const response = await axios.post(`${API_URL}/experts/apply`, applicationData, getAuthHeaders());
+    return response.data;
+};
+
+export const getMyExpertApplication = async () => {
+    const response = await axios.get(`${API_URL}/experts/my-application`, getAuthHeaders());
+    return response.data;
+};
+
+export const updateMyExpertProfile = async (profileData) => {
+    const response = await axios.put(`${API_URL}/experts/my-profile`, profileData, getAuthHeaders());
+    return response.data;
+};
+
+export const getAdminExpertApplications = async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const url = query
+        ? `${API_URL}/experts/admin/applications?${query}`
+        : `${API_URL}/experts/admin/applications`;
+    const response = await axios.get(url, getAuthHeaders());
+    return response.data;
+};
+
+export const verifyExpertApplication = async (id, data) => {
+    const response = await axios.patch(
+        `${API_URL}/experts/admin/applications/${id}/verify`,
+        data,
+        getAuthHeaders()
+    );
+    return response.data;
+};
