@@ -9,7 +9,7 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '12mb' }));
 
 // Test Route
 app.get('/', (req, res) => {
@@ -24,6 +24,7 @@ app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/supplies', require('./routes/supplyProductRoutes'));
 app.use('/api/supply-orders', require('./routes/supplyOrderRoutes'));
 app.use('/api/experts', require('./routes/expertRoutes'));
+app.use('/api/problems', require('./routes/problemRoutes'));
 app.use('/api/cart', require('./routes/cartRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 

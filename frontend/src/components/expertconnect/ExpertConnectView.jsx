@@ -31,6 +31,7 @@ import { getExpertsDirectory } from '../../services/api';
 import ExpertCard from './ExpertCard';
 import ExpertProfileModal from './ExpertProfileModal';
 import ExpertApplicationPortal from './ExpertApplicationPortal';
+import ProblemSubmissionPortal from './ProblemSubmissionPortal';
 
 // 14 Configurable Expert Specializations (Section 5.1)
 export const EXPERT_SPECIALIZATIONS = [
@@ -928,36 +929,20 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 3: DESCRIBE YOUR GREENHOUSE PROBLEM (Stage 5 Next)   */}
+      {/* VIEW 3: DESCRIBE YOUR GREENHOUSE PROBLEM (Stages 5 & 6)   */}
       {/* ========================================================= */}
       {activeSubTab === 'problem' && (
-        <div className="rounded-3xl bg-white/[0.07] border border-white/15 p-8 sm:p-12 text-center space-y-4 backdrop-blur-xl">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-400/35 text-emerald-300 flex items-center justify-center mx-auto">
-            <FileWarning className="w-8 h-8" />
-          </div>
-          <h3 className="text-xl sm:text-2xl font-extrabold text-white">
-            Describe Your Greenhouse Problem
-          </h3>
-          <p className="text-xs sm:text-sm text-white/70 max-w-lg mx-auto leading-relaxed">
-            Supported problem categories include: {PROBLEM_CATEGORIES.join(', ')}. Full MongoDB problem submission and automatic rule-based expert matching will be activated in Stages 5 and 6.
-          </p>
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => setActiveSubTab('directory')}
-              className="px-5 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs cursor-pointer"
-            >
-              Browse Verified Experts ({experts.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveSubTab('overview')}
-              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold cursor-pointer"
-            >
-              ← Back to Overview
-            </button>
-          </div>
-        </div>
+        <ProblemSubmissionPortal
+          currentUser={currentUser}
+          onOpenLogin={onOpenLogin}
+          onViewExpertProfile={(exp) => setSelectedExpertProfile(exp)}
+          onSelectExpertForBooking={(exp) => {
+            showToast(
+              `Selected ${exp.fullName} for consultation booking. Opening Consultations tab...`
+            );
+            setActiveSubTab('consultations');
+          }}
+        />
       )}
 
       {/* ========================================================= */}

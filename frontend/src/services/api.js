@@ -293,3 +293,28 @@ export const verifyExpertApplication = async (id, data) => {
     );
     return response.data;
 };
+
+// 19. ExpertConnect — Greenhouse Problem Reports & Expert Matching APIs (Stages 5 & 6)
+export const createProblemReport = async (reportData) => {
+    const response = await axios.post(`${API_URL}/problems`, reportData, getAuthHeaders());
+    return response.data;
+};
+
+export const getMyProblemReports = async () => {
+    const response = await axios.get(`${API_URL}/problems/my-problems`, getAuthHeaders());
+    return response.data;
+};
+
+export const getProblemReportById = async (id) => {
+    const response = await axios.get(`${API_URL}/problems/${id}`, getAuthHeaders());
+    return response.data;
+};
+
+export const updateProblemReportStatus = async (id, status) => {
+    const response = await axios.patch(
+        `${API_URL}/problems/${id}/status`,
+        { status },
+        getAuthHeaders()
+    );
+    return response.data;
+};
