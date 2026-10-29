@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import SupplyCard from './SupplyCard';
 import SupplyDetailsModal from './SupplyDetailsModal';
 import SupplierProductManager from './SupplierProductManager';
+import SupplyCartDrawer from './SupplyCartDrawer';
+import SupplyCheckoutModal from './SupplyCheckoutModal';
 import { getSupplyProducts, getSupplyFacets } from '../../services/api';
 import {
   Search,
@@ -300,11 +302,30 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
   const [sortBy, setSortBy] = useState('featured'); // 'featured' | 'newest' | 'priceAsc' | 'priceDesc'
   const [activeCollectionTab, setActiveCollectionTab] = useState('all'); // 'all' | 'featured' | 'newArrivals'
 
-  // Product Details Modal, Supplier Studio View & Cart Preview Toast
+  // Product Details Modal, Supplier Studio View, Cart Drawer & Checkout Modal
   const [selectedSupply, setSelectedSupply] = useState(null);
   const [isSupplierStudioOpen, setIsSupplierStudioOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
+  const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [checkoutData, setCheckoutData] = useState(null);
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('smartgrow_supplies_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Persist supplies basket in localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('smartgrow_supplies_cart', JSON.stringify(cartItems));
+    } catch {
+      // Ignore storage quota errors
+    }
+  }, [cartItems]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -485,9 +506,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
   const handleBuyNow = (supply, qtyToBuy = null) => {
     handleAddToCart(supply, qtyToBuy);
     setSelectedSupply(null);
-    showToast(
-      `Ready for checkout: ${qtyToBuy || supply.minOrderQuantity || 1} × ${supply.name} in your Supplies Basket!`
-    );
+    setIsCartDrawerOpen(true);
   };
 
   const handleAddToCart = (supply, qtyToAdd = null) => {
@@ -507,6 +526,45 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
     });
 
     showToast(`Added ${quantity} × ${supply.name} to your Supplies Basket`);
+  };
+
+  const handleUpdateCartQuantity = (supplyId, nextQty) => {
+    setCartItems((prev) =>
+      prev.map((item) => {
+        const id = item.supplyId || item.productId || item._id;
+        if (id !== supplyId) return item;
+        const minQty = item.minOrderQuantity || 1;
+        const maxQty = item.quantity !== undefined ? item.quantity : 999;
+        return {
+          ...item,
+          cartQuantity: Math.max(minQty, Math.min(maxQty, Number(nextQty) || minQty)),
+        };
+      })
+    );
+  };
+
+  const handleRemoveCartItem = (supplyId) => {
+    setCartItems((prev) =>
+      prev.filter((item) => (item.supplyId || item.productId || item._id) !== supplyId)
+    );
+  };
+
+  const handleProceedToCheckout = (summaryData) => {
+    setCheckoutData(summaryData);
+    setIsCartDrawerOpen(false);
+    setIsCheckoutModalOpen(true);
+  };
+
+  const handlePlaceSupplyOrder = async (orderPayload) => {
+    // Stage 7 validates & prepares order; Stage 8 persists SupplyOrder in MongoDB with order history
+    const tempOrderRef = `SUP-${Date.now().toString().slice(-6)}`;
+    setCartItems([]);
+    setIsCheckoutModalOpen(false);
+    showToast(
+      `Order ${tempOrderRef} validated ($${orderPayload.total.toFixed(
+        2
+      )})! Full MongoDB order history & confirmation modal activates in Stage 8.`
+    );
   };
 
   const totalBasketItems = cartItems.reduce((sum, item) => sum + item.cartQuantity, 0);
@@ -582,13 +640,8 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
             )}
 
             <button
-              onClick={() =>
-                showToast(
-                  totalBasketItems > 0
-                    ? `Supplies Basket has ${totalBasketItems} item(s). Full Cart & Checkout activates in Stage 7.`
-                    : 'Your Supplies Basket is empty. Click "Add to Cart" on any supply card!'
-                )
-              }
+              type="button"
+              onClick={() => setIsCartDrawerOpen(true)}
               className="relative px-5 py-3.5 rounded-2xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs sm:text-sm transition-all flex items-center gap-2.5 shadow-lg shadow-sky-500/25 cursor-pointer"
             >
               <ShoppingBag className="w-4 h-4" />
@@ -993,6 +1046,27 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
         onAddToCart={handleAddToCart}
         onBuyNow={handleBuyNow}
         onSelectRelated={(rel) => setSelectedSupply(rel)}
+      />
+
+      {/* Stage 7: Supplies Shopping Cart Drawer (Section 4.4) */}
+      <SupplyCartDrawer
+        isOpen={isCartDrawerOpen}
+        onClose={() => setIsCartDrawerOpen(false)}
+        cartItems={cartItems}
+        onUpdateQuantity={handleUpdateCartQuantity}
+        onRemoveItem={handleRemoveCartItem}
+        onProceedToCheckout={handleProceedToCheckout}
+      />
+
+      {/* Stage 7: Supplies Checkout Modal (Section 4.5) */}
+      <SupplyCheckoutModal
+        isOpen={isCheckoutModalOpen}
+        onClose={() => setIsCheckoutModalOpen(false)}
+        cartItems={cartItems}
+        initialFulfillmentMethod={checkoutData?.deliveryMethod || 'delivery'}
+        validatedCart={checkoutData?.validatedCart || null}
+        currentUser={currentUser}
+        onPlaceSupplyOrder={handlePlaceSupplyOrder}
       />
     </div>
   );

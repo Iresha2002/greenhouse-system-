@@ -185,3 +185,9 @@ export const updateSupplyProductStock = async (id, stockPayload) => {
     const response = await axios.patch(`${API_URL}/supplies/${id}/stock`, body, getAuthHeaders());
     return response.data;
 };
+
+// 13. Agricultural Supplies Cart Validation API
+export const calculateSuppliesCart = async (items, deliveryMethod = 'delivery') => {
+    const response = await axios.post(`${API_URL}/cart/calculate-supplies`, { items, deliveryMethod });
+    return response.data;
+};
