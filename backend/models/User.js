@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['farmer', 'supplier', 'customer'],
+    enum: ['farmer', 'supplier', 'customer', 'expert', 'admin'],
     default: 'farmer'
   },
   phoneNumber: {
@@ -33,7 +33,5 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
-
 
 module.exports = mongoose.model('User', userSchema);

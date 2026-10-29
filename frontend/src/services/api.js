@@ -243,3 +243,19 @@ export const updateAccountProfile = async (profileData) => {
     }
     return response.data;
 };
+
+// 17. ExpertConnect — Expert Directory & Profile APIs (Stage 3)
+export const getExpertsDirectory = async (params = {}) => {
+    const response = await axios.get(`${API_URL}/experts`, { params });
+    return response.data;
+};
+
+export const getExpertProfileById = async (id) => {
+    const response = await axios.get(`${API_URL}/experts/${id}`);
+    return response.data;
+};
+
+export const getExpertSpecializations = async () => {
+    const response = await axios.get(`${API_URL}/experts/specializations`);
+    return response.data;
+};
