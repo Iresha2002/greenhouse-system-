@@ -526,4 +526,71 @@ router.delete('/:id', protect, authorizeRoles('supplier'), async (req, res) => {
   }
 });
 
+// 9. UPDATE SUPPLY INVENTORY STOCK & LOW-STOCK THRESHOLD (SUPPLIER ONLY - OWNERSHIP ENFORCED)
+router.patch('/:id/stock', protect, authorizeRoles('supplier'), async (req, res) => {
+  try {
+    const { quantity, adjustment, lowStockThreshold } = req.body;
+
+    const supply = await SupplyProduct.findById(req.params.id);
+    if (!supply) {
+      return res.status(404).json({ error: 'Agricultural supply product not found' });
+    }
+
+    if (supply.supplier.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        error: "Forbidden: You do not have permission to modify another supplier's inventory"
+      });
+    }
+
+    // Apply either absolute quantity or relative +/- adjustment
+    if (quantity !== undefined) {
+      const numQuantity = Number(quantity);
+      if (isNaN(numQuantity) || numQuantity < 0) {
+        return res.status(400).json({ error: 'Stock quantity must be a non-negative number' });
+      }
+      supply.quantity = Math.floor(numQuantity);
+    } else if (adjustment !== undefined) {
+      const numAdj = Number(adjustment);
+      if (isNaN(numAdj)) {
+        return res.status(400).json({ error: 'Stock adjustment must be a valid number' });
+      }
+      const nextQty = supply.quantity + Math.floor(numAdj);
+      if (nextQty < 0) {
+        return res.status(400).json({ error: 'Stock quantity cannot be reduced below zero' });
+      }
+      supply.quantity = nextQty;
+    } else if (lowStockThreshold === undefined) {
+      return res.status(400).json({ error: 'Provide quantity, adjustment, or lowStockThreshold' });
+    }
+
+    if (lowStockThreshold !== undefined) {
+      const numThreshold = Number(lowStockThreshold);
+      if (isNaN(numThreshold) || numThreshold < 0) {
+        return res.status(400).json({ error: 'lowStockThreshold must be a non-negative number' });
+      }
+      supply.lowStockThreshold = Math.floor(numThreshold);
+    }
+
+    supply.updatedAt = Date.now();
+    await supply.save();
+
+    const threshold = supply.lowStockThreshold ?? 5;
+    const isOutOfStock = supply.quantity <= 0;
+    const isLowStock = supply.quantity > 0 && supply.quantity <= threshold;
+
+    res.json({
+      success: true,
+      message: isOutOfStock
+        ? `Marked "${supply.name}" as Out of Stock (0 ${supply.unit})`
+        : isLowStock
+        ? `Low-stock alert: "${supply.name}" has ${supply.quantity} ${supply.unit} remaining (threshold: ${threshold})`
+        : `Inventory updated: "${supply.name}" now has ${supply.quantity} ${supply.unit} in stock`,
+      inventoryStatus: isOutOfStock ? 'OUT_OF_STOCK' : isLowStock ? 'LOW_STOCK' : 'IN_STOCK',
+      data: supply
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

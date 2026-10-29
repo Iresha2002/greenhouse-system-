@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Plus,
+  Minus,
   Edit3,
   Trash2,
   Eye,
@@ -26,6 +27,7 @@ import {
   updateSupplyProduct,
   toggleSupplyProductStatus,
   deleteSupplyProduct,
+  updateSupplyProductStock,
 } from '../../services/api';
 
 const CATEGORIES = [
@@ -93,6 +95,13 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
 
   // Delete Confirmation Modal State
   const [deleteTarget, setDeleteTarget] = useState(null);
+
+  // Stage 6: Inventory Filter & Quick Stock Editor State
+  const [stockFilter, setStockFilter] = useState('all'); // 'all' | 'lowStock' | 'outOfStock'
+  const [stockEditId, setStockEditId] = useState(null);
+  const [stockEditValue, setStockEditValue] = useState('');
+  const [thresholdEditValue, setThresholdEditValue] = useState('');
+  const [stockUpdatingId, setStockUpdatingId] = useState(null);
 
   const notifySuccess = (msg) => {
     setSuccessMsg(msg);
@@ -272,6 +281,41 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
     }
   };
 
+  // Stage 6: Quick Inventory Adjustment (+1 / -1 / Set Exact / Mark Sold Out)
+  const handleQuickStockAdjust = async (supply, payload) => {
+    setStockUpdatingId(supply._id);
+    setErrorMsg('');
+    try {
+      const res = await updateSupplyProductStock(supply._id, payload);
+      notifySuccess(res.message || `Updated stock for "${supply.name}".`);
+      setStockEditId(null);
+      await fetchSupplierData();
+      if (onCatalogChanged) onCatalogChanged();
+    } catch (err) {
+      setErrorMsg(err.response?.data?.error || 'Failed to update inventory stock.');
+    } finally {
+      setStockUpdatingId(null);
+    }
+  };
+
+  const openInlineStockEditor = (supply) => {
+    setStockEditId(supply._id);
+    setStockEditValue(String(supply.quantity ?? 0));
+    setThresholdEditValue(String(supply.lowStockThreshold ?? 5));
+  };
+
+  const filteredSupplierItems = mySupplies.filter((item) => {
+    if (stockFilter === 'outOfStock') return item.quantity <= 0;
+    if (stockFilter === 'lowStock') {
+      return item.quantity > 0 && item.quantity <= (item.lowStockThreshold || 5);
+    }
+    return true;
+  });
+
+  const lowOrOutItems = mySupplies.filter(
+    (item) => item.quantity <= (item.lowStockThreshold || 5)
+  );
+
   return (
     <div className="space-y-8 pb-16">
       {/* Top Notification Banners */}
@@ -365,25 +409,87 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
         </div>
       )}
 
+      {/* Stage 6: Low-Stock & Out-of-Stock Alert Banner */}
+      {lowOrOutItems.length > 0 && (
+        <div className="rounded-3xl bg-amber-500/10 border border-amber-400/35 p-5 backdrop-blur-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-6 h-6 text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-sm font-extrabold text-amber-300">
+                Inventory Restock Attention Required ({lowOrOutItems.length} item
+                {lowOrOutItems.length > 1 ? 's' : ''})
+              </h4>
+              <p className="text-xs text-white/75 mt-0.5">
+                {lowOrOutItems
+                  .map(
+                    (i) =>
+                      `${i.name} (${i.quantity} ${i.unit} left, alert ≤ ${
+                        i.lowStockThreshold || 5
+                      })`
+                  )
+                  .join('  •  ')}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() =>
+                setStockFilter((prev) => (prev === 'lowStock' ? 'all' : 'lowStock'))
+              }
+              className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                stockFilter === 'lowStock'
+                  ? 'bg-amber-400 text-slate-950 border-amber-300'
+                  : 'bg-white/10 hover:bg-white/20 text-amber-300 border-amber-400/30'
+              }`}
+            >
+              {stockFilter === 'lowStock' ? 'Show All Products' : 'Filter Low Stock'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Supplier Product Listings Table */}
       <div className="rounded-3xl bg-white/[0.07] border border-white/15 backdrop-blur-xl overflow-hidden shadow-2xl">
-        <div className="p-5 border-b border-white/10 flex items-center justify-between">
+        <div className="p-5 border-b border-white/10 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h3 className="text-base sm:text-lg font-extrabold text-white">
-              Your Agricultural Supply Listings ({mySupplies.length})
+              Your Agricultural Supply Listings ({filteredSupplierItems.length})
             </h3>
             <p className="text-xs text-white/60">
-              Only products created by your supplier account ({currentUser?.email}) are shown here.
+              Only products created by your supplier account ({currentUser?.email}) are shown here. Use inline controls to adjust stock in real time.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={fetchSupplierData}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white cursor-pointer"
-            title="Refresh supplier listings"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-sky-400' : ''}`} />
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {[
+              { id: 'all', label: `All (${mySupplies.length})` },
+              { id: 'lowStock', label: `Low Stock (${metrics.lowStockCount})` },
+              { id: 'outOfStock', label: `Out of Stock (${metrics.outOfStockCount})` },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setStockFilter(tab.id)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  stockFilter === tab.id
+                    ? 'bg-sky-500 text-slate-950 font-extrabold'
+                    : 'bg-white/10 hover:bg-white/20 text-white/75'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+
+            <button
+              type="button"
+              onClick={fetchSupplierData}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white cursor-pointer"
+              title="Refresh supplier listings"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-sky-400' : ''}`} />
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -422,12 +528,13 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10 text-xs sm:text-sm">
-                {mySupplies.map((item) => {
+                {filteredSupplierItems.map((item) => {
                   const thumb =
                     item.image ||
                     (Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : '');
                   const isOut = item.quantity <= 0;
                   const isLow = item.quantity > 0 && item.quantity <= (item.lowStockThreshold || 5);
+                  const isUpdatingThis = stockUpdatingId === item._id;
 
                   return (
                     <tr key={item._id} className="hover:bg-white/[0.04] transition-colors">
@@ -463,18 +570,117 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
                       </td>
 
                       <td className="py-3.5 px-4">
-                        {isOut ? (
-                          <span className="px-2.5 py-1 rounded-full bg-red-500/20 border border-red-400/40 text-red-300 text-xs font-bold">
-                            Out of Stock (0)
-                          </span>
-                        ) : isLow ? (
-                          <span className="px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold">
-                            Low: {item.quantity} {item.unit}
-                          </span>
+                        {stockEditId === item._id ? (
+                          <div className="flex flex-wrap items-center gap-2 bg-black/40 p-2 rounded-xl border border-sky-400/40">
+                            <div>
+                              <span className="text-[10px] text-white/50 block">Qty</span>
+                              <input
+                                type="number"
+                                min="0"
+                                value={stockEditValue}
+                                onChange={(e) => setStockEditValue(e.target.value)}
+                                className="w-16 px-2 py-1 rounded bg-black/60 border border-white/20 text-white text-xs font-bold"
+                              />
+                            </div>
+                            <div>
+                              <span className="text-[10px] text-white/50 block">Low Alert</span>
+                              <input
+                                type="number"
+                                min="0"
+                                value={thresholdEditValue}
+                                onChange={(e) => setThresholdEditValue(e.target.value)}
+                                className="w-14 px-2 py-1 rounded bg-black/60 border border-white/20 text-amber-300 text-xs font-bold"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              disabled={isUpdatingThis}
+                              onClick={() =>
+                                handleQuickStockAdjust(item, {
+                                  quantity: Number(stockEditValue),
+                                  lowStockThreshold: Number(thresholdEditValue),
+                                })
+                              }
+                              className="px-2.5 py-1 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold cursor-pointer"
+                            >
+                              Save
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setStockEditId(null)}
+                              className="p-1 text-white/50 hover:text-white cursor-pointer"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         ) : (
-                          <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold">
-                            {item.quantity} {item.unit}
-                          </span>
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-2">
+                              {isOut ? (
+                                <span className="px-2.5 py-0.5 rounded-full bg-red-500/20 border border-red-400/40 text-red-300 text-xs font-bold">
+                                  Out of Stock (0)
+                                </span>
+                              ) : isLow ? (
+                                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold">
+                                  Low: {item.quantity} {item.unit}
+                                </span>
+                              ) : (
+                                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold">
+                                  {item.quantity} {item.unit}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Quick Stepper & Restock Controls */}
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                disabled={isUpdatingThis || item.quantity <= 0}
+                                onClick={() => handleQuickStockAdjust(item, { adjustment: -1 })}
+                                className="w-6 h-6 rounded bg-white/10 hover:bg-white/20 disabled:opacity-30 flex items-center justify-center text-white cursor-pointer"
+                                title="Decrease stock by 1"
+                              >
+                                <Minus className="w-3 h-3" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={isUpdatingThis}
+                                onClick={() => handleQuickStockAdjust(item, { adjustment: 1 })}
+                                className="w-6 h-6 rounded bg-white/10 hover:bg-white/20 disabled:opacity-30 flex items-center justify-center text-white cursor-pointer"
+                                title="Increase stock by 1"
+                              >
+                                <Plus className="w-3 h-3" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={isUpdatingThis}
+                                onClick={() => handleQuickStockAdjust(item, { adjustment: 10 })}
+                                className="px-1.5 h-6 rounded bg-emerald-500/20 hover:bg-emerald-500/35 border border-emerald-400/30 text-emerald-300 text-[10px] font-bold cursor-pointer"
+                                title="Quick restock +10"
+                              >
+                                +10
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => openInlineStockEditor(item)}
+                                className="px-2 h-6 rounded bg-sky-500/15 hover:bg-sky-500/30 border border-sky-400/30 text-sky-300 text-[10px] font-bold cursor-pointer"
+                                title="Set exact stock & alert threshold"
+                              >
+                                Set
+                              </button>
+                              {item.quantity > 0 && (
+                                <button
+                                  type="button"
+                                  disabled={isUpdatingThis}
+                                  onClick={() => handleQuickStockAdjust(item, { quantity: 0 })}
+                                  className="px-1.5 h-6 rounded bg-red-500/15 hover:bg-red-500/30 border border-red-400/30 text-red-300 text-[10px] font-bold cursor-pointer"
+                                  title="Mark Out of Stock (0)"
+                                >
+                                  0
+                                </button>
+                              )}
+                            </div>
+                          </div>
                         )}
                       </td>
 

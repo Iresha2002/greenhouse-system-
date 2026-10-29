@@ -179,3 +179,9 @@ export const deleteSupplyProduct = async (id) => {
     const response = await axios.delete(`${API_URL}/supplies/${id}`, getAuthHeaders());
     return response.data;
 };
+
+export const updateSupplyProductStock = async (id, stockPayload) => {
+    const body = typeof stockPayload === 'number' ? { quantity: stockPayload } : stockPayload;
+    const response = await axios.patch(`${API_URL}/supplies/${id}/stock`, body, getAuthHeaders());
+    return response.data;
+};
