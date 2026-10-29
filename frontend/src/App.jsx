@@ -252,7 +252,7 @@ export function App() {
                   : 'text-white/70 hover:bg-white/10 hover:text-white'
               }`}
             >
-              💧 Hydroponic Bay
+              🎓 ExpertConnect
             </button>
           </div>
 

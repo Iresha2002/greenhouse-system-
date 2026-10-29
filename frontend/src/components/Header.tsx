@@ -72,8 +72,8 @@ export const Header: React.FC<HeaderProps> = ({
     {
       id: 'hydroponics',
       index: 3,
-      title: 'Hydroponic Bay',
-      desc: 'Closed-loop automated pH & root aeration',
+      title: 'ExpertConnect',
+      desc: 'Verified greenhouse agronomists & crop consultation',
       icon: Droplet,
       color: '#06b6d4',
     },

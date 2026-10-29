@@ -74,7 +74,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectSlide }) => {
             }}
             className="hover:text-white transition-colors cursor-pointer"
           >
-            Hydroponics
+            ExpertConnect
           </button>
         </div>
 
