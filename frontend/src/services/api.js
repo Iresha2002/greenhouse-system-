@@ -148,3 +148,8 @@ export const getSupplyCategories = async () => {
     const response = await axios.get(`${API_URL}/supplies/categories`);
     return response.data;
 };
+
+export const getSupplyFacets = async () => {
+    const response = await axios.get(`${API_URL}/supplies/facets`);
+    return response.data;
+};

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import SupplyCard from './SupplyCard';
-import { getSupplyProducts } from '../../services/api';
+import SupplyDetailsModal from './SupplyDetailsModal';
+import { getSupplyProducts, getSupplyFacets } from '../../services/api';
 import {
   Search,
   Filter,
@@ -277,22 +278,29 @@ const SAMPLE_SUPPLIES_CATALOG = [
 export const SuppliersMarketplaceView = ({ currentUser }) => {
   // Catalog state backed by MongoDB /api/supplies with graceful offline fallback
   const [supplies, setSupplies] = useState([]);
+  const [totalMatchingCount, setTotalMatchingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isUsingFallback, setIsUsingFallback] = useState(false);
 
+  // Dynamic facets from backend (/api/supplies/facets)
+  const [facetSuppliers, setFacetSuppliers] = useState([]);
+  const [facetBrands, setFacetBrands] = useState([]);
+  const [maxCatalogPrice, setMaxCatalogPrice] = useState(150);
+
   // Filter & Search States (Section 4.1 & 4.2)
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedSupplier, setSelectedSupplier] = useState('All');
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [availabilityFilter, setAvailabilityFilter] = useState('all'); // 'all' | 'inStock'
+  const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(150);
   const [sortBy, setSortBy] = useState('featured'); // 'featured' | 'newest' | 'priceAsc' | 'priceDesc'
   const [activeCollectionTab, setActiveCollectionTab] = useState('all'); // 'all' | 'featured' | 'newArrivals'
 
   // Product Details Modal & Cart Preview Toast
   const [selectedSupply, setSelectedSupply] = useState(null);
-  const [detailQty, setDetailQty] = useState(1);
   const [cartItems, setCartItems] = useState([]);
   const [toastMessage, setToastMessage] = useState(null);
 
@@ -303,12 +311,53 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
     }, 3200);
   };
 
-  // Fetch active supply products from MongoDB backend
+  // Debounce search input by 250ms before querying backend
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Load supplier & brand facets once on mount
+  useEffect(() => {
+    const loadFacets = async () => {
+      try {
+        const res = await getSupplyFacets();
+        if (res && res.success && res.data) {
+          setFacetSuppliers(res.data.suppliers || []);
+          setFacetBrands(res.data.brands || []);
+          if (res.data.maxCatalogPrice) {
+            setMaxCatalogPrice(res.data.maxCatalogPrice);
+            setMaxPrice(res.data.maxCatalogPrice);
+          }
+        }
+      } catch {
+        // Fallback facets derived locally if offline
+      }
+    };
+    loadFacets();
+  }, []);
+
+  // Fetch filtered & sorted supply products from MongoDB backend
   const fetchSuppliesCatalog = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await getSupplyProducts({ limit: 100 });
-      if (response && response.success && Array.isArray(response.data) && response.data.length > 0) {
+      const params = {
+        limit: 100,
+        sortBy,
+      };
+      if (debouncedSearch) params.search = debouncedSearch;
+      if (selectedCategory !== 'All') params.category = selectedCategory;
+      if (selectedSupplier !== 'All') params.supplier = selectedSupplier;
+      if (selectedBrand !== 'All') params.brand = selectedBrand;
+      if (availabilityFilter === 'inStock') params.inStockOnly = 'true';
+      if (activeCollectionTab === 'featured') params.featuredOnly = 'true';
+      if (minPrice > 0) params.minPrice = minPrice;
+      if (maxPrice < maxCatalogPrice) params.maxPrice = maxPrice;
+
+      const response = await getSupplyProducts(params);
+      if (response && response.success && Array.isArray(response.data)) {
         const normalized = response.data.map((item, idx) => ({
           ...item,
           image:
@@ -317,78 +366,88 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
           isNewArrival: item.isNewArrival !== undefined ? item.isNewArrival : idx < 4,
         }));
         setSupplies(normalized);
+        setTotalMatchingCount(response.total ?? normalized.length);
         setIsUsingFallback(false);
       } else {
         setSupplies(SAMPLE_SUPPLIES_CATALOG);
+        setTotalMatchingCount(SAMPLE_SUPPLIES_CATALOG.length);
         setIsUsingFallback(true);
       }
     } catch (err) {
       console.warn('Backend /api/supplies unreachable, falling back to local sample catalog:', err.message);
       setSupplies(SAMPLE_SUPPLIES_CATALOG);
+      setTotalMatchingCount(SAMPLE_SUPPLIES_CATALOG.length);
       setIsUsingFallback(true);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [
+    debouncedSearch,
+    selectedCategory,
+    selectedSupplier,
+    selectedBrand,
+    availabilityFilter,
+    activeCollectionTab,
+    minPrice,
+    maxPrice,
+    maxCatalogPrice,
+    sortBy,
+  ]);
 
   useEffect(() => {
     fetchSuppliesCatalog();
   }, [fetchSuppliesCatalog]);
 
-  // Extract unique suppliers & brands from actual catalog data
+  // Unique suppliers & brands (from backend facets or local catalog fallback)
   const uniqueSuppliers = useMemo(() => {
+    if (facetSuppliers.length > 0) return ['All', ...facetSuppliers];
     const names = supplies.map((s) => s.supplierName).filter(Boolean);
     return ['All', ...Array.from(new Set(names))];
-  }, [supplies]);
+  }, [facetSuppliers, supplies]);
 
   const uniqueBrands = useMemo(() => {
+    if (facetBrands.length > 0) return ['All', ...facetBrands];
     const brands = supplies.map((s) => s.brand).filter(Boolean);
     return ['All', ...Array.from(new Set(brands))];
-  }, [supplies]);
+  }, [facetBrands, supplies]);
 
-  // Filter & Sort supplies
+  // Final list (applies client-side filtering as well if offline fallback is active)
   const filteredSupplies = useMemo(() => {
     return supplies
       .filter((item) => {
-        // Collection tab filter
         if (activeCollectionTab === 'featured' && !item.isFeatured) return false;
         if (activeCollectionTab === 'newArrivals' && !item.isNewArrival) return false;
-
-        // Category filter
         if (selectedCategory !== 'All' && item.category !== selectedCategory) return false;
-
-        // Supplier filter
         if (selectedSupplier !== 'All' && item.supplierName !== selectedSupplier) return false;
-
-        // Brand filter
         if (selectedBrand !== 'All' && item.brand !== selectedBrand) return false;
-
-        // Availability filter
         if (availabilityFilter === 'inStock' && item.quantity <= 0) return false;
+        if (item.price < minPrice || item.price > maxPrice) return false;
 
-        // Price filter
-        if (item.price > maxPrice) return false;
-
-        // Search by product name, brand, model, or supplier
         if (searchQuery.trim() !== '') {
           const q = searchQuery.toLowerCase();
           const matchName = item.name?.toLowerCase().includes(q);
           const matchBrand = item.brand?.toLowerCase().includes(q);
           const matchModel = item.model?.toLowerCase().includes(q);
+          const matchSku = item.sku?.toLowerCase().includes(q);
           const matchSupplier = item.supplierName?.toLowerCase().includes(q);
           const matchCategory = item.category?.toLowerCase().includes(q);
-          if (!matchName && !matchBrand && !matchModel && !matchSupplier && !matchCategory) {
+          if (
+            !matchName &&
+            !matchBrand &&
+            !matchModel &&
+            !matchSku &&
+            !matchSupplier &&
+            !matchCategory
+          ) {
             return false;
           }
         }
-
         return true;
       })
       .sort((a, b) => {
         if (sortBy === 'priceAsc') return a.price - b.price;
         if (sortBy === 'priceDesc') return b.price - a.price;
         if (sortBy === 'newest') return (b.isNewArrival ? 1 : 0) - (a.isNewArrival ? 1 : 0);
-        // default 'featured'
         return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
       });
   }, [
@@ -398,6 +457,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
     selectedSupplier,
     selectedBrand,
     availabilityFilter,
+    minPrice,
     maxPrice,
     searchQuery,
     sortBy,
@@ -405,18 +465,27 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
 
   const handleResetFilters = () => {
     setSearchQuery('');
+    setDebouncedSearch('');
     setSelectedCategory('All');
     setSelectedSupplier('All');
     setSelectedBrand('All');
     setAvailabilityFilter('all');
-    setMaxPrice(150);
+    setMinPrice(0);
+    setMaxPrice(maxCatalogPrice);
     setSortBy('featured');
     setActiveCollectionTab('all');
   };
 
   const handleOpenDetails = (supply) => {
     setSelectedSupply(supply);
-    setDetailQty(supply.minOrderQuantity || 1);
+  };
+
+  const handleBuyNow = (supply, qtyToBuy = null) => {
+    handleAddToCart(supply, qtyToBuy);
+    setSelectedSupply(null);
+    showToast(
+      `Ready for checkout: ${qtyToBuy || supply.minOrderQuantity || 1} × ${supply.name} in your Supplies Basket!`
+    );
   };
 
   const handleAddToCart = (supply, qtyToAdd = null) => {
@@ -698,24 +767,53 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
           </div>
         </div>
 
-        {/* Bottom Filter Row: Max Price Slider, Stock Toggle & Reset */}
+        {/* Bottom Filter Row: Min/Max Price Range, Stock Toggle & Reset */}
         <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-6">
-            {/* Price Range Control */}
-            <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-5">
+            {/* Min & Max Price Range Controls */}
+            <div className="flex flex-wrap items-center gap-3">
               <SlidersHorizontal className="w-4 h-4 text-sky-400" />
-              <label htmlFor="supply-price-range" className="text-xs text-white/80 font-semibold">
-                Max Unit Price: <span className="text-sky-300 font-bold">${maxPrice}</span>
-              </label>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-white/75 font-semibold">Price ($):</span>
+                <input
+                  type="number"
+                  min="0"
+                  max={maxPrice}
+                  value={minPrice}
+                  onChange={(e) => {
+                    const val = Math.max(0, Number(e.target.value) || 0);
+                    setMinPrice(Math.min(val, maxPrice));
+                  }}
+                  aria-label="Minimum unit price"
+                  placeholder="Min"
+                  className="w-16 px-2 py-1 rounded-lg bg-black/35 border border-white/15 text-white text-center font-bold focus:outline-none focus:border-sky-400"
+                />
+                <span className="text-white/40">to</span>
+                <input
+                  type="number"
+                  min={minPrice}
+                  max={maxCatalogPrice}
+                  value={maxPrice}
+                  onChange={(e) => {
+                    const val = Math.max(minPrice, Number(e.target.value) || 0);
+                    setMaxPrice(val);
+                  }}
+                  aria-label="Maximum unit price"
+                  placeholder="Max"
+                  className="w-16 px-2 py-1 rounded-lg bg-black/35 border border-white/15 text-white text-center font-bold focus:outline-none focus:border-sky-400"
+                />
+              </div>
+
               <input
                 id="supply-price-range"
                 type="range"
                 min="5"
-                max="150"
+                max={maxCatalogPrice}
                 step="5"
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(Number(e.target.value))}
-                className="w-32 sm:w-44 accent-sky-400 cursor-pointer"
+                onChange={(e) => setMaxPrice(Math.max(minPrice, Number(e.target.value)))}
+                className="w-28 sm:w-40 accent-sky-400 cursor-pointer"
+                aria-label="Maximum price slider"
               />
             </div>
 
@@ -746,6 +844,76 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
             Reset All Filters
           </button>
         </div>
+
+        {/* Active Filter Chips Bar */}
+        {(selectedCategory !== 'All' ||
+          selectedSupplier !== 'All' ||
+          selectedBrand !== 'All' ||
+          availabilityFilter === 'inStock' ||
+          minPrice > 0 ||
+          maxPrice < maxCatalogPrice ||
+          searchQuery.trim() !== '') && (
+          <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-white/50 font-semibold">Active Filters:</span>
+            {searchQuery.trim() !== '' && (
+              <span className="px-2.5 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-200 font-bold flex items-center gap-1.5">
+                Search: &ldquo;{searchQuery}&rdquo;
+                <X
+                  className="w-3 h-3 cursor-pointer"
+                  onClick={() => setSearchQuery('')}
+                />
+              </span>
+            )}
+            {selectedCategory !== 'All' && (
+              <span className="px-2.5 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-200 font-bold flex items-center gap-1.5">
+                Category: {selectedCategory}
+                <X
+                  className="w-3 h-3 cursor-pointer"
+                  onClick={() => setSelectedCategory('All')}
+                />
+              </span>
+            )}
+            {selectedSupplier !== 'All' && (
+              <span className="px-2.5 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-200 font-bold flex items-center gap-1.5">
+                Supplier: {selectedSupplier}
+                <X
+                  className="w-3 h-3 cursor-pointer"
+                  onClick={() => setSelectedSupplier('All')}
+                />
+              </span>
+            )}
+            {selectedBrand !== 'All' && (
+              <span className="px-2.5 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-200 font-bold flex items-center gap-1.5">
+                Brand: {selectedBrand}
+                <X
+                  className="w-3 h-3 cursor-pointer"
+                  onClick={() => setSelectedBrand('All')}
+                />
+              </span>
+            )}
+            {(minPrice > 0 || maxPrice < maxCatalogPrice) && (
+              <span className="px-2.5 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-200 font-bold flex items-center gap-1.5">
+                Price: ${minPrice} - ${maxPrice}
+                <X
+                  className="w-3 h-3 cursor-pointer"
+                  onClick={() => {
+                    setMinPrice(0);
+                    setMaxPrice(maxCatalogPrice);
+                  }}
+                />
+              </span>
+            )}
+            {availabilityFilter === 'inStock' && (
+              <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 font-bold flex items-center gap-1.5">
+                In-Stock Only
+                <X
+                  className="w-3 h-3 cursor-pointer"
+                  onClick={() => setAvailabilityFilter('all')}
+                />
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Product Grid, Loading State, or Empty State */}
@@ -785,257 +953,23 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
         </div>
       )}
 
-      {/* Product Details Modal (Section 4.3: Technical Specs, Composition, Warranty, Compatibility) */}
-      {selectedSupply && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md overflow-y-auto"
-          onClick={() => setSelectedSupply(null)}
-        >
-          <div
-            className="relative w-full max-w-3xl rounded-3xl bg-[#103326] border border-sky-400/30 p-6 sm:p-8 text-white shadow-2xl my-8 max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setSelectedSupply(null)}
-              className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 hover:text-white cursor-pointer"
-              aria-label="Close product details"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Left Image & Badges */}
-              <div className="space-y-4">
-                <div className="aspect-4/3 w-full rounded-2xl overflow-hidden bg-black/40 border border-white/15">
-                  <img
-                    src={
-                      selectedSupply.image ||
-                      (Array.isArray(selectedSupply.images) && selectedSupply.images.length > 0
-                        ? selectedSupply.images[0]
-                        : '')
-                    }
-                    alt={selectedSupply.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 text-xs font-bold">
-                    {selectedSupply.category}
-                  </span>
-                  {selectedSupply.warranty && (
-                    <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold flex items-center gap-1">
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      {selectedSupply.warranty}
-                    </span>
-                  )}
-                </div>
-
-                {/* Delivery & Collection Options */}
-                <div className="rounded-2xl bg-white/[0.06] border border-white/10 p-4 space-y-2">
-                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
-                    <Truck className="w-4 h-4" />
-                    Fulfilment & Delivery Options
-                  </h4>
-                  <div className="text-xs text-white/75 space-y-1">
-                    {selectedSupply.deliveryOptions?.islandwideDelivery && (
-                      <p>✓ Islandwide Agri-Courier Delivery available</p>
-                    )}
-                    {selectedSupply.deliveryOptions?.warehousePickup && (
-                      <p>✓ Direct Supplier Warehouse Collection supported</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Core Info & Technical Specifications */}
-              <div className="flex flex-col justify-between space-y-4">
-                <div>
-                  {(selectedSupply.brand || selectedSupply.model) && (
-                    <div className="text-xs font-bold text-sky-300 mb-1 flex items-center gap-1.5">
-                      <Tag className="w-3.5 h-3.5" />
-                      <span>
-                        {[selectedSupply.brand, selectedSupply.model].filter(Boolean).join(' • ')}
-                      </span>
-                    </div>
-                  )}
-
-                  <h3 className="text-xl sm:text-2xl font-extrabold text-white mb-2">
-                    {selectedSupply.name}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-white/75 leading-relaxed mb-4">
-                    {selectedSupply.description}
-                  </p>
-
-                  {/* Supplier & Stock Summary */}
-                  <div className="grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-black/25 border border-white/10 text-xs mb-4">
-                    <div>
-                      <span className="text-white/50 block">Supplier</span>
-                      <span className="font-bold text-white">{selectedSupply.supplierName}</span>
-                      {selectedSupply.location && (
-                        <span className="text-[11px] text-white/60 block">
-                          {selectedSupply.location}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <span className="text-white/50 block">Available Stock</span>
-                      <span className="font-bold text-emerald-300">
-                        {selectedSupply.quantity} {selectedSupply.unit}
-                      </span>
-                      <span className="text-[11px] text-white/60 block">
-                        Min Order: {selectedSupply.minOrderQuantity || 1} {selectedSupply.unit}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Supplied Technical or Agricultural Specifications */}
-                  {selectedSupply.specifications && (
-                    <div className="rounded-2xl bg-white/[0.05] border border-white/10 p-4 space-y-2 mb-4">
-                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
-                        <Cpu className="w-4 h-4" />
-                        Supplied Product Specifications
-                      </h4>
-                      <dl className="space-y-1.5 text-xs">
-                        {selectedSupply.specifications.composition && (
-                          <div>
-                            <dt className="text-white/50 font-semibold">Composition / Formula:</dt>
-                            <dd className="text-white/90">{selectedSupply.specifications.composition}</dd>
-                          </div>
-                        )}
-                        {selectedSupply.specifications.packageSize && (
-                          <div>
-                            <dt className="text-white/50 font-semibold">Packaging Size:</dt>
-                            <dd className="text-white/90">{selectedSupply.specifications.packageSize}</dd>
-                          </div>
-                        )}
-                        {selectedSupply.specifications.voltage && (
-                          <div>
-                            <dt className="text-white/50 font-semibold">Voltage & Power:</dt>
-                            <dd className="text-white/90">
-                              {selectedSupply.specifications.voltage}
-                              {selectedSupply.specifications.powerRequirements
-                                ? ` (${selectedSupply.specifications.powerRequirements})`
-                                : ''}
-                            </dd>
-                          </div>
-                        )}
-                        {selectedSupply.specifications.communicationProtocol && (
-                          <div>
-                            <dt className="text-white/50 font-semibold">Communication Protocol:</dt>
-                            <dd className="text-white/90">
-                              {selectedSupply.specifications.communicationProtocol}
-                            </dd>
-                          </div>
-                        )}
-                        {selectedSupply.specifications.supportedInterfaces && (
-                          <div>
-                            <dt className="text-white/50 font-semibold">Supported Interfaces:</dt>
-                            <dd className="text-white/90">
-                              {selectedSupply.specifications.supportedInterfaces}
-                            </dd>
-                          </div>
-                        )}
-                        {selectedSupply.specifications.operatingConditions && (
-                          <div>
-                            <dt className="text-white/50 font-semibold">Operating Conditions:</dt>
-                            <dd className="text-white/90">
-                              {selectedSupply.specifications.operatingConditions}
-                            </dd>
-                          </div>
-                        )}
-                        {selectedSupply.specifications.compatibility && (
-                          <div>
-                            <dt className="text-white/50 font-semibold">Compatibility:</dt>
-                            <dd className="text-sky-300">
-                              {selectedSupply.specifications.compatibility}
-                            </dd>
-                          </div>
-                        )}
-                        {selectedSupply.specifications.applicationInstructions && (
-                          <div>
-                            <dt className="text-white/50 font-semibold">Usage Instructions:</dt>
-                            <dd className="text-white/90">
-                              {selectedSupply.specifications.applicationInstructions}
-                            </dd>
-                          </div>
-                        )}
-                        {selectedSupply.specifications.safetyPrecautions && (
-                          <div>
-                            <dt className="text-amber-300/80 font-semibold">Safety Precautions:</dt>
-                            <dd className="text-amber-200/90">
-                              {selectedSupply.specifications.safetyPrecautions}
-                            </dd>
-                          </div>
-                        )}
-                      </dl>
-                    </div>
-                  )}
-                </div>
-
-                {/* Bottom Price & Quantity Selector */}
-                <div className="pt-4 border-t border-white/15 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-xs text-white/50 block">Unit Price</span>
-                      <span className="text-2xl font-extrabold text-white">
-                        ${selectedSupply.price.toFixed(2)}
-                      </span>
-                      <span className="text-xs text-sky-300 font-semibold">
-                        {' '}
-                        / {selectedSupply.unit}
-                      </span>
-                    </div>
-
-                    {/* Quantity Stepper */}
-                    <div className="flex items-center gap-2 bg-black/30 border border-white/15 rounded-xl p-1">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setDetailQty((q) =>
-                            Math.max(selectedSupply.minOrderQuantity || 1, q - 1)
-                          )
-                        }
-                        className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer"
-                      >
-                        <Minus className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="px-3 text-sm font-extrabold">{detailQty}</span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setDetailQty((q) => Math.min(selectedSupply.quantity, q + 1))
-                        }
-                        className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        handleAddToCart(selectedSupply, detailQty);
-                        setSelectedSupply(null);
-                      }}
-                      className="flex-1 py-3 px-4 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer"
-                    >
-                      <ShoppingBag className="w-4 h-4" />
-                      <span>
-                        Add {detailQty} to Basket ($
-                        {(selectedSupply.price * detailQty).toFixed(2)})
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Dedicated Product Details View Modal (Section 4.3) */}
+      <SupplyDetailsModal
+        supply={selectedSupply}
+        relatedSupplies={
+          selectedSupply
+            ? supplies.filter(
+                (item) =>
+                  item.category === selectedSupply.category &&
+                  item._id !== selectedSupply._id
+              )
+            : []
+        }
+        onClose={() => setSelectedSupply(null)}
+        onAddToCart={handleAddToCart}
+        onBuyNow={handleBuyNow}
+        onSelectRelated={(rel) => setSelectedSupply(rel)}
+      />
     </div>
   );
 };

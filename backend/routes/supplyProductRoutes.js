@@ -17,6 +17,45 @@ router.get('/categories', (req, res) => {
   });
 });
 
+// 1B. GET DYNAMIC FILTER FACETS (Unique Suppliers, Brands & Max Price across active catalog)
+router.get('/facets', async (req, res) => {
+  try {
+    const activeSupplies = await SupplyProduct.find(
+      { status: 'active' },
+      'supplierName brand price location'
+    );
+
+    const suppliers = Array.from(
+      new Set(activeSupplies.map((s) => s.supplierName).filter(Boolean))
+    ).sort();
+
+    const brands = Array.from(
+      new Set(activeSupplies.map((s) => s.brand).filter(Boolean))
+    ).sort();
+
+    const locations = Array.from(
+      new Set(activeSupplies.map((s) => s.location).filter(Boolean))
+    ).sort();
+
+    const highestPrice = activeSupplies.reduce(
+      (max, item) => (item.price > max ? item.price : max),
+      150
+    );
+
+    res.json({
+      success: true,
+      data: {
+        suppliers,
+        brands,
+        locations,
+        maxCatalogPrice: Math.ceil(highestPrice / 10) * 10
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // 2. GET ALL ACTIVE SUPPLY PRODUCTS (Search, Category, Brand, Supplier, Price, Stock, Sort & Pagination)
 router.get('/', async (req, res) => {
   try {
@@ -73,32 +112,42 @@ router.get('/', async (req, res) => {
     // Price range validation & filter
     if (minPrice !== undefined || maxPrice !== undefined) {
       query.price = {};
+      let numMin = null;
+      let numMax = null;
+
       if (minPrice !== undefined && minPrice !== '') {
-        const numMin = Number(minPrice);
+        numMin = Number(minPrice);
         if (isNaN(numMin) || numMin < 0) {
           return res.status(400).json({ error: 'minPrice must be a non-negative number' });
         }
         query.price.$gte = numMin;
       }
       if (maxPrice !== undefined && maxPrice !== '') {
-        const numMax = Number(maxPrice);
+        numMax = Number(maxPrice);
         if (isNaN(numMax) || numMax < 0) {
           return res.status(400).json({ error: 'maxPrice must be a non-negative number' });
         }
         query.price.$lte = numMax;
       }
+      if (numMin !== null && numMax !== null && numMin > numMax) {
+        return res.status(400).json({ error: 'minPrice cannot be greater than maxPrice' });
+      }
     }
 
-    // Multi-field search (name, brand, model, supplierName, category, description)
+    // Multi-field search (name, brand, model, sku, supplierName, category, description, specifications)
     if (search && search.trim()) {
       const safeRegex = new RegExp(escapeRegex(search.trim()), 'i');
       query.$or = [
         { name: safeRegex },
         { brand: safeRegex },
         { model: safeRegex },
+        { sku: safeRegex },
         { supplierName: safeRegex },
         { category: safeRegex },
-        { description: safeRegex }
+        { description: safeRegex },
+        { 'specifications.composition': safeRegex },
+        { 'specifications.communicationProtocol': safeRegex },
+        { 'specifications.compatibility': safeRegex }
       ];
     }
 
