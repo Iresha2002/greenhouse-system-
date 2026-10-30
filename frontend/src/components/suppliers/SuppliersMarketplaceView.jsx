@@ -729,7 +729,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search supplies"
-            className="w-full pl-9 pr-3 py-2 rounded-full bg-white/[0.06] border border-white/15 text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#4de1b7]"
+            className="w-full pl-9 pr-3 py-2 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:bg-white"
           />
         </div>
 
@@ -737,10 +737,10 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
         <select
           value={selectedSupplier}
           onChange={(e) => setSelectedSupplier(e.target.value)}
-          className="px-3.5 py-2 rounded-full bg-white/[0.06] border border-white/15 text-xs text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+          className="px-3.5 py-2 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white cursor-pointer"
         >
           {uniqueSuppliers.map((sup) => (
-            <option key={sup} value={sup} className="bg-[#0b2821] text-white">
+            <option key={sup} value={sup} className="bg-white text-slate-900">
               {sup === 'All' ? 'All suppliers ▾' : sup}
             </option>
           ))}
@@ -750,10 +750,10 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
         <select
           value={selectedBrand}
           onChange={(e) => setSelectedBrand(e.target.value)}
-          className="px-3.5 py-2 rounded-full bg-white/[0.06] border border-white/15 text-xs text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+          className="px-3.5 py-2 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white cursor-pointer"
         >
           {uniqueBrands.map((brand) => (
-            <option key={brand} value={brand} className="bg-[#0b2821] text-white">
+            <option key={brand} value={brand} className="bg-white text-slate-900">
               {brand === 'All' ? 'All brands ▾' : brand}
             </option>
           ))}
@@ -763,13 +763,13 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="px-3.5 py-2 rounded-full bg-white/[0.06] border border-white/15 text-xs text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+          className="px-3.5 py-2 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white cursor-pointer"
         >
-          <option value="featured" className="bg-[#0b2821] text-white">Sort: Featured ▾</option>
-          <option value="popular" className="bg-[#0b2821] text-white">Sort: Best sellers ▾</option>
-          <option value="newest" className="bg-[#0b2821] text-white">Sort: Newest ▾</option>
-          <option value="priceAsc" className="bg-[#0b2821] text-white">Price: Low to High</option>
-          <option value="priceDesc" className="bg-[#0b2821] text-white">Price: High to Low</option>
+          <option value="featured" className="bg-white text-slate-900">Sort: Featured ▾</option>
+          <option value="popular" className="bg-white text-slate-900">Sort: Best sellers ▾</option>
+          <option value="newest" className="bg-white text-slate-900">Sort: Newest ▾</option>
+          <option value="priceAsc" className="bg-white text-slate-900">Price: Low to High</option>
+          <option value="priceDesc" className="bg-white text-slate-900">Price: High to Low</option>
         </select>
 
         {/* In-stock toggle pill */}
@@ -778,15 +778,15 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
           onClick={() => setAvailabilityFilter((prev) => (prev === 'all' ? 'inStock' : 'all'))}
           className={`px-3.5 py-2 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
             availabilityFilter === 'inStock'
-              ? 'bg-[#4de1b7]/20 border-[#4de1b7] text-[#4de1b7]'
-              : 'bg-white/[0.06] border-white/15 text-white/70 hover:bg-white/10'
+              ? 'bg-emerald-50 border-emerald-400 text-emerald-800 font-bold'
+              : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
           }`}
         >
           In stock only
         </button>
 
         {/* Price tag */}
-        <span className="text-xs text-white/60 font-semibold px-2">
+        <span className="text-xs text-slate-600 font-semibold px-2">
           Price $0 – ${maxPrice}
         </span>
 
@@ -794,37 +794,37 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
         <button
           type="button"
           onClick={handleResetFilters}
-          className="text-xs text-white/50 hover:text-white underline cursor-pointer ml-auto"
+          className="text-xs text-emerald-700 hover:text-emerald-900 underline cursor-pointer ml-auto font-semibold"
         >
           Reset filters
         </button>
       </div>
 
       {/* Showing count matching Page 6 */}
-      <div className="text-xs text-white/60">
+      <div className="text-xs text-slate-500 font-medium">
         Showing {filteredSupplies.length} of {supplies.length} supplies
       </div>
 
       {/* Product Grid, Loading State, or Empty State */}
       {loading ? (
-        <div className="rounded-3xl bg-white/[0.06] border border-white/15 p-16 text-center max-w-xl mx-auto my-8">
-          <div className="w-10 h-10 border-4 border-sky-400/20 border-t-sky-400 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-sky-300 font-bold text-sm tracking-wide">
+        <div className="rounded-3xl bg-white border border-slate-200 p-16 text-center max-w-xl mx-auto my-8 shadow-xs">
+          <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-[#0b3b2c] rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-600 font-bold text-sm tracking-wide">
             Loading Agricultural Supplies Catalog from MongoDB...
           </p>
         </div>
       ) : filteredSupplies.length === 0 ? (
-        <div className="rounded-3xl bg-white/[0.06] border border-white/15 p-12 text-center max-w-xl mx-auto my-8">
-          <AlertCircle className="w-12 h-12 text-sky-400 mx-auto mb-3 opacity-80" />
-          <h3 className="text-xl font-bold text-white mb-2">
+        <div className="rounded-3xl bg-white border border-slate-200 p-12 text-center max-w-xl mx-auto my-8 shadow-xs">
+          <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-3" />
+          <h3 className="text-xl font-bold text-slate-900 mb-2">
             No Matching Agricultural Supplies Found
           </h3>
-          <p className="text-xs sm:text-sm text-white/65 mb-6">
+          <p className="text-xs sm:text-sm text-slate-600 mb-6">
             No supplies matched your current search or filter settings. Try broadening your price range or resetting the category filter.
           </p>
           <button
             onClick={handleResetFilters}
-            className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider transition-all cursor-pointer"
+            className="px-5 py-2.5 rounded-xl bg-[#0b3b2c] hover:bg-[#07291e] text-white font-extrabold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-xs"
           >
             Reset Search & Filters
           </button>

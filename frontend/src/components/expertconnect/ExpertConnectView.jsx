@@ -319,27 +319,27 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
         </div>
       )}
 
-      {/* Top Header — Clean Forest Aesthetic matching PDF Page 11 */}
+      {/* Top Header — Clean Light Aesthetic matching App Theme */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Ask an expert
           </h1>
-          <p className="text-xs sm:text-sm text-emerald-100/70 mt-1">
+          <p className="text-sm text-slate-600 mt-1">
             Get help with plants, pests, water and sensors. Only approved, verified experts are listed.
           </p>
         </div>
 
         {currentUser ? (
-          <div className="text-xs text-emerald-200/80 bg-[#0f3830] border border-emerald-500/20 px-3.5 py-1.5 rounded-full shrink-0 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span>Signed in as <strong className="text-white">{currentUser.username}</strong> ({currentUser.role})</span>
+          <div className="text-xs text-slate-700 bg-white border border-slate-200 px-3.5 py-1.5 rounded-full shrink-0 flex items-center gap-2 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Signed in as <strong className="text-slate-900">{currentUser.username}</strong> ({currentUser.role})</span>
           </div>
         ) : (
           <button
             type="button"
             onClick={onOpenLogin}
-            className="text-xs text-emerald-300 hover:text-white bg-[#0f3830] border border-emerald-500/30 px-3.5 py-1.5 rounded-full shrink-0 cursor-pointer font-medium"
+            className="text-xs text-slate-800 hover:text-slate-950 bg-white border border-slate-200 px-3.5 py-1.5 rounded-full shrink-0 cursor-pointer font-semibold shadow-2xs"
           >
             Sign in to submit problems & book →
           </button>
@@ -347,7 +347,7 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
       </div>
 
       {/* Sub-Navigation Pill Bar matching Page 11 Reference */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div className="flex flex-wrap items-center gap-2">
           {[
             { id: 'overview', label: 'Overview' },
@@ -405,9 +405,9 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
             type="button"
             onClick={fetchExperts}
             title="Refresh expert directory"
-            className="px-3.5 py-2 rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-white/90 text-xs font-semibold flex items-center gap-1.5 border border-white/10 cursor-pointer transition-colors"
+            className="px-3.5 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 border border-slate-200 cursor-pointer transition-colors shadow-2xs"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loadingExperts ? 'animate-spin text-emerald-300' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${loadingExperts ? 'animate-spin text-emerald-600' : ''}`} />
             <span>Refresh experts</span>
           </button>
         </div>
@@ -415,11 +415,11 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
 
       {/* Collapsible Notifications Drawer */}
       {showNotificationsPanel && currentUser && (
-        <div className="rounded-2xl bg-[#0f3830] border border-emerald-500/30 p-4 shadow-xl space-y-3">
-          <div className="flex items-center justify-between gap-2 pb-2 border-b border-emerald-500/20">
+        <div className="rounded-2xl bg-white border border-slate-200 p-4 shadow-xl space-y-3">
+          <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-200">
             <div className="flex items-center gap-2">
-              <Bell className="w-4 h-4 text-emerald-400" />
-              <h4 className="text-xs sm:text-sm font-bold text-white">
+              <Bell className="w-4 h-4 text-emerald-600" />
+              <h4 className="text-xs sm:text-sm font-bold text-slate-900">
                 Notifications ({notifications.length})
               </h4>
             </div>
@@ -428,7 +428,7 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                 <button
                   type="button"
                   onClick={handleMarkAllNotifsRead}
-                  className="px-3 py-1 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/30 text-emerald-200 text-xs font-medium cursor-pointer"
+                  className="px-3 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-semibold cursor-pointer"
                 >
                   Mark all read
                 </button>
@@ -436,7 +436,7 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
               <button
                 type="button"
                 onClick={() => setShowNotificationsPanel(false)}
-                className="p-1 rounded-full bg-black/20 hover:bg-black/40 text-white/70 hover:text-white cursor-pointer"
+                className="p-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -444,7 +444,7 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
           </div>
 
           {notifications.length === 0 ? (
-            <p className="text-xs text-emerald-100/60 py-3 text-center">
+            <p className="text-xs text-slate-500 py-3 text-center">
               You have no notifications yet.
             </p>
           ) : (
@@ -456,24 +456,24 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                   onClick={() => handleMarkNotifRead(n)}
                   className={`w-full text-left p-3 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
                     n.isRead
-                      ? 'bg-[#0a2720]/60 border-emerald-500/10 text-emerald-100/70'
-                      : 'bg-[#14473d] border-emerald-400/40 text-white'
+                      ? 'bg-slate-50 border-slate-200 text-slate-600'
+                      : 'bg-emerald-50/70 border-emerald-200 text-slate-900'
                   }`}
                 >
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
                       {!n.isRead && (
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                        <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
                       )}
-                      <span className="text-xs font-bold text-white">
+                      <span className="text-xs font-bold text-slate-900">
                         {n.title}
                       </span>
                     </div>
-                    <p className="text-xs text-emerald-100/75 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       {n.message}
                     </p>
                   </div>
-                  <span className="text-[10px] text-emerald-100/45 font-mono shrink-0">
+                  <span className="text-[10px] text-slate-400 font-mono shrink-0">
                     {new Date(n.createdAt).toLocaleString([], {
                       month: 'short',
                       day: 'numeric',
@@ -493,75 +493,75 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
       {/* ========================================================= */}
       {activeSubTab === 'overview' && (
         <div className="space-y-8">
-          {/* Quick Action Feature Cards - Light White Glassy Look */}
+          {/* Quick Action Feature Cards - Light Crisp Aesthetic */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-6 flex flex-col justify-between shadow-lg shadow-black/10 hover:border-white/25 transition-all min-h-[175px]">
+            <div className="rounded-2xl bg-white border border-slate-200 p-6 flex flex-col justify-between shadow-sm hover:shadow-md hover:border-slate-300 transition-all min-h-[175px]">
               <div>
-                <h3 className="text-lg font-bold text-white mb-2">
+                <h3 className="text-lg font-bold text-slate-900 mb-2">
                   Find an expert
                 </h3>
-                <p className="text-xs sm:text-sm text-white/70 leading-relaxed mb-4">
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
                   Browse plant, pest, hydroponic and sensor specialists.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveSubTab('directory')}
-                className="text-xs sm:text-sm font-bold text-[#4de1b7] hover:text-[#3cd0a6] flex items-center gap-1 cursor-pointer transition-colors mt-auto text-left"
+                className="text-xs sm:text-sm font-bold text-[#0b3b2c] hover:text-[#07291e] flex items-center gap-1 cursor-pointer transition-colors mt-auto text-left"
               >
                 <span>See experts →</span>
               </button>
             </div>
 
-            <div className="rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-6 flex flex-col justify-between shadow-lg shadow-black/10 hover:border-white/25 transition-all min-h-[175px]">
+            <div className="rounded-2xl bg-white border border-slate-200 p-6 flex flex-col justify-between shadow-sm hover:shadow-md hover:border-slate-300 transition-all min-h-[175px]">
               <div>
-                <h3 className="text-lg font-bold text-white mb-2">
+                <h3 className="text-lg font-bold text-slate-900 mb-2">
                   Describe your problem
                 </h3>
-                <p className="text-xs sm:text-sm text-white/70 leading-relaxed mb-4">
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
                   Tell us what you see. We match you with the right expert.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveSubTab('problem')}
-                className="text-xs sm:text-sm font-bold text-[#4de1b7] hover:text-[#3cd0a6] flex items-center gap-1 cursor-pointer transition-colors mt-auto text-left"
+                className="text-xs sm:text-sm font-bold text-[#0b3b2c] hover:text-[#07291e] flex items-center gap-1 cursor-pointer transition-colors mt-auto text-left"
               >
                 <span>Report a problem →</span>
               </button>
             </div>
 
-            <div className="rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-6 flex flex-col justify-between shadow-lg shadow-black/10 hover:border-white/25 transition-all min-h-[175px]">
+            <div className="rounded-2xl bg-white border border-slate-200 p-6 flex flex-col justify-between shadow-sm hover:shadow-md hover:border-slate-300 transition-all min-h-[175px]">
               <div>
-                <h3 className="text-lg font-bold text-white mb-2">
+                <h3 className="text-lg font-bold text-slate-900 mb-2">
                   My consultations
                 </h3>
-                <p className="text-xs sm:text-sm text-white/70 leading-relaxed mb-4">
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
                   Your bookings, messages and treatment plans.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveSubTab('consultations')}
-                className="text-xs sm:text-sm font-bold text-[#4de1b7] hover:text-[#3cd0a6] flex items-center gap-1 cursor-pointer transition-colors mt-auto text-left"
+                className="text-xs sm:text-sm font-bold text-[#0b3b2c] hover:text-[#07291e] flex items-center gap-1 cursor-pointer transition-colors mt-auto text-left"
               >
                 <span>Open →</span>
               </button>
             </div>
 
-            <div className="rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-6 flex flex-col justify-between shadow-lg shadow-black/10 hover:border-white/25 transition-all min-h-[175px]">
+            <div className="rounded-2xl bg-white border border-slate-200 p-6 flex flex-col justify-between shadow-sm hover:shadow-md hover:border-slate-300 transition-all min-h-[175px]">
               <div>
-                <h3 className="text-lg font-bold text-white mb-2">
+                <h3 className="text-lg font-bold text-slate-900 mb-2">
                   Become an expert
                 </h3>
-                <p className="text-xs sm:text-sm text-white/70 leading-relaxed mb-4">
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
                   Have farming qualifications? Apply to be verified.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveSubTab('apply')}
-                className="text-xs sm:text-sm font-bold text-[#4de1b7] hover:text-[#3cd0a6] flex items-center gap-1 cursor-pointer transition-colors mt-auto text-left"
+                className="text-xs sm:text-sm font-bold text-[#0b3b2c] hover:text-[#07291e] flex items-center gap-1 cursor-pointer transition-colors mt-auto text-left"
               >
                 <span>Apply →</span>
               </button>
@@ -570,7 +570,7 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
 
           {/* Experts Section - Matching Exact Screenshot Layout */}
           <div className="space-y-4 pt-2">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-slate-900">
               {experts.length} experts ready to help
             </h2>
 
@@ -592,8 +592,8 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                     }
                     className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-[#4de1b7] text-slate-950 font-bold border-transparent'
-                        : 'bg-white/[0.08] hover:bg-white/[0.15] text-white/90 border-white/10'
+                        ? 'bg-[#0b3b2c] text-white font-bold border-transparent shadow-xs'
+                        : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-2xs'
                     }`}
                   >
                     {type.label}
@@ -644,10 +644,10 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                   key={type.id}
                   type="button"
                   onClick={() => setSelectedConsultationType(type.id)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-[#4de1b7] text-slate-950 font-bold border-transparent'
-                      : 'bg-white/[0.08] hover:bg-white/[0.15] text-white/90 border border-white/10'
+                      ? 'bg-[#0b3b2c] text-white shadow-xs'
+                      : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs'
                   }`}
                 >
                   {type.label}
@@ -657,24 +657,24 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
           </div>
 
           {/* Search, Qualification, Specialty & Sort Controls */}
-          <div className="rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-4 space-y-3 shadow-lg shadow-black/10">
+          <div className="rounded-2xl bg-white border border-slate-200 p-4 space-y-3 shadow-xs">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
               {/* Search by Expert Name, Qualification, or Topic */}
               <div className="md:col-span-5 relative">
-                <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by name, qualification, or topic..."
                   aria-label="Search agricultural experts"
-                  className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/[0.06] border border-white/15 text-xs sm:text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#4de1b7]"
+                  className="w-full pl-9 pr-8 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:bg-white"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/50 hover:text-white cursor-pointer"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -687,13 +687,11 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                   value={selectedSpecialization}
                   onChange={(e) => setSelectedSpecialization(e.target.value)}
                   aria-label="Filter by specialization"
-                  className="w-full px-3 py-2 rounded-xl bg-white/[0.06] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white cursor-pointer"
                 >
-                  <option value="All" className="bg-[#0b2821] text-white">
-                    All Specializations
-                  </option>
+                  <option value="All">All Specializations</option>
                   {EXPERT_SPECIALIZATIONS.map((spec) => (
-                    <option key={spec.id} value={spec.id} className="bg-[#0b2821] text-white">
+                    <option key={spec.id} value={spec.id}>
                       {spec.label}
                     </option>
                   ))}
@@ -706,20 +704,12 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                   value={selectedQualification}
                   onChange={(e) => setSelectedQualification(e.target.value)}
                   aria-label="Filter by qualification"
-                  className="w-full px-3 py-2 rounded-xl bg-white/[0.06] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white cursor-pointer"
                 >
-                  <option value="All" className="bg-[#0b2821] text-white">
-                    All Degrees
-                  </option>
-                  <option value="PhD" className="bg-[#0b2821] text-white">
-                    Doctorate (PhD)
-                  </option>
-                  <option value="MSc" className="bg-[#0b2821] text-white">
-                    Master's (MSc)
-                  </option>
-                  <option value="BSc" className="bg-[#0b2821] text-white">
-                    Bachelor's (BSc)
-                  </option>
+                  <option value="All">All Degrees</option>
+                  <option value="PhD">Doctorate (PhD)</option>
+                  <option value="MSc">Master's (MSc)</option>
+                  <option value="BSc">Bachelor's (BSc)</option>
                 </select>
               </div>
 
@@ -729,46 +719,36 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   aria-label="Sort experts"
-                  className="w-full px-3 py-2 rounded-xl bg-white/[0.06] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white cursor-pointer"
                 >
-                  <option value="availability" className="bg-[#0b2821] text-white">
-                    Available First
-                  </option>
-                  <option value="experience" className="bg-[#0b2821] text-white">
-                    Most Experienced
-                  </option>
-                  <option value="rating" className="bg-[#0b2821] text-white">
-                    Top Rated
-                  </option>
-                  <option value="fee_asc" className="bg-[#0b2821] text-white">
-                    Fee: Low to High
-                  </option>
-                  <option value="fee_desc" className="bg-[#0b2821] text-white">
-                    Fee: High to Low
-                  </option>
+                  <option value="availability">Available First</option>
+                  <option value="experience">Most Experienced</option>
+                  <option value="rating">Top Rated</option>
+                  <option value="fee_asc">Fee: Low to High</option>
+                  <option value="fee_desc">Fee: High to Low</option>
                 </select>
               </div>
             </div>
 
             {/* Bottom Row: Availability Toggle, Max Fee Slider & Reset */}
-            <div className="pt-2 border-t border-emerald-500/15 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setAvailableOnly((prev) => !prev)}
                   className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1.5 ${
                     availableOnly
-                      ? 'bg-emerald-500/20 border-emerald-400/50 text-emerald-300 font-bold'
-                      : 'bg-[#0a2720] border-emerald-500/20 text-emerald-100/70 hover:text-white'
+                      ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
-                  <Clock className="w-3 h-3" />
+                  <Clock className="w-3 h-3 text-slate-500" />
                   <span>Available now only</span>
                 </button>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-emerald-100/75">
-                    Max fee: <strong className="text-white">${maxFee}</strong>
+                  <span className="text-slate-600">
+                    Max fee: <strong className="text-slate-900">${maxFee}</strong>
                   </span>
                   <input
                     type="range"
@@ -777,20 +757,20 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                     step="5"
                     value={maxFee}
                     onChange={(e) => setMaxFee(Number(e.target.value))}
-                    className="w-24 sm:w-32 accent-[#4de1b7] cursor-pointer"
+                    className="w-24 sm:w-32 accent-[#0b3b2c] cursor-pointer"
                     aria-label="Maximum consultation fee slider"
                   />
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-emerald-100/60">
-                  Showing <strong className="text-white">{experts.length}</strong> expert{experts.length === 1 ? '' : 's'}
+                <span className="text-slate-500">
+                  Showing <strong className="text-slate-900">{experts.length}</strong> expert{experts.length === 1 ? '' : 's'}
                 </span>
                 <button
                   type="button"
                   onClick={handleResetExpertFilters}
-                  className="text-xs text-emerald-300 hover:text-white underline cursor-pointer"
+                  className="text-xs text-emerald-700 hover:text-emerald-900 underline cursor-pointer font-semibold"
                 >
                   Reset filters
                 </button>
@@ -800,20 +780,20 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
 
           {/* Expert Cards Grid or Empty State */}
           {loadingExperts ? (
-            <div className="rounded-2xl bg-[#0f3830] border border-emerald-500/20 p-12 text-center">
-              <div className="w-8 h-8 border-3 border-emerald-400/20 border-t-[#4de1b7] rounded-full animate-spin mx-auto mb-2" />
-              <p className="text-xs font-semibold text-emerald-200">
+            <div className="rounded-2xl bg-white border border-slate-200 p-12 text-center shadow-xs">
+              <div className="w-8 h-8 border-3 border-emerald-500/20 border-t-[#0b3b2c] rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-xs font-semibold text-slate-600">
                 Loading expert directory...
               </p>
             </div>
           ) : experts.length === 0 ? (
-            <div className="rounded-2xl bg-[#0f3830] border border-emerald-500/20 p-10 text-center space-y-3">
-              <Users className="w-10 h-10 text-emerald-400/60 mx-auto" />
+            <div className="rounded-2xl bg-white border border-slate-200 p-10 text-center space-y-3 shadow-xs">
+              <Users className="w-10 h-10 text-slate-400 mx-auto" />
               <div>
-                <h4 className="text-base font-bold text-white">
+                <h4 className="text-base font-bold text-slate-900">
                   No experts match your filters
                 </h4>
-                <p className="text-xs text-emerald-100/65 max-w-sm mx-auto mt-0.5">
+                <p className="text-xs text-slate-500 max-w-sm mx-auto mt-0.5">
                   Try clearing your search terms or broadening the consultation type.
                 </p>
               </div>
@@ -821,7 +801,7 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                 <button
                   type="button"
                   onClick={handleResetExpertFilters}
-                  className="px-4 py-1.5 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 font-bold text-xs cursor-pointer"
+                  className="px-4 py-1.5 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white font-bold text-xs cursor-pointer shadow-xs"
                 >
                   Show all experts
                 </button>

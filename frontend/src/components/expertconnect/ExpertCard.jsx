@@ -68,7 +68,7 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
     Boolean(expert.profilePhoto) && !expert.profilePhoto.includes('unsplash');
 
   return (
-    <div className="flex flex-col justify-between rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-5 shadow-lg shadow-black/10 hover:border-white/25 transition-all">
+    <div className="flex flex-col justify-between rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 p-5 transition-all text-slate-900">
       <div className="space-y-3.5">
         {/* Top: Avatar, Name, Verification Badge */}
         <div className="flex items-center gap-3.5">
@@ -76,7 +76,7 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
             <img
               src={expert.profilePhoto}
               alt={expert.fullName}
-              className="rounded-full object-cover shrink-0 border border-white/20 shadow-sm"
+              className="rounded-full object-cover shrink-0 border border-slate-200 shadow-sm"
               style={{
                 width: '52px',
                 height: '52px',
@@ -103,14 +103,16 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
           )}
 
           <div className="min-w-0 flex-1">
-            <h3 className="text-base font-bold text-white truncate">
+            <h3 className="text-base font-bold text-slate-900 truncate">
               {expert.fullName}
             </h3>
 
-            <div className="text-xs text-emerald-400 font-medium mt-0.5">
-              <span>{expert.isVerified ? 'Verified' : 'Pending'}</span>
-              <span> · </span>
-              <span className={isAvailable ? 'text-emerald-400' : 'text-amber-300'}>
+            <div className="text-xs font-semibold mt-0.5 flex items-center gap-1.5">
+              <span className={expert.isVerified ? 'text-emerald-700' : 'text-slate-500'}>
+                {expert.isVerified ? 'Verified' : 'Pending'}
+              </span>
+              <span className="text-slate-300">·</span>
+              <span className={isAvailable ? 'text-emerald-700' : 'text-amber-700'}>
                 {isAvailable ? 'Available' : 'Busy'}
               </span>
             </div>
@@ -119,12 +121,12 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
 
         {/* Title */}
         <div>
-          <p className="text-xs sm:text-sm font-semibold text-[#4de1b7] line-clamp-1">
+          <p className="text-xs sm:text-sm font-semibold text-emerald-800 line-clamp-1">
             {expert.professionalTitle}
           </p>
 
           {/* Experience & Location */}
-          <div className="text-xs text-white/70 mt-1">
+          <div className="text-xs text-slate-500 mt-1">
             {expert.yearsOfExperience !== undefined && (
               <span>{expert.yearsOfExperience}+ years experience</span>
             )}
@@ -139,20 +141,20 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
           {(expert.specializations || []).slice(0, 3).map((spec) => (
             <span
               key={spec}
-              className="px-3 py-1 rounded-full bg-white/[0.10] border border-white/10 text-xs font-medium text-white/90"
+              className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700"
             >
               {spec}
             </span>
           ))}
           {(expert.specializations || []).length > 3 && (
-            <span className="px-2.5 py-1 rounded-full bg-white/[0.08] text-[11px] text-white/60">
+            <span className="px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-[11px] font-semibold text-slate-500">
               +{expert.specializations.length - 3}
             </span>
           )}
         </div>
 
         {/* Consultation Formats */}
-        <div className="text-xs text-white/60 pt-0.5">
+        <div className="text-xs text-slate-500 pt-0.5">
           {(expert.consultationTypes || [])
             .map((t) =>
               t === 'in_person'
@@ -168,23 +170,23 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
       </div>
 
       {/* Bottom: Fee, Rating & Actions */}
-      <div className="pt-4 mt-3 border-t border-white/10 flex flex-col gap-3">
+      <div className="pt-4 mt-3 border-t border-slate-100 flex flex-col gap-3">
         <div className="flex items-baseline justify-between">
           <div>
-            <span className="text-2xl font-extrabold text-white">
+            <span className="text-2xl font-black text-slate-950">
               ${Number(expert.consultationFee || 0).toFixed(0)}
             </span>
-            <span className="text-xs text-white/70 ml-1">per session</span>
+            <span className="text-xs text-slate-500 ml-1 font-medium">per session</span>
           </div>
 
           {hasGenuineRating ? (
-            <div className="flex items-center gap-1 text-xs text-amber-300 font-bold">
+            <div className="flex items-center gap-1 text-xs text-amber-600 font-bold">
               <span>★</span>
               <span>{Number(expert.averageRating).toFixed(1)}</span>
-              <span className="text-white/50">({reviewsCount})</span>
+              <span className="text-slate-400 font-normal">({reviewsCount})</span>
             </div>
           ) : (
-            <span className="text-xs text-white/60">
+            <span className="text-xs text-slate-500 font-medium">
               {expert.completedConsultationsCount > 0
                 ? `${expert.completedConsultationsCount} completed`
                 : 'Verified'}
@@ -196,7 +198,7 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
           <button
             type="button"
             onClick={() => onViewProfile && onViewProfile(expert)}
-            className="py-2 px-4 rounded-full border border-white/25 bg-white/[0.06] hover:bg-white/[0.14] text-white text-xs font-bold text-center cursor-pointer transition-colors"
+            className="py-2 px-4 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold text-center cursor-pointer transition-colors shadow-2xs"
           >
             Profile
           </button>
@@ -204,10 +206,10 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
             type="button"
             onClick={() => onRequestConsultation && onRequestConsultation(expert)}
             disabled={!isAvailable}
-            className={`py-2 px-4 rounded-full text-xs font-bold text-center transition-colors shadow-sm ${
+            className={`py-2 px-4 rounded-full text-xs font-bold text-center transition-colors shadow-xs ${
               isAvailable
-                ? 'bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 cursor-pointer'
-                : 'bg-white/10 text-white/30 cursor-not-allowed'
+                ? 'bg-[#0b3b2c] hover:bg-[#07291e] text-white font-extrabold cursor-pointer'
+                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
             }`}
           >
             Request help
