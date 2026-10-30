@@ -111,9 +111,9 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={handleGoHome}
           className="flex items-center gap-2.5 cursor-pointer group"
         >
-          <div className="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/30 shadow-md group-hover:bg-white/25 transition-all">
+          <div className="w-9 h-9 rounded-xl bg-emerald-600/10 border border-emerald-600/20 flex items-center justify-center shadow-sm group-hover:bg-emerald-600/15 transition-all">
             <svg
-              className="w-5 h-5 text-white"
+              className="w-5 h-5 text-emerald-700"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -125,7 +125,7 @@ export const Header: React.FC<HeaderProps> = ({
               <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
             </svg>
           </div>
-          <span className="text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
+          <span className="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-1.5">
             SmartGrow
           </span>
         </div>
@@ -137,8 +137,8 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={handleGoHome}
             className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
               currentView === 'home'
-                ? 'bg-white/15 text-white font-bold border border-white/20'
-                : 'text-white/80 hover:text-white hover:bg-white/10'
+                ? 'bg-slate-100 text-slate-900 font-bold border border-slate-200 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/60'
             }`}
           >
             Home
@@ -148,11 +148,11 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold text-white/90 hover:text-white hover:bg-white/10 transition-all cursor-pointer group"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold text-slate-700 hover:text-slate-950 hover:bg-slate-100/60 transition-all cursor-pointer group"
             >
               <span>Ecosystem</span>
               <ChevronDown
-                className={`w-4 h-4 text-white/70 group-hover:text-white transition-transform duration-300 ${
+                className={`w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-transform duration-300 ${
                   isDropdownOpen ? 'rotate-180' : ''
                 }`}
               />
@@ -160,9 +160,9 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Frosted Glass Dropdown Panel */}
             {isDropdownOpen && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 sm:w-80 rounded-2xl bg-[#0f3824]/95 backdrop-blur-2xl border border-white/25 shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="px-3 py-1.5 border-b border-white/10 mb-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300/80">
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 sm:w-80 rounded-2xl bg-white/95 backdrop-blur-2xl border border-slate-200 shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="px-3 py-1.5 border-b border-slate-100 mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
                     SmartGrow Modules
                   </span>
                 </div>
@@ -177,15 +177,15 @@ export const Header: React.FC<HeaderProps> = ({
                         onClick={() => handleDropdownSelect(item)}
                         className={`w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-all cursor-pointer group ${
                           isCurrent
-                            ? 'bg-white/20 border border-white/30 text-white'
-                            : 'hover:bg-white/10 text-white/80 hover:text-white'
+                            ? 'bg-emerald-50 border border-emerald-200 text-emerald-950 font-medium'
+                            : 'hover:bg-slate-50 text-slate-700 hover:text-slate-950'
                         }`}
                       >
                         <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-xs"
                           style={{
-                            backgroundColor: `${item.color}25`,
-                            border: `1px solid ${item.color}55`,
+                            backgroundColor: `${item.color}15`,
+                            border: `1px solid ${item.color}35`,
                           }}
                         >
                           <IconComponent
@@ -194,14 +194,14 @@ export const Header: React.FC<HeaderProps> = ({
                           />
                         </div>
                         <div className="flex flex-col min-w-0 flex-1">
-                          <span className="text-xs font-bold text-white tracking-tight group-hover:text-emerald-300 transition-colors">
+                          <span className="text-xs font-bold text-slate-900 tracking-tight group-hover:text-emerald-700 transition-colors">
                             {item.title}
                           </span>
-                          <span className="text-[10.5px] text-white/60 truncate mt-0.5">
+                          <span className="text-[10.5px] text-slate-500 truncate mt-0.5">
                             {item.desc}
                           </span>
                         </div>
-                        <ChevronRight className="w-3.5 h-3.5 text-white/30 group-hover:text-emerald-300 group-hover:translate-x-0.5 transition-all shrink-0" />
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all shrink-0" />
                       </button>
                     );
                   })}
@@ -217,11 +217,11 @@ export const Header: React.FC<HeaderProps> = ({
             }}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
               currentView === 'support'
-                ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-400/40 shadow-sm font-bold'
-                : 'text-white/80 hover:text-white hover:bg-white/10'
+                ? 'bg-emerald-50 text-emerald-900 border border-emerald-200 shadow-xs font-bold'
+                : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100/60'
             }`}
           >
-            <LifeBuoy className="w-3.5 h-3.5 text-emerald-300" />
+            <LifeBuoy className="w-3.5 h-3.5 text-emerald-600" />
             <span>Support</span>
           </button>
         </nav>
@@ -232,14 +232,14 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={onGoToDashboard}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/30 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm tracking-wide shadow-md transition-all cursor-pointer border border-emerald-400/50"
+                className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white font-bold text-xs sm:text-sm tracking-wide shadow-sm transition-all cursor-pointer"
               >
                 <span>Hi, {currentUser.username || currentUser.name || 'User'}</span>
               </button>
               {onLogout && (
                 <button
                   onClick={onLogout}
-                  className="px-3 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs cursor-pointer"
+                  className="px-3.5 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer border border-slate-200/80 transition-colors"
                   title="Logout"
                 >
                   Logout
@@ -249,9 +249,9 @@ export const Header: React.FC<HeaderProps> = ({
           ) : (
             <button
               onClick={() => onOpenLogin && onOpenLogin()}
-              className="flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full bg-white/15 hover:bg-white text-white hover:text-[#113824] backdrop-blur-md border border-white/30 text-xs sm:text-sm font-bold tracking-wide shadow-md transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer group"
+              className="flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white text-xs sm:text-sm font-bold tracking-wide shadow-sm transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer group"
             >
-              <LogIn className="w-4 h-4 text-[#4ade80] group-hover:text-[#113824] transition-colors" />
+              <LogIn className="w-4 h-4 text-emerald-300 group-hover:text-white transition-colors" />
               <span>Login</span>
             </button>
           )}

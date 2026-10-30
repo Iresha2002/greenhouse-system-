@@ -602,10 +602,10 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
       {/* Header matching Page 6: Buy farm supplies */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Buy farm supplies
           </h1>
-          <p className="text-white/60 text-sm mt-1">
+          <p className="text-slate-600 text-sm mt-1">
             Seeds, plant food, sensors and more. 10 sectors &middot; {supplies.length} products.
           </p>
         </div>
@@ -616,7 +616,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
             <button
               type="button"
               onClick={() => setIsSupplierStudioOpen(true)}
-              className="px-4 py-2 rounded-full border border-white/20 bg-white/[0.06] hover:bg-white/10 text-white font-bold text-xs transition-all cursor-pointer"
+              className="px-4 py-2 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs transition-all cursor-pointer shadow-2xs"
             >
               Supplier Studio
             </button>
@@ -625,7 +625,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
           <button
             type="button"
             onClick={() => setIsProfileModalOpen(true)}
-            className="px-4 py-2 rounded-full border border-white/20 bg-white/[0.06] hover:bg-white/10 text-white font-bold text-xs transition-all cursor-pointer"
+            className="px-4 py-2 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs transition-all cursor-pointer shadow-2xs"
           >
             My profile
           </button>
@@ -633,7 +633,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
           <button
             type="button"
             onClick={() => setIsCustomerOrdersOpen(true)}
-            className="px-4 py-2 rounded-full border border-white/20 bg-white/[0.06] hover:bg-white/10 text-white font-bold text-xs transition-all cursor-pointer"
+            className="px-4 py-2 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs transition-all cursor-pointer shadow-2xs"
           >
             My orders
           </button>
@@ -641,7 +641,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
           <button
             type="button"
             onClick={() => setIsCartDrawerOpen(true)}
-            className="px-5 py-2 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 font-extrabold text-xs transition-all cursor-pointer shadow-md"
+            className="px-5 py-2 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white font-extrabold text-xs transition-all cursor-pointer shadow-xs"
           >
             Basket ({totalBasketItems})
           </button>
@@ -649,7 +649,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
       </div>
 
       {/* Live status line matching Page 6 */}
-      <div className="flex items-center justify-between text-xs text-white/50 border-b border-white/10 pb-4">
+      <div className="flex items-center justify-between text-xs text-slate-500 border-b border-slate-200 pb-4">
         <div className="flex items-center gap-2">
           <span>
             {isUsingFallback ? 'Sample fallback catalog' : 'Live stock list'}
@@ -658,7 +658,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
           <button
             type="button"
             onClick={fetchSuppliesCatalog}
-            className="text-[#4de1b7] hover:underline cursor-pointer ml-2"
+            className="text-emerald-700 font-semibold hover:underline cursor-pointer ml-2"
           >
             Refresh list
           </button>
@@ -678,8 +678,8 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
             onClick={() => setActiveCollectionTab(tab.id)}
             className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               activeCollectionTab === tab.id
-                ? 'bg-white text-slate-950 font-black'
-                : 'bg-white/[0.06] border border-white/15 text-white/80 hover:bg-white/10'
+                ? 'bg-[#0b3b2c] text-white font-black shadow-xs'
+                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs'
             }`}
           >
             {tab.label}
@@ -709,8 +709,8 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
               onClick={() => setSelectedCategory(cat.id)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                 isSelected
-                  ? 'bg-[#4de1b7] text-slate-950 shadow-md'
-                  : 'bg-white/[0.07] border border-white/15 text-white/80 hover:bg-white/10'
+                  ? 'bg-[#f59e0b] text-slate-950 shadow-xs'
+                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs'
               }`}
             >
               {cat.label}
@@ -720,10 +720,10 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
       </div>
 
       {/* Search & Filter Controls matching Page 6 */}
-      <div className="bg-white/[0.07] border border-white/15 backdrop-blur-md rounded-2xl p-4 flex flex-wrap items-center gap-3">
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap items-center gap-3 shadow-xs">
         {/* Search */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="w-3.5 h-3.5 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}

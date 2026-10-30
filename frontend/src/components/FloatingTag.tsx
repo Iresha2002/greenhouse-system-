@@ -140,8 +140,8 @@ export const FloatingTag: React.FC<FloatingTagProps> = ({
 
         {/* Value and Label text */}
         <div className="flex items-center gap-1.5 whitespace-nowrap text-xs">
-          <span className="font-medium text-white/90">{tag.label}</span>
-          <span className="font-bold text-white">{tag.value}</span>
+          <span className="font-semibold text-slate-700">{tag.label}</span>
+          <span className="font-extrabold text-slate-950">{tag.value}</span>
         </div>
       </div>
     </>

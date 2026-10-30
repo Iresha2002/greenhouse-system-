@@ -158,12 +158,12 @@ export function App() {
   // Render Dashboard / Portal View
   if (currentView === 'dashboard') {
     return (
-      <div className="relative min-h-screen w-full bg-[#184832] overflow-x-hidden flex flex-col font-sans antialiased text-white selection:bg-emerald-400 selection:text-[#0b2b1c]">
+      <div className="relative min-h-screen w-full bg-[#f6f9f8] overflow-x-hidden flex flex-col font-sans antialiased text-slate-900 selection:bg-emerald-200 selection:text-emerald-950">
         {/* Background Atmosphere & Glow */}
         <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(130%_105%_at_65%_35%,#286e4d_0%,#1e593d_28%,#15462f_62%,#0f3523_100%)]" />
-          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none bg-emerald-500/20" />
-          <div className="absolute bottom-10 left-12 w-[450px] h-[450px] bg-[#34a86b]/20 rounded-full blur-[130px] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(130%_105%_at_65%_35%,#ffffff_0%,#f4f8f5_40%,#edf4f0_75%,#e5efe9_100%)]" />
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none bg-emerald-200/35" />
+          <div className="absolute bottom-10 left-12 w-[450px] h-[450px] bg-teal-100/40 rounded-full blur-[130px] pointer-events-none" />
         </div>
 
         <Navbar
@@ -183,7 +183,7 @@ export function App() {
         <main className="relative z-10 dashboard-main max-w-7xl mx-auto px-4 sm:px-8 py-6 w-full flex-1">
           {/* Module Navigation Tabs matching PDF Pages 2, 6, 11 */}
           <div className="mb-6 flex items-center">
-            <div className="inline-flex items-center p-1 rounded-full bg-black/25 border border-white/10 overflow-x-auto no-scrollbar">
+            <div className="inline-flex items-center p-1 rounded-full bg-white border border-slate-200 shadow-sm overflow-x-auto no-scrollbar">
               {[
                 { id: 'greenhouse', label: 'Smart Greenhouse' },
                 { id: 'marketplace', label: 'Crop Marketplace' },
@@ -191,7 +191,7 @@ export function App() {
                 { id: 'hydroponics', label: 'ExpertConnect' },
               ].map((tab) => {
                 const isActive = selectedDashboardTab === tab.id;
-                const activeStyle = 'bg-[#f59e0b] text-slate-950 font-bold shadow-md';
+                const activeStyle = 'bg-[#f59e0b] text-slate-950 font-bold shadow-sm';
 
                 return (
                   <button
@@ -201,7 +201,7 @@ export function App() {
                     className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
                       isActive
                         ? activeStyle
-                        : 'text-white/75 hover:text-white hover:bg-white/[0.08]'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
                     {tab.label}
@@ -300,12 +300,12 @@ export function App() {
   // Render Support Page View
   if (currentView === 'support') {
     return (
-      <div className="relative min-h-screen w-full bg-[#184832] overflow-x-hidden flex flex-col font-sans antialiased text-white selection:bg-emerald-400 selection:text-[#0b2b1c] scroll-smooth">
+      <div className="relative min-h-screen w-full bg-[#f6f9f8] overflow-x-hidden flex flex-col font-sans antialiased text-slate-900 selection:bg-emerald-200 selection:text-emerald-950 scroll-smooth">
         {/* Background Atmosphere & Glow */}
         <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(130%_105%_at_65%_35%,#286e4d_0%,#1e593d_28%,#15462f_62%,#0f3523_100%)]" />
-          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none bg-emerald-500/20" />
-          <div className="absolute bottom-10 left-12 w-[450px] h-[450px] bg-[#34a86b]/20 rounded-full blur-[130px] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(130%_105%_at_65%_35%,#ffffff_0%,#f4f8f5_40%,#edf4f0_75%,#e5efe9_100%)]" />
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none bg-emerald-200/35" />
+          <div className="absolute bottom-10 left-12 w-[450px] h-[450px] bg-teal-100/40 rounded-full blur-[130px] pointer-events-none" />
         </div>
 
         <Navbar
@@ -355,17 +355,14 @@ export function App() {
 
   // Render SmartGrow Landing Page
   return (
-    <div className="relative min-h-screen w-full bg-[#184832] overflow-x-hidden flex flex-col font-sans antialiased text-white selection:bg-emerald-400 selection:text-[#0b2b1c] scroll-smooth">
+    <div className="relative min-h-screen w-full bg-[#f6f9f8] overflow-x-hidden flex flex-col font-sans antialiased text-slate-900 selection:bg-emerald-200 selection:text-emerald-950 scroll-smooth">
       {/* Background Atmosphere & Glow */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(130%_105%_at_65%_35%,#286e4d_0%,#1e593d_28%,#15462f_62%,#0f3523_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(130%_105%_at_65%_35%,#ffffff_0%,#f4f8f5_40%,#edf4f0_75%,#e5efe9_100%)]" />
         <div
-          className="absolute top-1/4 right-1/4 w-[550px] h-[550px] rounded-full blur-[140px] pointer-events-none transition-all duration-1000 opacity-60"
-          style={{
-            backgroundColor: `${currentSlide.accentColor}30`,
-          }}
+          className="absolute top-1/4 right-1/4 w-[550px] h-[550px] rounded-full blur-[140px] pointer-events-none transition-all duration-1000 opacity-60 bg-emerald-200/40"
         />
-        <div className="absolute bottom-10 left-12 w-[450px] h-[450px] bg-[#34a86b]/20 rounded-full blur-[130px] pointer-events-none" />
+        <div className="absolute bottom-10 left-12 w-[450px] h-[450px] bg-lime-100/40 rounded-full blur-[130px] pointer-events-none" />
       </div>
 
       <AtmosphereCanvas />
@@ -398,31 +395,31 @@ export function App() {
 
         {/* Carousel Navigation Bar */}
         <div className="relative z-20 w-full flex flex-col shrink-0 pb-2">
-          <div className="flex items-center justify-between px-8 sm:px-12 md:px-16 pb-1 text-xs text-white/50 max-w-7xl mx-auto w-full">
+          <div className="flex items-center justify-between px-8 sm:px-12 md:px-16 pb-1 text-xs text-slate-500 max-w-7xl mx-auto w-full">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="font-medium text-white/70">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="font-semibold text-slate-700">
                 Slide {activeIndex + 1} of {SLIDES.length}
               </span>
-              <span className="text-white/40">•</span>
-              <span className="text-emerald-300 font-semibold">
+              <span className="text-slate-400">•</span>
+              <span className="text-[#0b3b2c] font-bold">
                 {currentSlide.bottomCard.title}
               </span>
             </div>
 
             <button
               onClick={() => setIsAutoPlay(!isAutoPlay)}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill hover:bg-white/10 hover:text-white transition-all cursor-pointer text-[11px]"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill hover:bg-slate-100 text-slate-700 hover:text-slate-900 transition-all cursor-pointer text-[11px] shadow-sm"
               title={isAutoPlay ? 'Pause auto-transition' : 'Resume auto-transition'}
             >
               {isAutoPlay ? (
                 <>
-                  <Pause className="w-3 h-3 text-emerald-400" />
+                  <Pause className="w-3 h-3 text-emerald-600" />
                   <span>Auto-transition Active</span>
                 </>
               ) : (
                 <>
-                  <Play className="w-3 h-3 text-white/70" />
+                  <Play className="w-3 h-3 text-slate-600" />
                   <span>Auto-transition Paused</span>
                 </>
               )}

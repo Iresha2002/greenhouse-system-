@@ -362,11 +362,11 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
             const isActive = activeSubTab === tab.id;
             let pillClass = '';
             if (isActive) {
-              pillClass = 'bg-[#4de1b7] text-slate-950 font-bold shadow';
+              pillClass = 'bg-[#0b3b2c] text-white font-bold shadow-xs';
             } else if (tab.isAdmin) {
-              pillClass = 'border border-amber-400/50 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20';
+              pillClass = 'border border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100 shadow-2xs';
             } else {
-              pillClass = 'bg-white/[0.08] hover:bg-white/[0.14] text-white/90 border border-white/10';
+              pillClass = 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs';
             }
             return (
               <button
@@ -389,9 +389,9 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                 setShowNotificationsPanel((prev) => !prev);
                 fetchNotifications();
               }}
-              className="relative px-3.5 py-2 rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-white/90 text-xs font-semibold flex items-center gap-1.5 border border-white/10 cursor-pointer transition-colors"
+              className="relative px-3.5 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-1.5 border border-slate-200 cursor-pointer transition-colors shadow-2xs"
             >
-              <Bell className="w-3.5 h-3.5 text-emerald-300" />
+              <Bell className="w-3.5 h-3.5 text-emerald-600" />
               <span>Notifications</span>
               {unreadNotifCount > 0 && (
                 <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950 font-bold text-[10px]">

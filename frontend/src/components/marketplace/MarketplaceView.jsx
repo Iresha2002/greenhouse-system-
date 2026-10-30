@@ -458,10 +458,10 @@ export const MarketplaceView = ({ currentUser }) => {
       {/* Top Page Header matching Page 2 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Buy fresh crops
           </h1>
-          <p className="text-xs sm:text-sm text-emerald-100/70 mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
             Pick a crop, add it to your basket, then choose delivery or pickup.
           </p>
         </div>
@@ -471,7 +471,7 @@ export const MarketplaceView = ({ currentUser }) => {
             <button
               type="button"
               onClick={() => setIsFarmerStudioOpen(true)}
-              className="px-4 py-2 rounded-full border border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/10 text-xs font-semibold cursor-pointer transition-colors"
+              className="px-4 py-2 rounded-full border border-emerald-600 text-emerald-800 hover:bg-emerald-50 text-xs font-semibold cursor-pointer transition-colors"
             >
               Farmer studio
             </button>
@@ -480,7 +480,7 @@ export const MarketplaceView = ({ currentUser }) => {
           <button
             type="button"
             onClick={() => setIsOrdersModalOpen(true)}
-            className="px-4 py-2 rounded-full border border-white/20 bg-white/[0.06] hover:bg-white/[0.14] text-white text-xs font-semibold cursor-pointer transition-colors"
+            className="px-4 py-2 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
           >
             My orders
           </button>
@@ -488,7 +488,7 @@ export const MarketplaceView = ({ currentUser }) => {
           <button
             type="button"
             onClick={() => setIsCartDrawerOpen(true)}
-            className="px-4 py-2 rounded-full bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-bold text-xs cursor-pointer transition-colors flex items-center gap-1.5 shadow-sm"
+            className="px-4 py-2 rounded-full bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-bold text-xs cursor-pointer transition-colors flex items-center gap-1.5 shadow-xs"
           >
             <span>Basket ({cartItems.reduce((acc, it) => acc + (it.quantity || 1), 0)})</span>
           </button>
@@ -500,19 +500,19 @@ export const MarketplaceView = ({ currentUser }) => {
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Search Box */}
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search crop, grower or place"
-              className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/[0.06] border border-white/15 text-white placeholder-white/40 text-xs sm:text-sm focus:outline-none focus:border-[#4de1b7] transition-all"
+              className="w-full pl-9 pr-8 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 text-xs sm:text-sm focus:outline-none focus:border-[#0b3b2c] transition-all shadow-2xs"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white cursor-pointer"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -524,8 +524,8 @@ export const MarketplaceView = ({ currentUser }) => {
             onClick={() => setShowFilterPanel(!showFilterPanel)}
             className={`px-4 py-2 rounded-full border text-xs font-semibold transition-all cursor-pointer ${
               showFilterPanel || locationFilter || minPrice || maxPrice
-                ? 'bg-[#4de1b7] text-slate-950 font-bold border-transparent'
-                : 'bg-white/[0.08] hover:bg-white/[0.14] text-white/90 border border-white/10'
+                ? 'bg-[#0b3b2c] text-white font-bold border-transparent shadow-xs'
+                : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300 shadow-2xs'
             }`}
           >
             Filters
@@ -536,8 +536,8 @@ export const MarketplaceView = ({ currentUser }) => {
             onClick={() => setInStockOnly(!inStockOnly)}
             className={`px-4 py-2 rounded-full border text-xs font-semibold transition-all cursor-pointer ${
               inStockOnly
-                ? 'bg-[#4de1b7] text-slate-950 font-bold border-transparent'
-                : 'bg-white/[0.08] hover:bg-white/[0.14] text-white/90 border border-white/10'
+                ? 'bg-[#0b3b2c] text-white font-bold border-transparent shadow-xs'
+                : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300 shadow-2xs'
             }`}
           >
             In stock only
@@ -547,18 +547,18 @@ export const MarketplaceView = ({ currentUser }) => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 text-white text-xs font-semibold focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+              className="px-4 py-2 rounded-full bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 text-xs font-semibold focus:outline-none focus:border-[#0b3b2c] cursor-pointer shadow-2xs"
             >
-              <option value="newest" className="bg-[#0b2821] text-white">
+              <option value="newest" className="bg-white text-slate-900">
                 Sort: Newest harvest ▾
               </option>
-              <option value="price-low" className="bg-[#0b2821] text-white">
+              <option value="price-low" className="bg-white text-slate-900">
                 Price: Low to High
               </option>
-              <option value="price-high" className="bg-[#0b2821] text-white">
+              <option value="price-high" className="bg-white text-slate-900">
                 Price: High to Low
               </option>
-              <option value="stock-high" className="bg-[#0b2821] text-white">
+              <option value="stock-high" className="bg-white text-slate-900">
                 Highest Stock
               </option>
             </select>
@@ -583,8 +583,8 @@ export const MarketplaceView = ({ currentUser }) => {
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer border ${
                   isSelected
-                    ? 'bg-[#4de1b7] text-slate-950 font-bold border-transparent shadow-sm'
-                    : 'bg-white/[0.08] hover:bg-white/[0.14] text-white/90 border-white/10'
+                    ? 'bg-[#0b3b2c] text-white font-bold border-transparent shadow-xs'
+                    : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-2xs'
                 }`}
               >
                 {cat.label}

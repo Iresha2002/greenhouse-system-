@@ -39,24 +39,24 @@ export const PreFooterCTA: React.FC<PreFooterCTAProps> = ({ onExploreDashboard }
   ];
 
   return (
-    <section id="how-it-works" className="relative z-20 w-full px-6 sm:px-12 py-16 max-w-7xl mx-auto text-white">
-      {/* 1. How it works Section matching Image 1 */}
+    <section id="how-it-works" className="relative z-20 w-full px-6 sm:px-12 py-16 max-w-7xl mx-auto text-slate-900">
+      {/* 1. How it works Section matching light palette */}
       <div className="mb-14">
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-8">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-8">
           How it works
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
           {steps.map((step) => (
             <div key={step.num} className="flex items-start gap-4">
-              <div className="w-9 h-9 rounded-full bg-[#4de1b7] text-slate-950 font-black text-sm flex items-center justify-center shrink-0 shadow-md">
+              <div className="w-9 h-9 rounded-full bg-[#0b3b2c] text-white font-black text-sm flex items-center justify-center shrink-0 shadow-md">
                 {step.num}
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white mb-1">
+                <h3 className="text-lg font-bold text-slate-900 mb-1">
                   {step.title}
                 </h3>
-                <p className="text-sm text-white/75 leading-relaxed">
+                <p className="text-sm text-slate-600 leading-relaxed">
                   {step.desc}
                 </p>
               </div>
@@ -65,16 +65,16 @@ export const PreFooterCTA: React.FC<PreFooterCTAProps> = ({ onExploreDashboard }
         </div>
       </div>
 
-      {/* 2. Glassy CTA Box matching Image 1 */}
-      <div className="relative rounded-[32px] sm:rounded-[36px] bg-white/[0.08] backdrop-blur-2xl border border-white/15 shadow-2xl p-8 sm:p-12 lg:p-14 flex flex-col items-center text-center">
+      {/* 2. Crisp Light CTA Box */}
+      <div className="relative rounded-[32px] sm:rounded-[36px] bg-white border border-slate-200/90 shadow-xl p-8 sm:p-12 lg:p-14 flex flex-col items-center text-center overflow-hidden">
         {/* Subtle background glow */}
         <div className="absolute inset-0 bg-emerald-500/5 rounded-[36px] pointer-events-none" />
 
-        <h2 className="text-2xl sm:text-4xl lg:text-4xl font-extrabold text-white tracking-tight max-w-2xl mb-2.5">
+        <h2 className="text-2xl sm:text-4xl lg:text-4xl font-extrabold text-slate-900 tracking-tight max-w-2xl mb-2.5">
           Ready to Cultivate the Future of Agriculture?
         </h2>
 
-        <p className="text-white/80 text-sm sm:text-base mb-8">
+        <p className="text-slate-600 text-sm sm:text-base mb-8">
           Join 200+ greenhouses.
         </p>
 
@@ -89,18 +89,18 @@ export const PreFooterCTA: React.FC<PreFooterCTAProps> = ({ onExploreDashboard }
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Your email"
               required
-              className="w-full sm:w-72 px-5 py-3 rounded-full bg-white text-slate-900 placeholder:text-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#4de1b7] shadow-inner"
+              className="w-full sm:w-72 px-5 py-3 rounded-full bg-slate-50 border border-slate-300 text-slate-900 placeholder:text-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0b3b2c] shadow-inner"
             />
             <button
               type="submit"
-              className="w-full sm:w-auto px-6 py-3 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 font-bold text-sm tracking-wide shadow-md transition-all cursor-pointer whitespace-nowrap hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-6 py-3 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white font-bold text-sm tracking-wide shadow-md transition-all cursor-pointer whitespace-nowrap hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
             >
               <span>Get Started &rarr;</span>
             </button>
           </form>
         ) : (
-          <div className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-[#4de1b7]/20 border border-[#4de1b7]/40 text-[#4de1b7] text-sm font-semibold">
-            <CheckCircle2 className="w-4 h-4 text-[#4de1b7]" />
+          <div className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 text-sm font-semibold">
+            <CheckCircle2 className="w-4 h-4 text-emerald-700" />
             <span>Welcome! Redirecting you to the system...</span>
           </div>
         )}
