@@ -27,29 +27,20 @@ export const SupplyDetailsModal = ({
   const specs = supply.specifications || {};
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#071f19]/95 backdrop-blur-xl animate-in fade-in duration-200 text-white">
-      {/* Top Header Bar matching Page 7 */}
-      <div className="border-b border-white/10 bg-[#0a2720]/80 sticky top-0 z-10 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#4de1b7]/20 border border-[#4de1b7]/40 flex items-center justify-center text-[#4de1b7] font-black text-sm">
-              SG
-            </div>
-            <span className="text-lg font-bold text-white tracking-tight">SmartGrow</span>
-          </div>
-
-          <button
-            onClick={onClose}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#4de1b7] hover:text-[#3bc7a1] transition-colors cursor-pointer"
-          >
-            <span>&larr;</span>
-            <span>Back to supplies</span>
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#071f19]/95 backdrop-blur-xl animate-in fade-in duration-200 text-white pt-20 sm:pt-24">
+      {/* Top Action Bar */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-2">
+        <button
+          onClick={onClose}
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-xs sm:text-sm font-semibold text-[#4de1b7] hover:text-white transition-all cursor-pointer shadow-sm group"
+        >
+          <span className="group-hover:-translate-x-0.5 transition-transform">&larr;</span>
+          <span>Back to supplies</span>
+        </button>
       </div>
 
       {/* Main Container */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Seller & Fulfillment matching Page 7 */}
           <div className="lg:col-span-4 space-y-4">

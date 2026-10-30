@@ -220,7 +220,7 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={onGoToDashboard}
                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/30 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm tracking-wide shadow-md transition-all cursor-pointer border border-emerald-400/50"
               >
-                <span>Dashboard ({currentUser.username})</span>
+                <span>Hi, {currentUser.username || currentUser.name || 'User'}</span>
               </button>
               {onLogout && (
                 <button
