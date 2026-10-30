@@ -170,11 +170,41 @@ export function App() {
           onLogout={handleLogout}
           onNavigateHome={() => setCurrentView('home')}
           onOpenLogin={() => setIsAuthModalOpen(true)}
-          selectedTab={selectedDashboardTab}
-          onSelectTab={(tab) => setSelectedDashboardTab(tab)}
         />
 
         <main className="relative z-10 dashboard-main max-w-7xl mx-auto px-4 sm:px-8 py-6 w-full flex-1">
+          {/* Module Navigation Tabs matching PDF Pages 2, 6, 11 */}
+          <div className="mb-6 flex items-center">
+            <div className="inline-flex items-center p-1 rounded-full bg-black/25 border border-white/10 overflow-x-auto no-scrollbar">
+              {[
+                { id: 'greenhouse', label: 'Smart Greenhouse' },
+                { id: 'marketplace', label: 'Crop Marketplace' },
+                { id: 'suppliers', label: 'Agri Suppliers' },
+                { id: 'hydroponics', label: 'ExpertConnect' },
+              ].map((tab) => {
+                const isActive = selectedDashboardTab === tab.id;
+                const activeStyle =
+                  tab.id === 'marketplace'
+                    ? 'bg-[#f59e0b] text-slate-950 font-bold shadow-md'
+                    : 'bg-[#4de1b7] text-slate-950 font-bold shadow-md';
+
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setSelectedDashboardTab(tab.id)}
+                    className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                      isActive
+                        ? activeStyle
+                        : 'text-white/75 hover:text-white hover:bg-white/[0.08]'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           {/* TAB 1: SMART GREENHOUSE */}
           {selectedDashboardTab === 'greenhouse' && (
             <>
