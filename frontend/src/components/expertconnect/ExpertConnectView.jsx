@@ -604,7 +604,14 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
 
             {/* Expert Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {experts.map((expert) => (
+              {(selectedConsultationType === 'All'
+                ? experts
+                : experts.filter(
+                    (e) =>
+                      Array.isArray(e.consultationTypes) &&
+                      e.consultationTypes.includes(selectedConsultationType)
+                  )
+              ).map((expert) => (
                 <ExpertCard
                   key={expert._id}
                   expert={expert}

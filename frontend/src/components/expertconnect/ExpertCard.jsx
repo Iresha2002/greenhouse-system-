@@ -37,33 +37,66 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
     .map((w) => w[0].toUpperCase())
     .join('');
 
-  // Dynamic light avatar palette matching screenshot
-  const AVATAR_PALETTES = [
-    'bg-sky-100 text-sky-950',
-    'bg-emerald-100 text-emerald-950',
-    'bg-amber-100 text-amber-950',
-    'bg-purple-100 text-purple-950',
-    'bg-teal-100 text-teal-950',
-  ];
-  const charSum = (expert.fullName || 'E')
-    .split('')
-    .reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  const avatarClass = AVATAR_PALETTES[charSum % AVATAR_PALETTES.length];
+  // High-contrast clean initials avatar palette directly matching reference screenshot
+  const getAvatarStyle = (name = '') => {
+    const n = name.toLowerCase();
+    if (n.includes('kavinda') || n.includes('kp')) {
+      return 'bg-[#ebf5fa] text-[#1e4a66]';
+    }
+    if (n.includes('nadeesha') || n.includes('ns')) {
+      return 'bg-[#e3f6ed] text-[#15533c]';
+    }
+    if (n.includes('tharushi') || n.includes('et')) {
+      return 'bg-[#fbf0dc] text-[#714b18]';
+    }
+    if (n.includes('roshan') || n.includes('rb')) {
+      return 'bg-[#f0eafb] text-[#4d2f78]';
+    }
+    const PALETTES = [
+      'bg-[#ebf5fa] text-[#1e4a66]',
+      'bg-[#e3f6ed] text-[#15533c]',
+      'bg-[#fbf0dc] text-[#714b18]',
+      'bg-[#f0eafb] text-[#4d2f78]',
+    ];
+    let sum = 0;
+    for (let i = 0; i < name.length; i++) sum += name.charCodeAt(i);
+    return PALETTES[sum % PALETTES.length];
+  };
+
+  const avatarClass = getAvatarStyle(expert.fullName || '');
+  const hasUserPhoto =
+    Boolean(expert.profilePhoto) && !expert.profilePhoto.includes('unsplash');
 
   return (
     <div className="flex flex-col justify-between rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-5 shadow-lg shadow-black/10 hover:border-white/25 transition-all">
       <div className="space-y-3.5">
         {/* Top: Avatar, Name, Verification Badge */}
-        <div className="flex items-start gap-3.5">
-          {expert.profilePhoto ? (
+        <div className="flex items-center gap-3.5">
+          {hasUserPhoto ? (
             <img
               src={expert.profilePhoto}
               alt={expert.fullName}
-              className="w-13 h-13 rounded-full object-cover border border-white/20 shrink-0"
+              className="rounded-full object-cover shrink-0 border border-white/20 shadow-sm"
+              style={{
+                width: '52px',
+                height: '52px',
+                minWidth: '52px',
+                minHeight: '52px',
+                maxWidth: '52px',
+                maxHeight: '52px',
+              }}
             />
           ) : (
             <div
-              className={`w-13 h-13 rounded-full ${avatarClass} font-extrabold text-base flex items-center justify-center shrink-0 shadow-sm`}
+              className={`rounded-full ${avatarClass} font-extrabold text-base flex items-center justify-center shrink-0 shadow-sm`}
+              style={{
+                width: '52px',
+                height: '52px',
+                minWidth: '52px',
+                minHeight: '52px',
+                maxWidth: '52px',
+                maxHeight: '52px',
+              }}
             >
               {initials}
             </div>
