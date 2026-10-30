@@ -321,16 +321,8 @@ export function App() {
           onGoToDashboard={() => setCurrentView('dashboard')}
           onLogout={handleLogout}
           onSelectModule={(moduleId) => {
-            if (moduleId === 'greenhouse' || moduleId === 'hydroponics') {
-              setSelectedDashboardTab(moduleId === 'hydroponics' ? 'hydroponics' : 'greenhouse');
-              setCurrentView('dashboard');
-            } else if (moduleId === 'marketplace') {
-              setSelectedDashboardTab('marketplace');
-              setCurrentView('dashboard');
-            } else if (moduleId === 'suppliers') {
-              setSelectedDashboardTab('suppliers');
-              setCurrentView('dashboard');
-            }
+            setSelectedDashboardTab(moduleId);
+            setCurrentView('dashboard');
           }}
         />
 

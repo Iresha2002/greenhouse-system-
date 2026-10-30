@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   ChevronDown,
+  ChevronRight,
   LogIn,
   Sprout,
   ShoppingBag,
@@ -166,14 +167,14 @@ export const Header: React.FC<HeaderProps> = ({
                       <button
                         key={item.id}
                         onClick={() => handleDropdownSelect(item)}
-                        className={`w-full flex items-start gap-3 p-2.5 rounded-xl text-left transition-all cursor-pointer ${
+                        className={`w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-all cursor-pointer group ${
                           isCurrent
                             ? 'bg-white/20 border border-white/30 text-white'
                             : 'hover:bg-white/10 text-white/80 hover:text-white'
                         }`}
                       >
                         <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm mt-0.5"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm"
                           style={{
                             backgroundColor: `${item.color}25`,
                             border: `1px solid ${item.color}55`,
@@ -185,31 +186,14 @@ export const Header: React.FC<HeaderProps> = ({
                           />
                         </div>
                         <div className="flex flex-col min-w-0 flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-white tracking-tight">
-                              {item.title}
-                            </span>
-                            <div className="flex items-center gap-1.5">
-                              {isCurrent && (
-                                <span className="text-[9.5px] px-1.5 py-0.5 rounded-md bg-[#4ade80]/20 text-[#4ade80] font-semibold border border-[#4ade80]/40">
-                                  Slide
-                                </span>
-                              )}
-                              <span
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDropdownSelect(item);
-                                }}
-                                className="text-[9.5px] px-2 py-0.5 rounded-md bg-white/15 hover:bg-emerald-400 hover:text-emerald-950 font-bold transition-all text-white/90"
-                              >
-                                View Portal →
-                              </span>
-                            </div>
-                          </div>
+                          <span className="text-xs font-bold text-white tracking-tight group-hover:text-emerald-300 transition-colors">
+                            {item.title}
+                          </span>
                           <span className="text-[10.5px] text-white/60 truncate mt-0.5">
                             {item.desc}
                           </span>
                         </div>
+                        <ChevronRight className="w-3.5 h-3.5 text-white/30 group-hover:text-emerald-300 group-hover:translate-x-0.5 transition-all shrink-0" />
                       </button>
                     );
                   })}
