@@ -170,92 +170,11 @@ export function App() {
           onLogout={handleLogout}
           onNavigateHome={() => setCurrentView('home')}
           onOpenLogin={() => setIsAuthModalOpen(true)}
+          selectedTab={selectedDashboardTab}
+          onSelectTab={(tab) => setSelectedDashboardTab(tab)}
         />
 
-        <main className="relative z-10 dashboard-main max-w-7xl mx-auto px-6 sm:px-12 py-8 w-full flex-1">
-          {/* Header Bar with Sub-heading & Status */}
-          <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-                <span className="text-xs font-bold uppercase tracking-widest text-emerald-300">
-                  {selectedDashboardTab === 'marketplace'
-                    ? 'Agricultural Produce Exchange'
-                    : selectedDashboardTab === 'suppliers'
-                    ? 'Agricultural Supplier Hub'
-                    : selectedDashboardTab === 'hydroponics'
-                    ? 'Greenhouse Agricultural Consultation'
-                    : 'Live Greenhouse Control Matrix'}
-                </span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                {selectedDashboardTab === 'marketplace'
-                  ? 'SmartGrow Crop Marketplace'
-                  : selectedDashboardTab === 'suppliers'
-                  ? 'Agricultural Supplies Marketplace'
-                  : selectedDashboardTab === 'hydroponics'
-                  ? 'SmartGrow ExpertConnect'
-                  : 'Greenhouse Telemetry & Actuators'}
-              </h1>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <span className="text-xs uppercase tracking-wider font-extrabold text-emerald-950 bg-emerald-400 px-3.5 py-1.5 rounded-full shadow-md">
-                {currentUser ? `${currentUser.role} portal` : 'Guest Shopper'}
-              </span>
-              <button
-                onClick={() => setCurrentView('home')}
-                className="px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-all flex items-center gap-2 cursor-pointer border border-white/20"
-              >
-                ← Back to Home
-              </button>
-            </div>
-          </div>
-
-          {/* Module Navigation Tabs */}
-          <div className="flex flex-wrap items-center gap-2 mb-8 bg-white/[0.08] backdrop-blur-xl p-2 rounded-2xl border border-white/15 shadow-xl">
-            <button
-              onClick={() => setSelectedDashboardTab('greenhouse')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                selectedDashboardTab === 'greenhouse'
-                  ? 'bg-emerald-500 text-emerald-950 shadow-lg font-extrabold'
-                  : 'text-white/70 hover:bg-white/10 hover:text-white'
-              }`}
-            >
-              🌱 Smart Greenhouse
-            </button>
-            <button
-              onClick={() => setSelectedDashboardTab('marketplace')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                selectedDashboardTab === 'marketplace'
-                  ? 'bg-orange-500 text-white shadow-lg font-extrabold'
-                  : 'text-white/70 hover:bg-white/10 hover:text-white'
-              }`}
-            >
-              🛍️ Crop Marketplace
-            </button>
-            <button
-              onClick={() => setSelectedDashboardTab('suppliers')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                selectedDashboardTab === 'suppliers'
-                  ? 'bg-sky-500 text-white shadow-lg font-extrabold'
-                  : 'text-white/70 hover:bg-white/10 hover:text-white'
-              }`}
-            >
-              ⚡ Agri Suppliers
-            </button>
-            <button
-              onClick={() => setSelectedDashboardTab('hydroponics')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                selectedDashboardTab === 'hydroponics'
-                  ? 'bg-cyan-500 text-cyan-950 shadow-lg font-extrabold'
-                  : 'text-white/70 hover:bg-white/10 hover:text-white'
-              }`}
-            >
-              🎓 ExpertConnect
-            </button>
-          </div>
-
+        <main className="relative z-10 dashboard-main max-w-7xl mx-auto px-4 sm:px-8 py-6 w-full flex-1">
           {/* TAB 1: SMART GREENHOUSE */}
           {selectedDashboardTab === 'greenhouse' && (
             <>

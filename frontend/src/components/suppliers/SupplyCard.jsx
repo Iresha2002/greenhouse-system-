@@ -1,229 +1,141 @@
 import React from 'react';
-import {
-  ShoppingBag,
-  Eye,
-  Building2,
-  MapPin,
-  Cpu,
-  CheckCircle,
-  AlertTriangle,
-  Tag,
-  ShieldCheck,
-} from 'lucide-react';
 
 export const SupplyCard = ({ supply, onViewDetails, onAddToCart }) => {
   const isOutOfStock = supply.quantity <= 0;
-  const isLowStock =
-    supply.quantity > 0 && supply.quantity <= (supply.lowStockThreshold || 5);
+  const isLowStock = supply.quantity > 0 && supply.quantity <= (supply.lowStockThreshold || 5);
   const displayImage =
     supply.image ||
     (Array.isArray(supply.images) && supply.images.length > 0 ? supply.images[0] : '');
 
-  // Category badge styling tailored to the 10 agricultural supply categories
-  const categoryColors = {
-    'Seeds': 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30',
-    'Fertilizers': 'bg-lime-500/20 text-lime-300 border-lime-400/30',
-    'Crop Protection Products': 'bg-amber-500/20 text-amber-300 border-amber-400/30',
-    'Irrigation Equipment': 'bg-sky-500/20 text-sky-300 border-sky-400/30',
-    'Greenhouse Equipment': 'bg-teal-500/20 text-teal-300 border-teal-400/30',
-    'Smart Farming Devices': 'bg-cyan-500/20 text-cyan-300 border-cyan-400/30',
-    'IoT Components': 'bg-indigo-500/20 text-indigo-300 border-indigo-400/30',
-    'Farming Tools': 'bg-orange-500/20 text-orange-300 border-orange-400/30',
-    'Growing Supplies': 'bg-green-500/20 text-green-300 border-green-400/30',
-    'Hydroponic Equipment': 'bg-blue-500/20 text-blue-300 border-blue-400/30',
-  };
-
-  const badgeClass =
-    categoryColors[supply.category] || 'bg-white/10 text-white/80 border-white/20';
-
-  // Pick a concise technical/composition preview badge if provided
-  const getQuickSpecSummary = () => {
+  // Power or tech specs preview
+  const getPowerSpec = () => {
     if (!supply.specifications) return null;
-    const { composition, voltage, communicationProtocol, packageSize } =
-      supply.specifications;
-    if (composition) return `Formula: ${composition}`;
-    if (voltage && communicationProtocol) return `${voltage} • ${communicationProtocol}`;
+    const { voltage, powerRequirements, communicationProtocol } = supply.specifications;
+    if (voltage && communicationProtocol) return `Power: ${voltage} &middot; ${communicationProtocol}`;
     if (voltage) return `Power: ${voltage}`;
-    if (packageSize) return `Pack: ${packageSize}`;
+    if (powerRequirements) return `Power: ${powerRequirements}`;
     return null;
   };
 
-  const quickSpec = getQuickSpecSummary();
+  const powerSpec = getPowerSpec();
+  const unitName = supply.unit || 'unit';
 
   return (
-    <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white/[0.08] backdrop-blur-xl border border-white/15 hover:border-sky-400/40 p-4 transition-all duration-300 hover:shadow-2xl hover:shadow-sky-950/40 hover:-translate-y-1">
-      {/* Background ambient radial glow */}
-      <div className="absolute -top-16 -right-16 w-36 h-36 rounded-full bg-sky-500/10 blur-2xl pointer-events-none group-hover:bg-sky-500/20 transition-all duration-500" />
-
-      {/* Top Media / Thumbnail Section */}
-      <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl bg-black/30 border border-white/10 mb-4">
-        {displayImage ? (
-          <img
-            src={displayImage}
-            alt={supply.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement.classList.add(
-                'flex',
-                'items-center',
-                'justify-center'
-              );
-            }}
-          />
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-sky-950/60 to-black/60 text-sky-300/80">
-            <span className="text-4xl mb-1">⚙️</span>
-            <span className="text-xs font-semibold uppercase tracking-wider text-white/50">
-              {supply.category}
-            </span>
-          </div>
-        )}
-
-        {/* Floating Category Pill */}
-        <div className="absolute top-3 left-3">
-          <span
-            className={`text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full border backdrop-blur-md shadow-md ${badgeClass}`}
-          >
+    <div className="group relative flex flex-col justify-between rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-5 transition-all duration-300 hover:border-white/25 hover:shadow-xl hover:-translate-y-0.5 text-white">
+      <div>
+        {/* Top Badges Row: Category & Stock Status */}
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/10 border border-white/15 text-white/90">
             {supply.category}
+          </span>
+          <span
+            className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+              isOutOfStock
+                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                : isLowStock
+                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+            }`}
+          >
+            {isOutOfStock ? 'Out of stock' : `${supply.quantity} ${unitName}s in stock`}
           </span>
         </div>
 
-        {/* Floating Stock Status Indicator */}
-        <div className="absolute top-3 right-3">
-          {isOutOfStock ? (
-            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/85 text-white backdrop-blur-md border border-red-400/40 shadow-md flex items-center gap-1">
-              Out of Stock
+        {/* Secondary Info Badges: Sales / Featured / Warranty */}
+        <div className="flex items-center gap-2 mb-3 text-[11px] text-white/70">
+          {supply.totalUnitsSold > 0 ? (
+            <span className="px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/10 text-white/80">
+              {supply.totalUnitsSold} {unitName} sold
             </span>
-          ) : isLowStock ? (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/85 text-amber-950 backdrop-blur-md border border-amber-300/40 shadow-md flex items-center gap-1">
-              <AlertTriangle className="w-2.5 h-2.5" />
-              Low: {supply.quantity} {supply.unit}
+          ) : supply.isFeatured ? (
+            <span className="px-2 py-0.5 rounded-full bg-[#4de1b7]/15 border border-[#4de1b7]/30 text-[#4de1b7] font-semibold">
+              Featured
             </span>
-          ) : (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/85 text-emerald-950 backdrop-blur-md border border-emerald-300/40 shadow-md flex items-center gap-1">
-              {supply.quantity} {supply.unit} in stock
+          ) : null}
+
+          {supply.warranty && (
+            <span className="px-2 py-0.5 rounded-full bg-white/[0.06] border border-white/10 text-white/70">
+              {supply.warranty}
             </span>
           )}
         </div>
 
-        {/* Bottom Overlay Badges: Verified Supplier, Genuine Order Count, or Warranty */}
-        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-1 pointer-events-none">
-          {supply.totalUnitsSold > 0 ? (
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-950/90 border border-amber-400/40 text-[10px] font-bold text-amber-300 backdrop-blur-md">
-              <span>🔥 {supply.totalUnitsSold} {supply.unit} sold</span>
-            </div>
-          ) : (
-            supply.isSupplierVerified && (
-              <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/90 border border-sky-400/40 text-[10px] font-bold text-sky-300 backdrop-blur-md">
-                <CheckCircle className="w-3 h-3 text-sky-400" />
-                <span>Verified Supplier</span>
-              </div>
-            )
-          )}
-          {supply.warranty && (
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/90 border border-emerald-400/30 text-[10px] font-semibold text-emerald-300 backdrop-blur-md ml-auto">
-              <ShieldCheck className="w-3 h-3 text-emerald-400" />
-              <span>{supply.warranty}</span>
-            </div>
-          )}
-        </div>
+        {/* Image Preview if available */}
+        {displayImage && (
+          <div className="aspect-16/10 w-full overflow-hidden rounded-xl bg-black/30 border border-white/10 mb-3.5">
+            <img
+              src={displayImage}
+              alt={supply.name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </div>
+        )}
+
+        {/* Brand & Model line */}
+        {(supply.brand || supply.model) && (
+          <p className="text-xs font-semibold text-white/50 mb-1">
+            {[supply.brand, supply.model].filter(Boolean).join(' · ')}
+          </p>
+        )}
+
+        {/* Title */}
+        <h3 className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug mb-2 group-hover:text-[#4de1b7] transition-colors">
+          {supply.name}
+        </h3>
+
+        {/* Description */}
+        <p className="text-xs text-white/60 line-clamp-2 mb-3">
+          {supply.description || 'Heavy-duty agricultural supply engineered for greenhouse efficiency.'}
+        </p>
+
+        {/* Power spec if available */}
+        {powerSpec && (
+          <p
+            className="text-xs text-white/70 mb-2 font-mono"
+            dangerouslySetInnerHTML={{ __html: powerSpec }}
+          />
+        )}
+
+        {/* Seller Info */}
+        <p className="text-xs text-white/60 mb-4">
+          Seller: <span className="text-white/80">{supply.supplierName || 'SmartGrow Automation Supplies'}</span>
+          {supply.location && ` · ${supply.location}`}
+        </p>
       </div>
 
-      {/* Middle Content */}
-      <div className="flex-1 flex flex-col justify-between">
-        <div>
-          {/* Brand & Model Tag if provided */}
-          {(supply.brand || supply.model) && (
-            <div className="flex items-center gap-1.5 mb-1 text-[11px] font-semibold text-sky-300/90">
-              <Tag className="w-3 h-3 text-sky-400 shrink-0" />
-              <span className="truncate">
-                {[supply.brand, supply.model].filter(Boolean).join(' • ')}
-              </span>
-            </div>
-          )}
-
-          <h3 className="text-base sm:text-lg font-bold text-white tracking-tight group-hover:text-sky-300 transition-colors line-clamp-1 mb-1">
-            {supply.name}
-          </h3>
-
-          <p className="text-xs text-white/60 line-clamp-2 mb-3">
-            {supply.description ||
-              'Commercial-grade agricultural supply engineered for greenhouse automation and high-yield cultivation.'}
-          </p>
-
-          {/* Quick Spec / Composition Pill */}
-          {quickSpec && (
-            <div className="mb-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.06] border border-white/10 text-[11px] text-emerald-300 font-medium">
-              <Cpu className="w-3 h-3 text-emerald-400 shrink-0" />
-              <span className="truncate">{quickSpec}</span>
-            </div>
-          )}
-
-          {/* Supplier & Location Metadata */}
-          <div className="space-y-1 mb-4 text-[11px] text-white/70">
-            <div className="flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-              <span className="font-medium text-white/90 truncate">
-                {supply.supplierName || 'Authorized Agri Supplier'}
-              </span>
-            </div>
-            {supply.location && (
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span className="truncate">{supply.location}</span>
-              </div>
-            )}
-          </div>
+      {/* Bottom Area: Price & Action Pills */}
+      <div className="pt-3 border-t border-white/10 mt-2">
+        <div className="flex items-baseline gap-1.5 mb-3">
+          <span className="text-xl sm:text-2xl font-black text-white">
+            ${typeof supply.price === 'number' ? supply.price.toFixed(2) : supply.price}
+          </span>
+          <span className="text-xs text-white/60">per {unitName}</span>
         </div>
 
-        {/* Price & Action Bottom Area */}
-        <div className="pt-3 border-t border-white/10">
-          <div className="flex items-baseline justify-between mb-3">
-            <div>
-              <span className="text-xs text-white/50 block">Unit price</span>
-              <div className="flex items-baseline gap-1">
-                <span className="text-xl font-extrabold text-white">
-                  ${typeof supply.price === 'number' ? supply.price.toFixed(2) : supply.price}
-                </span>
-                <span className="text-xs font-semibold text-sky-300">
-                  / {supply.unit || 'unit'}
-                </span>
-              </div>
-            </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onViewDetails && onViewDetails(supply)}
+            className="flex-1 py-2 px-3 rounded-full border border-white/20 bg-white/[0.06] hover:bg-white/10 text-white font-bold text-xs transition-all cursor-pointer text-center"
+          >
+            Details
+          </button>
 
-            {supply.minOrderQuantity && supply.minOrderQuantity > 1 && (
-              <span className="text-[10px] text-white/50">
-                Min Order: {supply.minOrderQuantity} {supply.unit}
-              </span>
-            )}
-          </div>
-
-          {/* Buttons: View Details & Add to Cart */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => onViewDetails && onViewDetails(supply)}
-              className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-all border border-white/15 flex items-center justify-center gap-1.5 cursor-pointer"
-              title="View full specifications and product details"
-            >
-              <Eye className="w-3.5 h-3.5 text-white/80" />
-              <span>View Details</span>
-            </button>
-
-            <button
-              onClick={() => onAddToCart && onAddToCart(supply)}
-              disabled={isOutOfStock}
-              className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md ${
-                isOutOfStock
-                  ? 'bg-white/5 text-white/30 border border-white/10 cursor-not-allowed'
-                  : 'bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold cursor-pointer hover:shadow-sky-500/25 hover:scale-[1.02]'
-              }`}
-              title={isOutOfStock ? 'Currently out of stock' : 'Add supply to cart'}
-            >
-              <ShoppingBag className="w-3.5 h-3.5" />
-              <span>{isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => onAddToCart && onAddToCart(supply)}
+            disabled={isOutOfStock}
+            className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition-all text-center ${
+              isOutOfStock
+                ? 'bg-white/10 text-white/30 cursor-not-allowed'
+                : 'bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 font-extrabold cursor-pointer shadow-md'
+            }`}
+          >
+            {isOutOfStock ? 'Out of stock' : 'Add to cart'}
+          </button>
         </div>
       </div>
     </div>

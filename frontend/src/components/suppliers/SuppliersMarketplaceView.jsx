@@ -599,429 +599,210 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
         </div>
       )}
 
-      {/* Top Hero Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0e392d] via-[#124235] to-[#0c2d38] border border-sky-400/30 p-6 sm:p-8 shadow-2xl">
-        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-sky-500/15 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-extrabold uppercase tracking-wider mb-3">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>B2B & Farmer Agricultural Supplies Exchange</span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-2">
-              Certified Inputs, Automation & IoT Hardware
-            </h2>
-            <p className="text-sm sm:text-base text-white/75 leading-relaxed">
-              Source calibrated water-soluble NPK fertilizers, F1 greenhouse seeds, brass solenoid valves,
-              RS485 soil sensors, and closed-loop hydroponic dosing systems directly from verified suppliers.
-            </p>
-          </div>
-
-          {/* Right Quick Stats & Basket Counter */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="px-4 py-3 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md">
-              <span className="text-[11px] uppercase tracking-wider text-white/50 font-bold block">
-                Catalog Categories
-              </span>
-              <span className="text-xl font-extrabold text-sky-300">10 Sectors</span>
-            </div>
-
-            <div className="px-4 py-3 rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md">
-              <span className="text-[11px] uppercase tracking-wider text-white/50 font-bold block">
-                Active Listings
-              </span>
-              <span className="text-xl font-extrabold text-emerald-300">
-                {supplies.length} Products
-              </span>
-            </div>
-
-            {currentUser?.role === 'supplier' && (
-              <button
-                type="button"
-                onClick={() => setIsSupplierStudioOpen(true)}
-                className="px-5 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold text-xs sm:text-sm transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/25 cursor-pointer"
-              >
-                <Building2 className="w-4 h-4" />
-                <span>Supplier Studio</span>
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setIsProfileModalOpen(true)}
-              className="px-4 py-3.5 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 text-white font-extrabold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <User className="w-4 h-4 text-emerald-300" />
-              <span>Account Profile</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsCustomerOrdersOpen(true)}
-              className="px-4 py-3.5 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 text-white font-extrabold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <Package className="w-4 h-4 text-sky-300" />
-              <span>My Supply Orders</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsCartDrawerOpen(true)}
-              className="relative px-5 py-3.5 rounded-2xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs sm:text-sm transition-all flex items-center gap-2.5 shadow-lg shadow-sky-500/25 cursor-pointer"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              <span>Supplies Basket</span>
-              <span className="px-2 py-0.5 rounded-full bg-slate-950 text-sky-300 text-xs font-black">
-                {totalBasketItems}
-              </span>
-            </button>
-          </div>
+      {/* Header matching Page 6: Buy farm supplies */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Buy farm supplies
+          </h1>
+          <p className="text-white/60 text-sm mt-1">
+            Seeds, plant food, sensors and more. 10 sectors &middot; {supplies.length} products.
+          </p>
         </div>
 
-        {/* Database Connection & Stage Status Banner */}
-        <div className="relative z-10 mt-6 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-white/60">
-          <div className="flex items-center gap-2">
-            {isUsingFallback ? (
-              <>
-                <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-400/30 text-amber-300 font-bold uppercase text-[10px]">
-                  Offline Sample Fallback
-                </span>
-                <span>
-                  Backend API unreachable — displaying fallback sample catalog.
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 font-bold uppercase text-[10px]">
-                  Live MongoDB Catalog
-                </span>
-                <span>
-                  Connected to /api/supplies — displaying real-time database inventory & technical specifications.
-                </span>
-              </>
-            )}
+        {/* Action Pills matching Page 6: My profile, My orders, Basket */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {currentUser?.role === 'supplier' && (
             <button
               type="button"
-              onClick={fetchSuppliesCatalog}
-              className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-[11px] font-semibold transition-all cursor-pointer"
-              title="Refresh supply catalog from MongoDB"
+              onClick={() => setIsSupplierStudioOpen(true)}
+              className="px-4 py-2 rounded-full border border-white/20 bg-white/[0.06] hover:bg-white/10 text-white font-bold text-xs transition-all cursor-pointer"
             >
-              <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin text-sky-300' : ''}`} />
-              <span>Sync</span>
-            </button>
-          </div>
-          {currentUser && (
-            <span className="text-sky-300 font-semibold">
-              Signed in as: {currentUser.fullName || currentUser.username} ({currentUser.role})
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Collection Tabs: All Supplies | Featured Supplies | Best-Selling (Order-Backed) | New Arrivals */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2 bg-white/[0.06] p-1.5 rounded-2xl border border-white/10">
-          {[
-            { id: 'all', label: 'All Agricultural Supplies' },
-            { id: 'featured', label: '⭐ Featured Supplies' },
-            { id: 'bestSelling', label: '🔥 Best-Selling (Order Backed)' },
-            { id: 'newArrivals', label: '🆕 New Arrivals' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveCollectionTab(tab.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                activeCollectionTab === tab.id
-                  ? 'bg-sky-500 text-slate-950 font-extrabold shadow-md'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="text-xs text-white/60 font-medium">
-          Showing <span className="text-white font-bold">{filteredSupplies.length}</span> of{' '}
-          <span className="text-white font-bold">{supplies.length}</span> agricultural supplies
-        </div>
-      </div>
-
-      {/* Configurable 10 Category Pills */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-wider text-sky-300/90 flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5" />
-            Browse by Agricultural Supply Category
-          </span>
-          {selectedCategory !== 'All' && (
-            <button
-              onClick={() => setSelectedCategory('All')}
-              className="text-xs text-sky-300 hover:text-sky-200 underline cursor-pointer"
-            >
-              Clear category ({selectedCategory})
+              Supplier Studio
             </button>
           )}
-        </div>
-
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
-          {SUPPLY_CATEGORIES.map((cat) => {
-            const IconComponent = cat.icon;
-            const isSelected = selectedCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border cursor-pointer ${
-                  isSelected
-                    ? 'bg-sky-500 text-slate-950 border-sky-300 shadow-lg shadow-sky-500/20 font-extrabold'
-                    : 'bg-white/[0.06] hover:bg-white/[0.12] text-white/80 border-white/10'
-                }`}
-              >
-                <IconComponent className="w-3.5 h-3.5" />
-                <span>{cat.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Search, Filter & Sort Control Panel (Section 4.2) */}
-      <div className="rounded-3xl bg-white/[0.07] backdrop-blur-xl border border-white/15 p-5 shadow-xl space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          {/* Search Input (Name, Brand, Model, Supplier) */}
-          <div className="md:col-span-5 relative">
-            <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by supply name, brand, model (e.g. RS485, NPK-19), or supplier..."
-              aria-label="Search agricultural supplies"
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-black/30 border border-white/15 text-xs sm:text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-sky-400"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white cursor-pointer"
-                title="Clear search"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
-          {/* Supplier Filter */}
-          <div className="md:col-span-3">
-            <select
-              value={selectedSupplier}
-              onChange={(e) => setSelectedSupplier(e.target.value)}
-              aria-label="Filter by supplier"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-black/30 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400 cursor-pointer"
-            >
-              {uniqueSuppliers.map((sup) => (
-                <option key={sup} value={sup} className="bg-slate-900 text-white">
-                  {sup === 'All' ? 'All Suppliers' : `Supplier: ${sup}`}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Brand Filter */}
-          <div className="md:col-span-2">
-            <select
-              value={selectedBrand}
-              onChange={(e) => setSelectedBrand(e.target.value)}
-              aria-label="Filter by brand"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-black/30 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400 cursor-pointer"
-            >
-              {uniqueBrands.map((brand) => (
-                <option key={brand} value={brand} className="bg-slate-900 text-white">
-                  {brand === 'All' ? 'All Brands' : `Brand: ${brand}`}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Sort By Dropdown */}
-          <div className="md:col-span-2">
-            <div className="relative">
-              <ArrowUpDown className="w-3.5 h-3.5 text-sky-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                aria-label="Sort supplies"
-                className="w-full pl-8 pr-3 py-2.5 rounded-xl bg-black/30 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400 cursor-pointer"
-              >
-                <option value="featured" className="bg-slate-900 text-white">
-                  Sort: Featured
-                </option>
-                <option value="popular" className="bg-slate-900 text-white">
-                  Sort: Best-Selling
-                </option>
-                <option value="newest" className="bg-slate-900 text-white">
-                  Sort: Newest
-                </option>
-                <option value="priceAsc" className="bg-slate-900 text-white">
-                  Price: Low to High
-                </option>
-                <option value="priceDesc" className="bg-slate-900 text-white">
-                  Price: High to Low
-                </option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Filter Row: Min/Max Price Range, Stock Toggle & Reset */}
-        <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-5">
-            {/* Min & Max Price Range Controls */}
-            <div className="flex flex-wrap items-center gap-3">
-              <SlidersHorizontal className="w-4 h-4 text-sky-400" />
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-white/75 font-semibold">Price ($):</span>
-                <input
-                  type="number"
-                  min="0"
-                  max={maxPrice}
-                  value={minPrice}
-                  onChange={(e) => {
-                    const val = Math.max(0, Number(e.target.value) || 0);
-                    setMinPrice(Math.min(val, maxPrice));
-                  }}
-                  aria-label="Minimum unit price"
-                  placeholder="Min"
-                  className="w-16 px-2 py-1 rounded-lg bg-black/35 border border-white/15 text-white text-center font-bold focus:outline-none focus:border-sky-400"
-                />
-                <span className="text-white/40">to</span>
-                <input
-                  type="number"
-                  min={minPrice}
-                  max={maxCatalogPrice}
-                  value={maxPrice}
-                  onChange={(e) => {
-                    const val = Math.max(minPrice, Number(e.target.value) || 0);
-                    setMaxPrice(val);
-                  }}
-                  aria-label="Maximum unit price"
-                  placeholder="Max"
-                  className="w-16 px-2 py-1 rounded-lg bg-black/35 border border-white/15 text-white text-center font-bold focus:outline-none focus:border-sky-400"
-                />
-              </div>
-
-              <input
-                id="supply-price-range"
-                type="range"
-                min="5"
-                max={maxCatalogPrice}
-                step="5"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(Math.max(minPrice, Number(e.target.value)))}
-                className="w-28 sm:w-40 accent-sky-400 cursor-pointer"
-                aria-label="Maximum price slider"
-              />
-            </div>
-
-            {/* Availability Toggle */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() =>
-                  setAvailabilityFilter((prev) => (prev === 'all' ? 'inStock' : 'all'))
-                }
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center gap-1.5 ${
-                  availabilityFilter === 'inStock'
-                    ? 'bg-emerald-500/20 border-emerald-400/50 text-emerald-300'
-                    : 'bg-white/5 border-white/15 text-white/70 hover:text-white'
-                }`}
-              >
-                <CheckCircle className="w-3.5 h-3.5" />
-                <span>In-Stock Only</span>
-              </button>
-            </div>
-          </div>
 
           <button
             type="button"
-            onClick={handleResetFilters}
-            className="text-xs text-white/60 hover:text-white font-semibold underline cursor-pointer"
+            onClick={() => setIsProfileModalOpen(true)}
+            className="px-4 py-2 rounded-full border border-white/20 bg-white/[0.06] hover:bg-white/10 text-white font-bold text-xs transition-all cursor-pointer"
           >
-            Reset All Filters
+            My profile
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsCustomerOrdersOpen(true)}
+            className="px-4 py-2 rounded-full border border-white/20 bg-white/[0.06] hover:bg-white/10 text-white font-bold text-xs transition-all cursor-pointer"
+          >
+            My orders
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsCartDrawerOpen(true)}
+            className="px-5 py-2 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 font-extrabold text-xs transition-all cursor-pointer shadow-md"
+          >
+            Basket ({totalBasketItems})
           </button>
         </div>
+      </div>
 
-        {/* Active Filter Chips Bar */}
-        {(selectedCategory !== 'All' ||
-          selectedSupplier !== 'All' ||
-          selectedBrand !== 'All' ||
-          availabilityFilter === 'inStock' ||
-          minPrice > 0 ||
-          maxPrice < maxCatalogPrice ||
-          searchQuery.trim() !== '') && (
-          <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-white/50 font-semibold">Active Filters:</span>
-            {searchQuery.trim() !== '' && (
-              <span className="px-2.5 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-200 font-bold flex items-center gap-1.5">
-                Search: &ldquo;{searchQuery}&rdquo;
-                <X
-                  className="w-3 h-3 cursor-pointer"
-                  onClick={() => setSearchQuery('')}
-                />
-              </span>
-            )}
-            {selectedCategory !== 'All' && (
-              <span className="px-2.5 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-200 font-bold flex items-center gap-1.5">
-                Category: {selectedCategory}
-                <X
-                  className="w-3 h-3 cursor-pointer"
-                  onClick={() => setSelectedCategory('All')}
-                />
-              </span>
-            )}
-            {selectedSupplier !== 'All' && (
-              <span className="px-2.5 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-200 font-bold flex items-center gap-1.5">
-                Supplier: {selectedSupplier}
-                <X
-                  className="w-3 h-3 cursor-pointer"
-                  onClick={() => setSelectedSupplier('All')}
-                />
-              </span>
-            )}
-            {selectedBrand !== 'All' && (
-              <span className="px-2.5 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-200 font-bold flex items-center gap-1.5">
-                Brand: {selectedBrand}
-                <X
-                  className="w-3 h-3 cursor-pointer"
-                  onClick={() => setSelectedBrand('All')}
-                />
-              </span>
-            )}
-            {(minPrice > 0 || maxPrice < maxCatalogPrice) && (
-              <span className="px-2.5 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-200 font-bold flex items-center gap-1.5">
-                Price: ${minPrice} - ${maxPrice}
-                <X
-                  className="w-3 h-3 cursor-pointer"
-                  onClick={() => {
-                    setMinPrice(0);
-                    setMaxPrice(maxCatalogPrice);
-                  }}
-                />
-              </span>
-            )}
-            {availabilityFilter === 'inStock' && (
-              <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 font-bold flex items-center gap-1.5">
-                In-Stock Only
-                <X
-                  className="w-3 h-3 cursor-pointer"
-                  onClick={() => setAvailabilityFilter('all')}
-                />
-              </span>
-            )}
-          </div>
-        )}
+      {/* Live status line matching Page 6 */}
+      <div className="flex items-center justify-between text-xs text-white/50 border-b border-white/10 pb-4">
+        <div className="flex items-center gap-2">
+          <span>
+            {isUsingFallback ? 'Sample fallback catalog' : 'Live stock list'}
+            {currentUser && ` · Signed in as ${currentUser.fullName || currentUser.username} (${currentUser.role})`}
+          </span>
+          <button
+            type="button"
+            onClick={fetchSuppliesCatalog}
+            className="text-[#4de1b7] hover:underline cursor-pointer ml-2"
+          >
+            Refresh list
+          </button>
+        </div>
+      </div>
+
+      {/* Collection Pills: All supplies | Featured | Best sellers | New arrivals */}
+      <div className="flex flex-wrap items-center gap-2">
+        {[
+          { id: 'all', label: 'All supplies' },
+          { id: 'featured', label: 'Featured' },
+          { id: 'bestSelling', label: 'Best sellers' },
+          { id: 'newArrivals', label: 'New arrivals' },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveCollectionTab(tab.id)}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+              activeCollectionTab === tab.id
+                ? 'bg-white text-slate-950 font-black'
+                : 'bg-white/[0.06] border border-white/15 text-white/80 hover:bg-white/10'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* 10 Sector Category Pills matching Page 6 */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar flex-wrap">
+        {[
+          { id: 'All', label: 'All' },
+          { id: 'Seeds', label: 'Seeds' },
+          { id: 'Fertilizers', label: 'Fertilizers' },
+          { id: 'Crop Protection Products', label: 'Crop protection' },
+          { id: 'Irrigation Equipment', label: 'Irrigation' },
+          { id: 'Greenhouse Equipment', label: 'Greenhouse equipment' },
+          { id: 'Smart Farming Devices', label: 'Smart farming devices' },
+          { id: 'IoT Components', label: 'IoT components' },
+          { id: 'Hydroponic Equipment', label: 'Hydroponic equipment' },
+          { id: 'Growing Supplies', label: 'Growing supplies' },
+          { id: 'Farming Tools', label: 'Farming tools' },
+        ].map((cat) => {
+          const isSelected = selectedCategory === cat.id;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                isSelected
+                  ? 'bg-[#4de1b7] text-slate-950 shadow-md'
+                  : 'bg-white/[0.07] border border-white/15 text-white/80 hover:bg-white/10'
+              }`}
+            >
+              {cat.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Search & Filter Controls matching Page 6 */}
+      <div className="bg-white/[0.07] border border-white/15 backdrop-blur-md rounded-2xl p-4 flex flex-wrap items-center gap-3">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="w-3.5 h-3.5 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search supplies"
+            className="w-full pl-9 pr-3 py-2 rounded-full bg-white/[0.06] border border-white/15 text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#4de1b7]"
+          />
+        </div>
+
+        {/* Suppliers Dropdown */}
+        <select
+          value={selectedSupplier}
+          onChange={(e) => setSelectedSupplier(e.target.value)}
+          className="px-3.5 py-2 rounded-full bg-white/[0.06] border border-white/15 text-xs text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+        >
+          {uniqueSuppliers.map((sup) => (
+            <option key={sup} value={sup} className="bg-[#0b2821] text-white">
+              {sup === 'All' ? 'All suppliers ▾' : sup}
+            </option>
+          ))}
+        </select>
+
+        {/* Brands Dropdown */}
+        <select
+          value={selectedBrand}
+          onChange={(e) => setSelectedBrand(e.target.value)}
+          className="px-3.5 py-2 rounded-full bg-white/[0.06] border border-white/15 text-xs text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+        >
+          {uniqueBrands.map((brand) => (
+            <option key={brand} value={brand} className="bg-[#0b2821] text-white">
+              {brand === 'All' ? 'All brands ▾' : brand}
+            </option>
+          ))}
+        </select>
+
+        {/* Sort By Dropdown */}
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="px-3.5 py-2 rounded-full bg-white/[0.06] border border-white/15 text-xs text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+        >
+          <option value="featured" className="bg-[#0b2821] text-white">Sort: Featured ▾</option>
+          <option value="popular" className="bg-[#0b2821] text-white">Sort: Best sellers ▾</option>
+          <option value="newest" className="bg-[#0b2821] text-white">Sort: Newest ▾</option>
+          <option value="priceAsc" className="bg-[#0b2821] text-white">Price: Low to High</option>
+          <option value="priceDesc" className="bg-[#0b2821] text-white">Price: High to Low</option>
+        </select>
+
+        {/* In-stock toggle pill */}
+        <button
+          type="button"
+          onClick={() => setAvailabilityFilter((prev) => (prev === 'all' ? 'inStock' : 'all'))}
+          className={`px-3.5 py-2 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+            availabilityFilter === 'inStock'
+              ? 'bg-[#4de1b7]/20 border-[#4de1b7] text-[#4de1b7]'
+              : 'bg-white/[0.06] border-white/15 text-white/70 hover:bg-white/10'
+          }`}
+        >
+          In stock only
+        </button>
+
+        {/* Price tag */}
+        <span className="text-xs text-white/60 font-semibold px-2">
+          Price $0 – ${maxPrice}
+        </span>
+
+        {/* Reset filters */}
+        <button
+          type="button"
+          onClick={handleResetFilters}
+          className="text-xs text-white/50 hover:text-white underline cursor-pointer ml-auto"
+        >
+          Reset filters
+        </button>
+      </div>
+
+      {/* Showing count matching Page 6 */}
+      <div className="text-xs text-white/60">
+        Showing {filteredSupplies.length} of {supplies.length} supplies
       </div>
 
       {/* Product Grid, Loading State, or Empty State */}

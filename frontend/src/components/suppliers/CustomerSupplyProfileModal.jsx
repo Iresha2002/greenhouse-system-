@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  X,
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  ShieldCheck,
-  Save,
-  Package,
-  CheckCircle,
-  Lock,
-} from 'lucide-react';
+import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { getAccountProfile, updateAccountProfile } from '../../services/api';
 
 export const CustomerSupplyProfileModal = ({
@@ -53,7 +42,6 @@ export const CustomerSupplyProfileModal = ({
           });
         }
       } catch (err) {
-        // Fallback to currentUser prop if token expired or offline
         setProfile(currentUser);
         setFormData({
           username: currentUser.username || '',
@@ -79,19 +67,8 @@ export const CustomerSupplyProfileModal = ({
     const cleanPhone = formData.phoneNumber.trim();
     const cleanLocation = formData.location.trim();
 
-    if (cleanName.length < 3) {
-      setErrorMsg('Display name / username must be at least 3 characters.');
-      return;
-    }
-
-    const digitsOnly = cleanPhone.replace(/[\s\-()]/g, '');
-    if (!/^\+?[0-9]{9,15}$/.test(digitsOnly)) {
-      setErrorMsg('Please enter a valid contact phone number (9 to 15 digits).');
-      return;
-    }
-
-    if (cleanLocation.length < 3) {
-      setErrorMsg('Default delivery address / district must be at least 3 characters.');
+    if (cleanName.length < 2) {
+      setErrorMsg('Name must be at least 2 characters.');
       return;
     }
 
@@ -105,194 +82,184 @@ export const CustomerSupplyProfileModal = ({
 
       if (res && res.success && res.user) {
         setProfile(res.user);
-        setSuccessMsg(res.message || 'Account profile & delivery address saved.');
+        setSuccessMsg(res.message || 'Profile changes saved successfully.');
+        setTimeout(() => setSuccessMsg(''), 4000);
       }
     } catch (err) {
-      setErrorMsg(
-        err.response?.data?.error || 'Failed to update account profile.'
-      );
+      setErrorMsg(err.response?.data?.error || 'Failed to update account profile.');
     } finally {
       setSaving(false);
     }
   };
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto"
-      onClick={onClose}
-    >
-      <div
-        className="relative w-full max-w-xl rounded-3xl bg-[#0d3126] border border-sky-400/35 p-6 sm:p-8 text-white shadow-2xl my-8"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 cursor-pointer"
-          aria-label="Close Account Profile Modal"
-        >
-          <X className="w-5 h-5" />
-        </button>
+  const userEmail = profile?.email || currentUser?.email || 'user@smartgrow.lk';
+  const userRole = (profile?.role || currentUser?.role || 'Customer').toUpperCase();
 
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-extrabold uppercase tracking-wider mb-3">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Account Profile & Delivery Preferences</span>
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#071f19]/95 backdrop-blur-xl animate-in fade-in duration-200 text-white">
+      {/* Top Header Bar matching Page 10 */}
+      <div className="border-b border-white/10 bg-[#0a2720]/80 sticky top-0 z-10 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-[#4de1b7]/20 border border-[#4de1b7]/40 flex items-center justify-center text-[#4de1b7] font-black text-sm">
+              SG
+            </div>
+            <span className="text-lg font-bold text-white tracking-tight">SmartGrow</span>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[#4de1b7] hover:text-[#3bc7a1] transition-colors cursor-pointer"
+          >
+            <span>&larr;</span>
+            <span>Back to supplies</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Container */}
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="mb-6">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            My profile
+          </h1>
+          <p className="text-white/60 text-sm mt-1">
+            Your details and delivery address. Passwords are never shown.
+          </p>
         </div>
 
-        <h3 className="text-xl sm:text-2xl font-extrabold text-white">
-          My SmartGrow Marketplace Profile
-        </h3>
-        <p className="text-xs text-white/65 mt-1 mb-6">
-          Manage your permitted account details and default agricultural supply delivery address. Sensitive credentials (passwords and tokens) are never exposed.
-        </p>
-
-        {!currentUser ? (
-          <div className="rounded-2xl bg-black/30 border border-white/15 p-6 text-center space-y-4">
-            <Lock className="w-10 h-10 text-amber-400 mx-auto" />
-            <div>
-              <h4 className="text-base font-bold text-white">
-                Browsing as Guest Customer
-              </h4>
-              <p className="text-xs text-white/65 max-w-sm mx-auto mt-1">
-                Sign in using the SmartGrow OS navigation bar to save your default farm delivery address and contact number across sessions. You can still view your guest orders using your phone number.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                onClose();
-                if (onOpenOrderHistory) onOpenOrderHistory();
-              }}
-              className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider inline-flex items-center gap-2 cursor-pointer"
-            >
-              <Package className="w-4 h-4" />
-              <span>Lookup My Supply Orders</span>
-            </button>
+        {/* Feedback Alerts */}
+        {successMsg && (
+          <div className="mb-5 p-3 rounded-2xl bg-white/[0.08] border border-[#4de1b7]/40 text-[#4de1b7] text-xs flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 shrink-0" />
+            <span>{successMsg}</span>
           </div>
-        ) : loading ? (
-          <div className="py-12 text-center">
-            <div className="w-8 h-8 border-4 border-sky-400/20 border-t-sky-400 rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-xs font-bold text-sky-300">Loading your account profile...</p>
+        )}
+
+        {errorMsg && (
+          <div className="mb-5 p-3 rounded-2xl bg-rose-500/20 border border-rose-400/40 text-rose-200 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{errorMsg}</span>
           </div>
-        ) : (
-          <form onSubmit={handleSaveProfile} className="space-y-4">
-            {errorMsg && (
-              <div className="p-3.5 rounded-xl bg-red-500/20 border border-red-400/40 text-red-200 text-xs font-bold">
-                {errorMsg}
-              </div>
-            )}
+        )}
 
-            {successMsg && (
-              <div className="p-3.5 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs font-bold flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>{successMsg}</span>
-              </div>
-            )}
-
-            {/* Read-Only Account Identity Row (Email & Role) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-2xl bg-black/30 border border-white/10 p-4">
-              <div>
-                <span className="text-[11px] uppercase tracking-wider text-white/50 font-bold flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-sky-400" />
-                  Registered Email (Verified)
-                </span>
-                <p className="text-xs sm:text-sm font-bold text-white mt-1 truncate">
-                  {profile?.email || currentUser.email}
-                </p>
-              </div>
-              <div>
-                <span className="text-[11px] uppercase tracking-wider text-white/50 font-bold flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  Authorized Role
-                </span>
-                <p className="text-xs sm:text-sm font-extrabold uppercase text-emerald-300 mt-1">
-                  {profile?.role || currentUser.role}
-                </p>
-              </div>
+        {/* Profile Card */}
+        <div className="bg-white/[0.07] border border-white/15 backdrop-blur-md rounded-2xl p-6 sm:p-8">
+          {loading ? (
+            <div className="py-12 flex flex-col items-center justify-center text-white/50">
+              <Loader2 className="w-7 h-7 animate-spin text-[#4de1b7] mb-2" />
+              <span className="text-xs">Loading profile details...</span>
             </div>
+          ) : (
+            <form onSubmit={handleSaveProfile} className="space-y-5">
+              {/* Row 1: Email & Role */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-white/60 mb-1.5">
+                    Email (verified)
+                  </label>
+                  <input
+                    type="text"
+                    disabled
+                    value={userEmail}
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white/70 cursor-not-allowed"
+                  />
+                </div>
 
-            {/* Editable Permitted Fields */}
-            <div>
-              <label className="block text-xs font-semibold text-white/80 mb-1">
-                Full Name / Farm or Business Name *
-              </label>
-              <div className="relative">
-                <User className="w-4 h-4 text-white/40 absolute left-3.5 top-3" />
+                <div>
+                  <label className="block text-xs font-semibold text-white/60 mb-1.5">
+                    Your role
+                  </label>
+                  <input
+                    type="text"
+                    disabled
+                    value={userRole}
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white/70 cursor-not-allowed"
+                  />
+                </div>
+              </div>
+
+              {/* Row 2: Name or farm name */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-white">
+                    Name or farm name
+                  </label>
+                  <span className="text-[11px] text-white/40">Required</span>
+                </div>
                 <input
                   type="text"
                   required
                   value={formData.username}
-                  onChange={(e) =>
-                    setFormData({ ...formData, username: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  placeholder="e.g. SmartGrow Admin or Green Hills Farm"
+                  className="w-full bg-white/[0.06] border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#4de1b7]"
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-white/80 mb-1">
-                Contact Phone Number (Used for Order Dispatch Alerts) *
-              </label>
-              <div className="relative">
-                <Phone className="w-4 h-4 text-white/40 absolute left-3.5 top-3" />
+              {/* Row 3: Phone number */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-white">
+                    Phone number
+                  </label>
+                  <span className="text-[11px] text-white/40">Required. We use it to text you when your order ships.</span>
+                </div>
                 <input
                   type="text"
                   required
                   value={formData.phoneNumber}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phoneNumber: e.target.value })
-                  }
-                  placeholder="e.g., 0771234567"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  placeholder="e.g. 0770000001"
+                  className="w-full bg-white/[0.06] border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#4de1b7]"
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-white/80 mb-1">
-                Default Farm / Greenhouse Delivery Address & District *
-              </label>
-              <div className="relative">
-                <MapPin className="w-4 h-4 text-white/40 absolute left-3.5 top-3" />
+              {/* Row 4: Delivery address and district */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-white">
+                    Delivery address and district
+                  </label>
+                  <span className="text-[11px] text-white/40">Required. Your farm or greenhouse.</span>
+                </div>
                 <input
                   type="text"
                   required
                   value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
-                  placeholder="e.g., Greenhouse Plot 4, Nuwara Eliya"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  placeholder="e.g. Colombo HQ or Nuwara Eliya Station"
+                  className="w-full bg-white/[0.06] border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#4de1b7]"
                 />
               </div>
-            </div>
 
-            <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  if (onOpenOrderHistory) onOpenOrderHistory();
-                }}
-                className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold flex items-center gap-2 cursor-pointer"
-              >
-                <Package className="w-4 h-4 text-sky-300" />
-                <span>View My Supply Orders</span>
-              </button>
+              {/* Actions Row matching Page 10 */}
+              <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    if (onOpenOrderHistory) onOpenOrderHistory();
+                  }}
+                  className="px-5 py-2.5 rounded-full border border-white/20 bg-white/[0.06] hover:bg-white/10 text-white font-bold text-xs transition-all cursor-pointer"
+                >
+                  View my orders
+                </button>
 
-              <button
-                type="submit"
-                disabled={saving}
-                className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs sm:text-sm font-extrabold flex items-center gap-2 shadow-lg shadow-sky-500/25 cursor-pointer"
-              >
-                <Save className="w-4 h-4" />
-                <span>{saving ? 'Saving...' : 'Save Profile Changes'}</span>
-              </button>
-            </div>
-          </form>
-        )}
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-6 py-2.5 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 font-bold text-xs transition-all cursor-pointer shadow-md disabled:opacity-50"
+                >
+                  {saving ? 'Saving...' : 'Save changes'}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
 };
+
+export default CustomerSupplyProfileModal;
