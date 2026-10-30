@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Consultation = require('../models/Consultation');
+const ConsultationMessage = require('../models/ConsultationMessage');
 const ExpertProfile = require('../models/ExpertProfile');
 const ProblemReport = require('../models/ProblemReport');
 const { protect } = require('../middleware/authMiddleware');
@@ -508,6 +509,239 @@ router.patch('/:id/status', protect, async (req, res) => {
     return res.status(500).json({
       success: false,
       error: 'Failed to update consultation booking status'
+    });
+  }
+});
+
+// ============================================================================
+// STAGE 8: CONSULTATION COMMUNICATION (Section 11 — Farmer–Expert Thread)
+// ============================================================================
+
+const ALLOWED_IMAGE_MIME_PREFIXES = [
+  'data:image/jpeg;base64,',
+  'data:image/jpg;base64,',
+  'data:image/png;base64,',
+  'data:image/webp;base64,'
+];
+const MAX_ATTACHMENT_BYTES = 2 * 1024 * 1024; // 2 MB per image
+
+const validateMessageAttachments = (attachments = []) => {
+  if (!Array.isArray(attachments)) {
+    return { valid: false, error: 'Attachments must be an array' };
+  }
+  if (attachments.length > 3) {
+    return { valid: false, error: 'Maximum 3 image attachments allowed per message' };
+  }
+
+  const sanitized = [];
+  for (const item of attachments) {
+    if (!item || typeof item !== 'string') continue;
+    const trimmed = item.trim();
+    if (!trimmed) continue;
+
+    if (trimmed.startsWith('data:')) {
+      const lower = trimmed.toLowerCase();
+      const allowed = ALLOWED_IMAGE_MIME_PREFIXES.some((prefix) =>
+        lower.startsWith(prefix)
+      );
+      if (!allowed) {
+        return {
+          valid: false,
+          error: 'Invalid image format. Only JPEG, PNG, and WebP attachments are permitted.'
+        };
+      }
+      const commaIdx = trimmed.indexOf(',');
+      const base64Body = commaIdx !== -1 ? trimmed.slice(commaIdx + 1) : '';
+      const approxBytes = Math.ceil((base64Body.length * 3) / 4);
+      if (approxBytes > MAX_ATTACHMENT_BYTES) {
+        return {
+          valid: false,
+          error: 'Each attached image must be 2 MB or smaller.'
+        };
+      }
+      sanitized.push(trimmed);
+    } else if (/^https?:\/\/.+/i.test(trimmed)) {
+      sanitized.push(trimmed);
+    } else {
+      return {
+        valid: false,
+        error: 'Invalid attachment URL or image format.'
+      };
+    }
+  }
+
+  return { valid: true, sanitized };
+};
+
+// 6. GET /api/consultations/:id/messages — Retrieve chronological message thread (Participant or Admin only)
+router.get('/:id/messages', protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        error: 'Consultation not found'
+      });
+    }
+
+    const consultation = await Consultation.findById(id);
+    if (!consultation) {
+      return res.status(404).json({
+        success: false,
+        error: 'Consultation not found'
+      });
+    }
+
+    const userIdStr = req.user._id.toString();
+    const isFarmerOwner = consultation.farmer.toString() === userIdStr;
+    const isAssignedExpert = consultation.expertUser.toString() === userIdStr;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isFarmerOwner && !isAssignedExpert && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error:
+          'Forbidden: Only the consultation farmer, assigned expert, or platform administrator may access this message thread'
+      });
+    }
+
+    const messages = await ConsultationMessage.find({
+      consultation: consultation._id
+    }).sort({ createdAt: 1 });
+
+    return res.status(200).json({
+      success: true,
+      count: messages.length,
+      consultation: {
+        _id: consultation._id,
+        consultationNumber: consultation.consultationNumber,
+        farmerName: consultation.farmerName,
+        expertName: consultation.expertName,
+        expertTitle: consultation.expertTitle,
+        status: consultation.status,
+        consultationType: consultation.consultationType,
+        preferredDate: consultation.preferredDate,
+        timeSlot: consultation.timeSlot,
+        meetingLink: consultation.meetingLink,
+        problemSummary: consultation.problemSummary,
+        affectedCrop: consultation.affectedCrop
+      },
+      messages
+    });
+  } catch (error) {
+    console.error('Fetch consultation messages error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve consultation messages'
+    });
+  }
+});
+
+// 7. POST /api/consultations/:id/messages — Send message or photo in consultation thread (Participant or Admin only)
+router.post('/:id/messages', protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { text, messageType, attachments } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        error: 'Consultation not found'
+      });
+    }
+
+    const consultation = await Consultation.findById(id);
+    if (!consultation) {
+      return res.status(404).json({
+        success: false,
+        error: 'Consultation not found'
+      });
+    }
+
+    const userIdStr = req.user._id.toString();
+    const isFarmerOwner = consultation.farmer.toString() === userIdStr;
+    const isAssignedExpert = consultation.expertUser.toString() === userIdStr;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isFarmerOwner && !isAssignedExpert && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error:
+          'Forbidden: Only the consultation farmer, assigned expert, or platform administrator may send messages in this thread'
+      });
+    }
+
+    const cleanText = String(text || '').trim();
+    if (!cleanText) {
+      return res.status(400).json({
+        success: false,
+        error: 'Message text cannot be empty'
+      });
+    }
+
+    const attachmentCheck = validateMessageAttachments(attachments || []);
+    if (!attachmentCheck.valid) {
+      return res.status(400).json({
+        success: false,
+        error: attachmentCheck.error
+      });
+    }
+
+    // Determine effective participant role label for clear thread identification
+    let senderRole = 'farmer';
+    let senderName = req.user.username || 'Farmer';
+    if (isAssignedExpert) {
+      senderRole = 'expert';
+      senderName = consultation.expertName || req.user.username || 'Agricultural Expert';
+    } else if (isAdmin && !isFarmerOwner) {
+      senderRole = 'admin';
+      senderName = `${req.user.username || 'Admin'} (Platform Moderator)`;
+    } else if (isFarmerOwner) {
+      senderRole = 'farmer';
+      senderName = consultation.farmerName || req.user.username || 'Greenhouse Farmer';
+    }
+
+    const resolvedType =
+      attachmentCheck.sanitized.length > 0 && (!messageType || messageType === 'text')
+        ? 'photo'
+        : ['text', 'photo', 'diagnostic_note', 'system'].includes(messageType)
+        ? messageType
+        : 'text';
+
+    const createdMessage = await ConsultationMessage.create({
+      consultation: consultation._id,
+      sender: req.user._id,
+      senderName,
+      senderRole,
+      messageType: resolvedType,
+      text: cleanText,
+      attachments: attachmentCheck.sanitized
+    });
+
+    // Automatically advance 'confirmed' consultation to 'in_progress' when assigned expert responds
+    if (isAssignedExpert && consultation.status === 'confirmed') {
+      consultation.status = 'in_progress';
+      consultation.statusHistory.push({
+        status: 'in_progress',
+        changedByRole: 'expert',
+        note: 'Expert initiated active consultation discussion',
+        changedAt: new Date()
+      });
+    }
+    consultation.updatedAt = new Date();
+    await consultation.save();
+
+    return res.status(201).json({
+      success: true,
+      message: 'Message sent',
+      data: createdMessage,
+      consultationStatus: consultation.status
+    });
+  } catch (error) {
+    console.error('Send consultation message error:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to send consultation message'
     });
   }
 });

@@ -26,6 +26,7 @@ import {
   getMyExpertApplication,
   updateMyExpertProfile,
 } from '../../services/api';
+import ConsultationChatModal from './ConsultationChatModal';
 
 const WEEKDAYS = [
   'Monday',
@@ -104,6 +105,9 @@ export const ConsultationBookingPortal = ({
   const [rescheduleTargetId, setRescheduleTargetId] = useState(null);
   const [rescheduleDate, setRescheduleDate] = useState(getDefaultBookingDate());
   const [rescheduleSlot, setRescheduleSlot] = useState('11:00 AM');
+
+  // Stage 8: Active Consultation Chat Modal State
+  const [activeChatConsultation, setActiveChatConsultation] = useState(null);
 
   // Expert Availability Management State (Section 10.3)
   const [myExpertProfile, setMyExpertProfile] = useState(null);
@@ -965,12 +969,19 @@ export const ConsultationBookingPortal = ({
                   )}
 
                   {/* Action Controls for Assigned Expert & Requesting Farmer */}
-                  {!['cancelled', 'rejected', 'completed'].includes(con.status) && (
-                    <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-[11px] text-white/50">
-                        Booking Actions:
-                      </span>
+                  <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setActiveChatConsultation(con)}
+                        className="px-3.5 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/35 border border-cyan-400/40 text-cyan-200 text-xs font-extrabold flex items-center gap-1.5 cursor-pointer transition-all"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5 text-cyan-300" />
+                        <span>Open Consultation Chat</span>
+                      </button>
+                    </div>
 
+                    {!['cancelled', 'rejected', 'completed'].includes(con.status) && (
                       <div className="flex flex-wrap items-center gap-2">
                         {/* Assigned Expert Controls */}
                         {isAssignedExpert && con.status === 'pending' && (
@@ -1050,14 +1061,26 @@ export const ConsultationBookingPortal = ({
                           </>
                         )}
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               );
             })}
           </div>
         )}
       </div>
+
+      {/* Stage 8: Consultation Message Thread Modal */}
+      {activeChatConsultation && (
+        <ConsultationChatModal
+          consultation={activeChatConsultation}
+          currentUser={currentUser}
+          onClose={() => setActiveChatConsultation(null)}
+          onStatusUpdated={() => {
+            fetchPortalData();
+          }}
+        />
+      )}
     </div>
   );
 };

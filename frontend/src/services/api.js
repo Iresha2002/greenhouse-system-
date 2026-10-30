@@ -354,3 +354,21 @@ export const updateConsultationStatus = async (id, payload) => {
     );
     return response.data;
 };
+
+// 21. ExpertConnect — Consultation Message Thread APIs (Stage 8)
+export const getConsultationMessages = async (consultationId) => {
+    const response = await axios.get(
+        `${API_URL}/consultations/${consultationId}/messages`,
+        getAuthHeaders()
+    );
+    return response.data;
+};
+
+export const sendConsultationMessage = async (consultationId, payload) => {
+    const response = await axios.post(
+        `${API_URL}/consultations/${consultationId}/messages`,
+        payload,
+        getAuthHeaders()
+    );
+    return response.data;
+};
