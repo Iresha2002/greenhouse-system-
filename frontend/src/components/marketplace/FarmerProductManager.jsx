@@ -229,19 +229,19 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
       )}
 
       {/* Top Banner & Actions */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/80 via-white/[0.08] to-emerald-900/50 backdrop-blur-2xl border border-white/20 p-6 sm:p-10 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-xs">
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-bold uppercase tracking-widest text-emerald-300">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
+              <span className="text-xs font-bold uppercase tracking-widest text-emerald-800">
                 {activeTab === 'orders' ? 'Farmer Orders & Fulfillment • Portal' : 'Farmer Listing Studio • Portal'}
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               {activeTab === 'orders' ? 'Harvest Orders & Fulfillment' : 'Manage Crop Listings'}
             </h1>
-            <p className="text-xs sm:text-sm text-white/70 max-w-xl mt-1">
+            <p className="text-xs sm:text-sm text-slate-600 max-w-xl mt-1">
               {activeTab === 'orders'
                 ? 'Review customer harvest orders, track live fulfillment stages, coordinate dispatches, and monitor sales revenue.'
                 : 'Publish fresh harvests, calibrate market prices, track real-time stock levels, and toggle listing visibility in the SmartGrow Marketplace.'}
@@ -251,16 +251,16 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={onBackToMarketplace}
-              className="px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold border border-white/20 transition-all flex items-center gap-2 cursor-pointer shadow-md"
+              className="px-4 py-2.5 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200 transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 text-slate-600" />
               <span>Back to Marketplace</span>
             </button>
 
             {activeTab === 'listings' && (
               <button
                 onClick={handleOpenAddModal}
-                className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-lg hover:scale-105"
+                className="px-5 py-2.5 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white font-extrabold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-xs hover:scale-102"
               >
                 <Plus className="w-4 h-4 stroke-[3]" />
                 <span>Add New Crop</span>
@@ -271,13 +271,13 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
       </div>
 
       {/* Studio Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-white/[0.08] backdrop-blur-xl border border-white/15 shadow-xl w-fit">
+      <div className="flex flex-wrap items-center gap-2">
         <button
           onClick={() => setActiveTab('listings')}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all cursor-pointer ${
             activeTab === 'listings'
-              ? 'bg-emerald-500 text-emerald-950 shadow-lg font-extrabold'
-              : 'text-white/70 hover:bg-white/10 hover:text-white'
+              ? 'bg-[#0b3b2c] text-white shadow-xs font-extrabold'
+              : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs'
           }`}
         >
           <Layers className="w-4 h-4" />
@@ -286,10 +286,10 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
 
         <button
           onClick={() => setActiveTab('orders')}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all cursor-pointer ${
             activeTab === 'orders'
-              ? 'bg-amber-500 text-amber-950 shadow-lg font-extrabold'
-              : 'text-white/70 hover:bg-white/10 hover:text-white'
+              ? 'bg-[#0b3b2c] text-white shadow-xs font-extrabold'
+              : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs'
           }`}
         >
           <Package className="w-4 h-4" />
@@ -318,23 +318,23 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
       {/* Listings Table / Grid */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-10 h-10 border-4 border-emerald-400/20 border-t-emerald-400 rounded-full animate-spin mb-4" />
-          <p className="text-emerald-300 font-semibold tracking-wide text-sm">
+          <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-[#0b3b2c] rounded-full animate-spin mb-4" />
+          <p className="text-slate-600 font-semibold tracking-wide text-sm">
             Fetching your MongoDB crop inventory...
           </p>
         </div>
       ) : myProducts.length === 0 ? (
-        <div className="rounded-3xl bg-white/[0.05] border border-white/15 p-16 text-center shadow-2xl">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 flex items-center justify-center mx-auto mb-4 text-3xl">
+        <div className="rounded-3xl bg-white border border-slate-200 p-16 text-center shadow-xs">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto mb-4 text-3xl">
             🌱
           </div>
-          <h3 className="text-xl font-bold text-white mb-2">No Crop Listings Published Yet</h3>
-          <p className="text-xs sm:text-sm text-white/60 max-w-md mx-auto mb-6">
+          <h3 className="text-xl font-bold text-slate-900 mb-2">No Crop Listings Published Yet</h3>
+          <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mb-6">
             You haven't listed any crops for sale. Add your first harvest now to reach direct consumers and wholesale buyers.
           </p>
           <button
             onClick={handleOpenAddModal}
-            className="px-6 py-3 rounded-full bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold text-xs transition-all cursor-pointer shadow-lg hover:scale-105 inline-flex items-center gap-2"
+            className="px-6 py-3 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white font-extrabold text-xs transition-all cursor-pointer shadow-xs inline-flex items-center gap-2"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
             <span>Publish Your First Crop</span>
@@ -351,11 +351,11 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
             return (
               <div
                 key={product._id}
-                className="relative overflow-hidden rounded-3xl bg-white/[0.08] backdrop-blur-xl border border-white/15 p-5 shadow-xl flex flex-col justify-between hover:border-emerald-400/30 transition-all"
+                className="relative overflow-hidden rounded-2xl bg-white border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between text-slate-900"
               >
                 <div>
                   {/* Top Thumbnail & Status */}
-                  <div className="relative aspect-16/9 w-full rounded-2xl overflow-hidden bg-black/40 border border-white/10 mb-4">
+                  <div className="relative aspect-16/9 w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mb-4">
                     {displayImage ? (
                       <img
                         src={displayImage}
@@ -369,17 +369,17 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                     )}
 
                     <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                      <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-emerald-900/80 text-emerald-300 border border-emerald-400/30 backdrop-blur-md">
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/95 text-slate-800 border border-slate-200 shadow-2xs backdrop-blur-md">
                         {product.category}
                       </span>
                     </div>
 
                     <div className="absolute top-2.5 right-2.5">
                       <span
-                        className={`text-[10px] font-bold px-2.5 py-1 rounded-full border backdrop-blur-md ${
+                        className={`text-[10px] font-bold px-2.5 py-1 rounded-full border shadow-2xs backdrop-blur-md ${
                           isActive
-                            ? 'bg-emerald-500/80 text-emerald-950 border-emerald-400'
-                            : 'bg-zinc-700/80 text-zinc-300 border-zinc-500'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                            : 'bg-slate-100 text-slate-600 border-slate-300'
                         }`}
                       >
                         {isActive ? 'Active' : 'Inactive'}
@@ -390,41 +390,41 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                   {/* Header Title & Pricing */}
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div>
-                      <h3 className="text-base font-bold text-white tracking-tight line-clamp-1">
+                      <h3 className="text-base font-bold text-slate-900 tracking-tight line-clamp-1">
                         {product.name}
                       </h3>
-                      <span className="text-xs text-white/50">{product.location}</span>
+                      <span className="text-xs text-slate-500">{product.location}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-lg font-extrabold text-emerald-300 block">
+                      <span className="text-xl font-black text-slate-950 block">
                         ${product.price.toFixed(2)}
                       </span>
-                      <span className="text-[10px] text-white/50">per {product.unit}</span>
+                      <span className="text-[11px] text-slate-500">per {product.unit}</span>
                     </div>
                   </div>
 
                   {/* Stock Metrics & Quick Inventory Controls */}
-                  <div className="my-3 p-3 rounded-2xl bg-white/[0.04] border border-white/10 space-y-2.5">
+                  <div className="my-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
                     <div className="flex items-center justify-between text-xs">
                       <div>
-                        <span className="text-white/50 block text-[10px]">Inventory Stock</span>
-                        <span className="font-extrabold text-white text-sm">
+                        <span className="text-slate-500 block text-[10px] font-semibold uppercase">Inventory Stock</span>
+                        <span className="font-extrabold text-slate-900 text-sm">
                           {product.quantity} {product.unit}
                         </span>
                       </div>
 
                       <div>
                         {isOutOfStock ? (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+                          <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
                             Sold Out
                           </span>
                         ) : isLowStock ? (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                          <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
                             <AlertTriangle className="w-2.5 h-2.5" />
                             Low Stock ({product.quantity})
                           </span>
                         ) : (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                             In Stock
                           </span>
                         )}
@@ -432,13 +432,13 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                     </div>
 
                     {/* Quick Inventory Adjustment Buttons */}
-                    <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[11px]">
-                      <span className="text-white/40 text-[10px]">Quick Adjust:</span>
+                    <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/80 text-[11px]">
+                      <span className="text-slate-500 text-[10px] font-semibold uppercase">Quick Adjust:</span>
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => handleQuickStockChange(product, -10)}
                           disabled={product.quantity <= 0}
-                          className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-white/15 disabled:opacity-30 text-white/80 hover:text-white border border-white/10 transition-all cursor-pointer font-bold"
+                          className="px-2.5 py-1 rounded-md bg-white hover:bg-slate-100 disabled:opacity-30 text-slate-700 border border-slate-300 transition-all cursor-pointer font-bold text-xs shadow-2xs"
                           title="Reduce 10"
                         >
                           -10
@@ -446,21 +446,21 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                         <button
                           onClick={() => handleQuickStockChange(product, -1)}
                           disabled={product.quantity <= 0}
-                          className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-white/15 disabled:opacity-30 text-white/80 hover:text-white border border-white/10 transition-all cursor-pointer font-bold"
+                          className="px-2.5 py-1 rounded-md bg-white hover:bg-slate-100 disabled:opacity-30 text-slate-700 border border-slate-300 transition-all cursor-pointer font-bold text-xs shadow-2xs"
                           title="Reduce 1"
                         >
                           -1
                         </button>
                         <button
                           onClick={() => handleQuickStockChange(product, +1)}
-                          className="px-2 py-0.5 rounded-md bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 transition-all cursor-pointer font-bold"
+                          className="px-2.5 py-1 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition-all cursor-pointer font-bold text-xs shadow-2xs"
                           title="Add 1"
                         >
                           +1
                         </button>
                         <button
                           onClick={() => handleQuickStockChange(product, +10)}
-                          className="px-2 py-0.5 rounded-md bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 transition-all cursor-pointer font-bold"
+                          className="px-2.5 py-1 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition-all cursor-pointer font-bold text-xs shadow-2xs"
                           title="Add 10"
                         >
                           +10
@@ -471,19 +471,19 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                 </div>
 
                 {/* Card Actions */}
-                <div className="flex items-center gap-2 pt-3 border-t border-white/10">
+                <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
                   <button
                     onClick={() => handleToggleStatus(product)}
-                    className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-all border border-white/15 flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="flex-1 py-2 px-3 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold transition-all border border-slate-200 flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
                     title={isActive ? 'Deactivate listing' : 'Activate listing'}
                   >
-                    {isActive ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    {isActive ? <EyeOff className="w-3.5 h-3.5 text-slate-500" /> : <Eye className="w-3.5 h-3.5 text-slate-500" />}
                     <span>{isActive ? 'Pause' : 'Activate'}</span>
                   </button>
 
                   <button
                     onClick={() => handleOpenEditModal(product)}
-                    className="p-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 transition-all cursor-pointer"
+                    className="p-2 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition-all cursor-pointer shadow-2xs"
                     title="Edit crop details & pricing"
                   >
                     <Edit2 className="w-4 h-4" />
@@ -491,7 +491,7 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
 
                   <button
                     onClick={() => setDeletingId(product._id)}
-                    className="p-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 transition-all cursor-pointer"
+                    className="p-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-all cursor-pointer shadow-2xs"
                     title="Delete crop listing"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -507,20 +507,20 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
 
       {/* ADD / EDIT CROP MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-xl overflow-hidden rounded-3xl bg-[#0f3824] border border-white/20 p-6 sm:p-8 shadow-2xl text-white max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-xl overflow-hidden rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-2xl text-slate-900 max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-5 right-5 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer border border-white/15 z-10"
+              className="absolute top-5 right-5 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-all cursor-pointer border border-slate-200 z-10"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="mb-6">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
                 {editingProduct ? 'Edit Existing Listing' : 'New Harvest Publication'}
               </span>
-              <h2 className="text-2xl font-extrabold text-white tracking-tight">
+              <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
                 {editingProduct ? `Edit "${editingProduct.name}"` : 'Publish Crop to Marketplace'}
               </h2>
             </div>
@@ -528,7 +528,7 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
             <form onSubmit={handleSubmitForm} className="space-y-4">
               {/* Crop Name */}
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Crop Name *
                 </label>
                 <input
@@ -537,20 +537,20 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                   placeholder="e.g. Hydroponic Cherry Tomatoes"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/[0.08] border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-emerald-400"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
                 />
               </div>
 
               {/* Category & Unit */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     Category *
                   </label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0b2b1c] border border-white/20 text-white text-sm focus:outline-none focus:border-emerald-400"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white cursor-pointer"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
@@ -561,13 +561,13 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     Unit of Measurement *
                   </label>
                   <select
                     value={formData.unit}
                     onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0b2b1c] border border-white/20 text-white text-sm focus:outline-none focus:border-emerald-400"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white cursor-pointer"
                   >
                     {UNITS.map((u) => (
                       <option key={u} value={u}>
@@ -581,7 +581,7 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
               {/* Price & Quantity */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     Price per Unit ($) *
                   </label>
                   <input
@@ -592,12 +592,12 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                     placeholder="3.50"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.08] border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-emerald-400"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     Available Quantity ({formData.unit}) *
                   </label>
                   <input
@@ -607,7 +607,7 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                     placeholder="50"
                     value={formData.quantity}
                     onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.08] border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-emerald-400"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
                   />
                 </div>
               </div>
@@ -615,7 +615,7 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
               {/* Location & Harvest Date */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     Farm Location / Greenhouse Bay
                   </label>
                   <input
@@ -623,26 +623,26 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                     placeholder="e.g. Matara Eco Bay 1"
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.08] border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-emerald-400"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
                     Harvest Date
                   </label>
                   <input
                     type="date"
                     value={formData.harvestDate}
                     onChange={(e) => setFormData({ ...formData, harvestDate: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.08] border border-white/20 text-white text-sm focus:outline-none focus:border-emerald-400"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
                   />
                 </div>
               </div>
 
               {/* Image URL */}
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Crop Image URL (Optional)
                 </label>
                 <input
@@ -650,13 +650,13 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                   placeholder="https://images.unsplash.com/photo-..."
                   value={formData.image}
                   onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/[0.08] border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-emerald-400"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Crop Description
                 </label>
                 <textarea
@@ -664,25 +664,25 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                   placeholder="Cultivation conditions, freshness guarantee, taste profile..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/[0.08] border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:border-emerald-400 resize-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white resize-none"
                 />
               </div>
 
               {/* Verification & Status */}
               <div className="flex items-center gap-6 pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-white/80 select-none">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 select-none">
                   <input
                     type="checkbox"
                     checked={formData.isOrganicVerified}
                     onChange={(e) =>
                       setFormData({ ...formData, isOrganicVerified: e.target.checked })
                     }
-                    className="w-4 h-4 rounded text-emerald-500 bg-transparent border-white/30"
+                    className="w-4 h-4 rounded text-emerald-700 accent-[#0b3b2c]"
                   />
                   <span>Organic Verified Harvest</span>
                 </label>
 
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-white/80 select-none">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 select-none">
                   <input
                     type="checkbox"
                     checked={formData.status === 'active'}
@@ -692,25 +692,25 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                         status: e.target.checked ? 'active' : 'inactive',
                       })
                     }
-                    className="w-4 h-4 rounded text-emerald-500 bg-transparent border-white/30"
+                    className="w-4 h-4 rounded text-emerald-700 accent-[#0b3b2c]"
                   />
                   <span>Active & Visible in Marketplace</span>
                 </label>
               </div>
 
               {/* Submit Buttons */}
-              <div className="flex items-center gap-3 pt-4 border-t border-white/10">
+              <div className="flex items-center gap-3 pt-4 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold border border-white/15 transition-all cursor-pointer"
+                  className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-emerald-950 font-extrabold text-xs transition-all shadow-lg cursor-pointer"
+                  className="flex-1 py-3 px-4 rounded-xl bg-[#0b3b2c] hover:bg-[#07291e] disabled:opacity-50 text-white font-extrabold text-xs transition-all shadow-xs cursor-pointer"
                 >
                   {submitting ? 'Saving to Database...' : editingProduct ? 'Update Listing' : 'Publish Crop'}
                 </button>
@@ -722,25 +722,25 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
 
       {/* DELETE CONFIRMATION DIALOG */}
       {deletingId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-sm rounded-3xl bg-[#0f3824] border border-rose-500/30 p-6 text-center shadow-2xl text-white">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center justify-center mx-auto mb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-sm rounded-3xl bg-white border border-slate-200 p-6 text-center shadow-2xl text-slate-900">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center mx-auto mb-3">
               <Trash2 className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">Delete Crop Listing?</h3>
-            <p className="text-xs text-white/70 mb-5 leading-relaxed">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Delete Crop Listing?</h3>
+            <p className="text-xs text-slate-600 mb-5 leading-relaxed">
               Are you sure you want to permanently delete this crop listing from the SmartGrow marketplace? This action cannot be undone.
             </p>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setDeletingId(null)}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold border border-white/15 cursor-pointer"
+                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmDelete}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-bold text-xs shadow-lg cursor-pointer"
+                className="flex-1 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs cursor-pointer"
               >
                 Yes, Delete
               </button>

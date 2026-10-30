@@ -198,68 +198,68 @@ export const FarmerOrdersManager = ({ currentUser }) => {
       {/* Real-time Metrics Matrix */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Total Orders */}
-        <div className="p-4 rounded-3xl bg-white/[0.06] backdrop-blur-xl border border-white/15 shadow-xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-white/60 mb-2">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider">Total Received</span>
-            <Package className="w-4 h-4 text-emerald-400" />
+            <Package className="w-4 h-4 text-slate-600" />
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-white">
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900">
             {metrics.totalOrders}
           </div>
-          <span className="text-[10px] text-white/50 mt-1">Across all harvest listings</span>
+          <span className="text-[10px] text-slate-400 mt-1">Across all harvest listings</span>
         </div>
 
         {/* Pending Orders */}
-        <div className="p-4 rounded-3xl bg-amber-500/10 backdrop-blur-xl border border-amber-400/30 shadow-xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-amber-300 mb-2">
+        <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between text-amber-800 mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider">Pending Action</span>
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping" />
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-amber-300">
+          <div className="text-2xl sm:text-3xl font-extrabold text-amber-900">
             {metrics.pendingOrders}
           </div>
-          <span className="text-[10px] text-amber-200/60 mt-1">Requires farm acceptance</span>
+          <span className="text-[10px] text-amber-700/80 mt-1">Requires farm acceptance</span>
         </div>
 
         {/* In Preparation */}
-        <div className="p-4 rounded-3xl bg-teal-500/10 backdrop-blur-xl border border-teal-400/30 shadow-xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-teal-300 mb-2">
+        <div className="p-4 rounded-2xl bg-teal-50/80 border border-teal-200 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between text-teal-800 mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider">Active Harvests</span>
-            <Sparkles className="w-4 h-4 text-teal-400" />
+            <Sparkles className="w-4 h-4 text-teal-600" />
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-teal-300">
+          <div className="text-2xl sm:text-3xl font-extrabold text-teal-900">
             {metrics.activeOrders}
           </div>
-          <span className="text-[10px] text-teal-200/60 mt-1">Picking & staging orders</span>
+          <span className="text-[10px] text-teal-700/80 mt-1">Picking & staging orders</span>
         </div>
 
         {/* Completed Orders */}
-        <div className="p-4 rounded-3xl bg-emerald-500/10 backdrop-blur-xl border border-emerald-400/30 shadow-xl flex flex-col justify-between">
-          <div className="flex items-center justify-between text-emerald-300 mb-2">
+        <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between text-emerald-800 mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider">Delivered</span>
-            <CheckCircle className="w-4 h-4 text-emerald-400" />
+            <CheckCircle className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-emerald-300">
+          <div className="text-2xl sm:text-3xl font-extrabold text-emerald-900">
             {metrics.completedOrders}
           </div>
-          <span className="text-[10px] text-emerald-200/60 mt-1">Completed fulfillments</span>
+          <span className="text-[10px] text-emerald-700/80 mt-1">Completed fulfillments</span>
         </div>
 
         {/* Gross Revenue */}
-        <div className="p-4 rounded-3xl bg-emerald-950/60 backdrop-blur-xl border border-emerald-400/40 shadow-xl flex flex-col justify-between col-span-2 lg:col-span-1">
-          <div className="flex items-center justify-between text-emerald-300 mb-2">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between col-span-2 lg:col-span-1">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider">Realized Revenue</span>
-            <DollarSign className="w-4 h-4 text-emerald-400" />
+            <DollarSign className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-emerald-300">
+          <div className="text-2xl sm:text-3xl font-black text-slate-950">
             ${metrics.totalRevenue.toFixed(2)}
           </div>
-          <span className="text-[10px] text-emerald-200/60 mt-1">Verified delivered sales</span>
+          <span className="text-[10px] text-slate-400 mt-1">Verified delivered sales</span>
         </div>
       </div>
 
       {/* Filter Tabs & Search Controls */}
-      <div className="p-3 sm:p-4 rounded-3xl bg-white/[0.08] backdrop-blur-xl border border-white/15 shadow-xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="p-3 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         {/* Filter Badges */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 text-xs scrollbar-none">
           {[
@@ -274,10 +274,10 @@ export const FarmerOrdersManager = ({ currentUser }) => {
             <button
               key={tab.id}
               onClick={() => setActiveFilter(tab.id)}
-              className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-full font-bold whitespace-nowrap transition-all cursor-pointer ${
                 activeFilter === tab.id
-                  ? 'bg-emerald-500 text-emerald-950 shadow-md font-extrabold'
-                  : 'text-white/70 hover:bg-white/10 hover:text-white'
+                  ? 'bg-[#0b3b2c] text-white shadow-xs font-extrabold'
+                  : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs font-semibold'
               }`}
             >
               {tab.label}
@@ -287,13 +287,13 @@ export const FarmerOrdersManager = ({ currentUser }) => {
 
         {/* Search Input */}
         <div className="relative w-full md:w-72">
-          <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search order ID, customer, phone..."
-            className="w-full pl-9 pr-3 py-2 rounded-2xl bg-white/10 border border-white/15 text-white placeholder-white/40 text-xs focus:outline-none focus:border-emerald-400"
+            className="w-full pl-9 pr-3 py-2 rounded-full bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs focus:outline-none focus:border-emerald-600 focus:bg-white"
           />
         </div>
       </div>
@@ -301,18 +301,18 @@ export const FarmerOrdersManager = ({ currentUser }) => {
       {/* Orders List Feed */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Loader2 className="w-9 h-9 text-emerald-400 animate-spin mb-3" />
-          <p className="text-emerald-300 font-semibold tracking-wide text-xs">
+          <Loader2 className="w-9 h-9 text-emerald-600 animate-spin mb-3" />
+          <p className="text-slate-600 font-semibold tracking-wide text-xs">
             Querying active greenhouse fulfillment orders...
           </p>
         </div>
       ) : filteredOrders.length === 0 ? (
-        <div className="rounded-3xl bg-white/[0.05] border border-white/15 p-16 text-center shadow-xl space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 flex items-center justify-center mx-auto text-3xl">
+        <div className="rounded-2xl bg-white border border-slate-200 p-16 text-center shadow-xs space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-center mx-auto text-3xl">
             📦
           </div>
-          <h3 className="text-xl font-bold text-white">No Harvest Orders Found</h3>
-          <p className="text-xs sm:text-sm text-white/60 max-w-md mx-auto">
+          <h3 className="text-xl font-bold text-slate-900">No Harvest Orders Found</h3>
+          <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
             {activeFilter !== 'all'
               ? `No customer orders currently match the "${activeFilter}" filter state.`
               : 'You have not received any orders yet. Ensure your crop listings are marked "active" and well-stocked in the Marketplace!'}
@@ -328,45 +328,45 @@ export const FarmerOrdersManager = ({ currentUser }) => {
             return (
               <div
                 key={order._id}
-                className="rounded-3xl bg-white/[0.06] backdrop-blur-xl border border-white/15 overflow-hidden transition-all hover:border-white/25 shadow-xl"
+                className="rounded-2xl bg-white border border-slate-200 overflow-hidden transition-all hover:shadow-md shadow-xs text-slate-900"
               >
                 {/* Order Summary Bar */}
                 <div
                   onClick={() => setExpandedOrderId(isExpanded ? null : order._id)}
-                  className="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 cursor-pointer bg-white/[0.02] hover:bg-white/[0.05] transition-all"
+                  className="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 cursor-pointer hover:bg-slate-50/70 transition-all"
                 >
                   <div className="flex items-start sm:items-center gap-3.5 min-w-0">
-                    <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 shrink-0 mt-1 sm:mt-0">
+                    <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0 mt-1 sm:mt-0">
                       <Receipt className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2.5 flex-wrap">
-                        <span className="font-mono font-bold text-sm text-white tracking-wide">
+                        <span className="font-mono font-bold text-sm text-slate-900 tracking-wide">
                           {order.orderNumber}
                         </span>
                         {getStatusBadge(status)}
-                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10">
+                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                           {order.fulfillmentMethod === 'pickup' ? 'Farm Gate Collection' : 'Home Delivery'}
                         </span>
                       </div>
-                      <div className="text-[11px] text-white/60 flex items-center gap-3 mt-1.5 flex-wrap">
-                        <span className="flex items-center gap-1 text-white/80 font-semibold">
-                          <User className="w-3 h-3 text-emerald-400" />
+                      <div className="text-[11px] text-slate-500 flex items-center gap-3 mt-1.5 flex-wrap">
+                        <span className="flex items-center gap-1 text-slate-800 font-semibold">
+                          <User className="w-3 h-3 text-emerald-600" />
                           {order.customerInfo?.name}
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
-                          <Phone className="w-3 h-3" />
+                          <Phone className="w-3 h-3 text-slate-400" />
                           {order.customerInfo?.phone}
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-amber-400" />
+                          <MapPin className="w-3 h-3 text-amber-500" />
                           {order.customerInfo?.district}
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
+                          <Calendar className="w-3 h-3 text-slate-400" />
                           {new Date(order.createdAt).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
@@ -379,14 +379,14 @@ export const FarmerOrdersManager = ({ currentUser }) => {
                   </div>
 
                   {/* Financials & Expand Toggle */}
-                  <div className="flex items-center justify-between lg:justify-end gap-5 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-white/10">
+                  <div className="flex items-center justify-between lg:justify-end gap-5 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-100">
                     <div className="text-left lg:text-right">
-                      <span className="text-[10px] text-white/50 block">Your Farm Subtotal</span>
-                      <span className="text-base font-black text-emerald-300">
+                      <span className="text-[10px] text-slate-400 block font-semibold uppercase">Your Farm Subtotal</span>
+                      <span className="text-lg font-black text-slate-950">
                         ${order.farmerSubtotal?.toFixed(2)}
                       </span>
                     </div>
-                    <div className="p-2 rounded-xl bg-white/10 text-white/70 hover:text-white">
+                    <div className="p-2 rounded-full bg-slate-100 text-slate-600 hover:text-slate-900">
                       {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </div>
                   </div>
@@ -394,60 +394,60 @@ export const FarmerOrdersManager = ({ currentUser }) => {
 
                 {/* Expanded Details and Lifecycle Transition Buttons */}
                 {isExpanded && (
-                  <div className="p-6 border-t border-white/10 space-y-6 bg-black/20 text-xs">
+                  <div className="p-6 border-t border-slate-100 space-y-6 bg-slate-50/50 text-xs">
                     {/* Customer & Delivery Context */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
-                        <span className="text-[10px] uppercase font-bold text-white/40 block">
+                      <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-1.5 shadow-2xs">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">
                           Customer Delivery Instructions
                         </span>
-                        <div className="text-white/80 space-y-1">
+                        <div className="text-slate-700 space-y-1">
                           <div>
-                            <strong className="text-white">Full Address:</strong> {order.customerInfo?.address || 'Pickup at Farm Gate'}
+                            <strong className="text-slate-900">Full Address:</strong> {order.customerInfo?.address || 'Pickup at Farm Gate'}
                           </div>
                           <div>
-                            <strong className="text-white">Contact Phone:</strong> {order.customerInfo?.phone}
+                            <strong className="text-slate-900">Contact Phone:</strong> {order.customerInfo?.phone}
                           </div>
                           {order.customerInfo?.notes && (
-                            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-400/20 text-amber-300 text-[11px] mt-2">
+                            <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[11px] mt-2">
                               💬 Note from buyer: "{order.customerInfo?.notes}"
                             </div>
                           )}
                         </div>
                       </div>
 
-                      <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
-                        <span className="text-[10px] uppercase font-bold text-white/40 block">
+                      <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-1.5 shadow-2xs">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">
                           Payment & Fulfillment Method
                         </span>
-                        <div className="text-white/80 space-y-1">
+                        <div className="text-slate-700 space-y-1">
                           <div>
-                            <strong className="text-white">Fulfillment:</strong>{' '}
+                            <strong className="text-slate-900">Fulfillment:</strong>{' '}
                             {order.fulfillmentMethod === 'pickup' ? 'Farm Gate Collection' : 'Direct Eco Delivery'}
                           </div>
                           <div>
-                            <strong className="text-white">Payment Mode:</strong>{' '}
+                            <strong className="text-slate-900">Payment Mode:</strong>{' '}
                             {order.paymentMethod === 'pay_on_pickup' ? 'Pay on Collection' : 'Cash on Delivery (COD)'}
                           </div>
                           <div>
-                            <strong className="text-white">Payment Status:</strong>{' '}
-                            <span className="capitalize text-emerald-300 font-bold">{order.paymentStatus || 'Pending'}</span>
+                            <strong className="text-slate-900">Payment Status:</strong>{' '}
+                            <span className="capitalize text-emerald-700 font-bold">{order.paymentStatus || 'Pending'}</span>
                           </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Crops to Harvest for this Farmer */}
-                    <div className="rounded-2xl border border-white/10 overflow-hidden">
-                      <div className="p-3 bg-white/[0.04] font-bold text-white/90 text-xs border-b border-white/10 flex justify-between">
+                    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs">
+                      <div className="p-3 bg-slate-50 font-bold text-slate-800 text-xs border-b border-slate-200 flex justify-between">
                         <span>Crops Ordered From Your Farm</span>
                         <span>Item Subtotal</span>
                       </div>
-                      <div className="divide-y divide-white/5">
+                      <div className="divide-y divide-slate-100">
                         {order.myItems?.map((item, idx) => (
                           <div key={idx} className="p-3.5 flex items-center justify-between gap-3 text-xs">
                             <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-10 h-10 rounded-xl bg-black/40 overflow-hidden border border-white/10 shrink-0">
+                              <div className="w-10 h-10 rounded-xl bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
                                 {item.image ? (
                                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                                 ) : (
@@ -455,33 +455,33 @@ export const FarmerOrdersManager = ({ currentUser }) => {
                                 )}
                               </div>
                               <div className="min-w-0">
-                                <div className="font-bold text-white truncate text-xs sm:text-sm">{item.name}</div>
-                                <div className="text-[11px] text-emerald-300">
-                                  Quantity: <strong className="text-white font-extrabold">{item.quantity} {item.unit}</strong> × ${Number(item.price).toFixed(2)}
+                                <div className="font-bold text-slate-900 truncate text-xs sm:text-sm">{item.name}</div>
+                                <div className="text-[11px] text-emerald-800">
+                                  Quantity: <strong className="text-slate-900 font-extrabold">{item.quantity} {item.unit}</strong> × ${Number(item.price).toFixed(2)}
                                 </div>
                               </div>
                             </div>
-                            <div className="font-extrabold text-white text-sm shrink-0">
+                            <div className="font-extrabold text-slate-950 text-sm shrink-0">
                               ${Number(item.itemTotal || (item.price * item.quantity)).toFixed(2)}
                             </div>
                           </div>
                         ))}
                       </div>
-                      <div className="p-3 bg-white/[0.02] border-t border-white/10 flex justify-between items-center text-xs font-bold text-white">
+                      <div className="p-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center text-xs font-bold text-slate-900">
                         <span>Total Revenue for Your Farm:</span>
-                        <span className="text-emerald-300 text-sm font-black">
+                        <span className="text-slate-950 text-sm font-black">
                           ${order.farmerSubtotal?.toFixed(2)}
                         </span>
                       </div>
                     </div>
 
                     {/* One-Click Lifecycle Transition Controller */}
-                    <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3">
+                    <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-3 shadow-2xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] uppercase font-bold text-white/50">
+                        <span className="text-[11px] uppercase font-bold text-slate-500">
                           Order Fulfillment Actions
                         </span>
-                        <span className="text-[10px] text-white/40">
+                        <span className="text-[10px] text-slate-400">
                           Update status step-by-step as you harvest and dispatch
                         </span>
                       </div>
@@ -492,7 +492,7 @@ export const FarmerOrdersManager = ({ currentUser }) => {
                           <button
                             onClick={() => handleStatusTransition(order._id, 'accepted', 'Accepted by greenhouse farm')}
                             disabled={isUpdating}
-                            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-emerald-950 font-extrabold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg"
+                            className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] disabled:opacity-50 text-white font-extrabold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs"
                           >
                             {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4 stroke-[3]" />}
                             <span>Accept Order & Confirm Harvest</span>
@@ -505,18 +505,18 @@ export const FarmerOrdersManager = ({ currentUser }) => {
                                 value={rejectReason}
                                 onChange={(e) => setRejectReason(e.target.value)}
                                 placeholder="Reason for rejection (e.g. crop damaged)..."
-                                className="px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-white text-xs placeholder:text-white/40 focus:outline-none focus:border-rose-400 flex-1 sm:w-60"
+                                className="px-3 py-2 rounded-full bg-slate-50 border border-slate-200 text-slate-900 text-xs placeholder:text-slate-400 focus:outline-none focus:border-rose-400 flex-1 sm:w-60"
                               />
                               <button
                                 onClick={() => handleStatusTransition(order._id, 'rejected', rejectReason || 'Rejected by farm')}
                                 disabled={isUpdating}
-                                className="px-3 py-2 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-bold text-xs transition-all cursor-pointer"
+                                className="px-3.5 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-all cursor-pointer"
                               >
                                 Confirm Reject
                               </button>
                               <button
                                 onClick={() => setRejectingId(null)}
-                                className="px-2.5 py-2 rounded-xl bg-white/10 text-white text-xs cursor-pointer"
+                                className="px-3 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs cursor-pointer font-semibold"
                               >
                                 Cancel
                               </button>
@@ -528,7 +528,7 @@ export const FarmerOrdersManager = ({ currentUser }) => {
                                 setRejectReason('');
                               }}
                               disabled={isUpdating}
-                              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
+                              className="w-full sm:w-auto px-4 py-2.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
                             >
                               <X className="w-4 h-4" />
                               <span>Reject Order & Return Stock</span>
@@ -542,12 +542,12 @@ export const FarmerOrdersManager = ({ currentUser }) => {
                           <button
                             onClick={() => handleStatusTransition(order._id, 'preparing', 'Fresh greenhouse harvesting started')}
                             disabled={isUpdating}
-                            className="px-5 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 disabled:opacity-50 text-teal-950 font-extrabold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-lg"
+                            className="px-5 py-2.5 rounded-full bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white font-extrabold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-xs"
                           >
                             {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                             <span>Start Fresh Harvesting</span>
                           </button>
-                          <span className="text-[11px] text-white/50">
+                          <span className="text-[11px] text-slate-500">
                             Moves order to "Harvesting In Progress"
                           </span>
                         </div>
@@ -558,12 +558,12 @@ export const FarmerOrdersManager = ({ currentUser }) => {
                           <button
                             onClick={() => handleStatusTransition(order._id, 'ready_for_dispatch', 'Crops harvested, washed, and boxed')}
                             disabled={isUpdating}
-                            className="px-5 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-400 disabled:opacity-50 text-purple-950 font-extrabold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-lg"
+                            className="px-5 py-2.5 rounded-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-extrabold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-xs"
                           >
                             {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Package className="w-4 h-4" />}
                             <span>Mark Packaged & Staged for Dispatch</span>
                           </button>
-                          <span className="text-[11px] text-white/50">
+                          <span className="text-[11px] text-slate-500">
                             Signals quality check complete and ready for driver or pickup
                           </span>
                         </div>
@@ -574,12 +574,12 @@ export const FarmerOrdersManager = ({ currentUser }) => {
                           <button
                             onClick={() => handleStatusTransition(order._id, 'dispatched', 'Order handed over to delivery route / courier')}
                             disabled={isUpdating}
-                            className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-sky-950 font-extrabold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-lg"
+                            className="px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white font-extrabold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-xs"
                           >
                             {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
                             <span>Dispatch / Out for Delivery</span>
                           </button>
-                          <span className="text-[11px] text-white/50">
+                          <span className="text-[11px] text-slate-500">
                             Notifies customer that harvest is on the move
                           </span>
                         </div>
@@ -590,20 +590,20 @@ export const FarmerOrdersManager = ({ currentUser }) => {
                           <button
                             onClick={() => handleStatusTransition(order._id, 'delivered', 'Order safely delivered and payment received')}
                             disabled={isUpdating}
-                            className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-emerald-950 font-extrabold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-lg"
+                            className="px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-extrabold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-xs"
                           >
                             {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                             <span>Confirm Delivered & Completed</span>
                           </button>
-                          <span className="text-[11px] text-emerald-300 font-semibold">
+                          <span className="text-[11px] text-emerald-800 font-semibold">
                             Marks order complete and finalizes revenue
                           </span>
                         </div>
                       )}
 
                       {['delivered', 'rejected', 'cancelled'].includes(status) && (
-                        <div className="flex items-center gap-2 text-white/60 text-xs">
-                          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                        <div className="flex items-center gap-2 text-slate-500 text-xs">
+                          <ShieldCheck className="w-4 h-4 text-emerald-600" />
                           <span>This order lifecycle is finalized ({status}).</span>
                         </div>
                       )}

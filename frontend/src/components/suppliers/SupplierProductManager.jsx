@@ -390,17 +390,17 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
       )}
 
       {/* Supplier Studio Header Bar */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0d342b] via-[#113d33] to-[#0c2938] border border-sky-400/35 p-6 sm:p-8 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-xs">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-extrabold uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
               <Building2 className="w-3.5 h-3.5" />
               <span>Authorized Supplier Portal</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               {currentUser?.username || 'Supplier'} — Catalog & Specification Studio
             </h2>
-            <p className="text-xs sm:text-sm text-white/70 mt-1">
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
               Manage your agricultural inputs, greenhouse hardware, technical datasheets, and live stock availability.
             </p>
           </div>
@@ -409,16 +409,16 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
             <button
               type="button"
               onClick={onBackToMarketplace}
-              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer"
+              className="px-4 py-2.5 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 text-slate-600" />
               <span>Customer Storefront</span>
             </button>
 
             <button
               type="button"
               onClick={handleOpenCreate}
-              className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs sm:text-sm font-extrabold flex items-center gap-2 shadow-lg shadow-sky-500/25 transition-all cursor-pointer"
+              className="px-5 py-2.5 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white text-xs sm:text-sm font-extrabold flex items-center gap-2 shadow-xs transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Add New Supply Product</span>
@@ -429,40 +429,40 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
 
       {/* Supplier Dashboard KPI Cards (Section 5.1) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="rounded-2xl bg-white/[0.07] border border-white/15 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-white/60 text-xs font-bold uppercase mb-1">
+        <div className="rounded-2xl bg-white border border-slate-200 p-5 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-bold uppercase mb-1">
             <span>Total Listed Supplies</span>
-            <Package className="w-4 h-4 text-sky-400" />
+            <Package className="w-4 h-4 text-slate-600" />
           </div>
-          <p className="text-3xl font-extrabold text-white">{metrics.totalListed}</p>
-          <span className="text-[11px] text-white/50">Owned by your supplier account</span>
+          <p className="text-3xl font-extrabold text-slate-900">{metrics.totalListed}</p>
+          <span className="text-[11px] text-slate-400">Owned by your supplier account</span>
         </div>
 
-        <div className="rounded-2xl bg-white/[0.07] border border-emerald-400/25 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-emerald-300/80 text-xs font-bold uppercase mb-1">
+        <div className="rounded-2xl bg-white border border-slate-200 p-5 shadow-xs">
+          <div className="flex items-center justify-between text-emerald-800 text-xs font-bold uppercase mb-1">
             <span>Active in Storefront</span>
-            <CheckCircle className="w-4 h-4 text-emerald-400" />
+            <CheckCircle className="w-4 h-4 text-emerald-600" />
           </div>
-          <p className="text-3xl font-extrabold text-emerald-300">{metrics.activeCount}</p>
-          <span className="text-[11px] text-white/50">Publicly visible to farmers</span>
+          <p className="text-3xl font-extrabold text-emerald-700">{metrics.activeCount}</p>
+          <span className="text-[11px] text-slate-400">Publicly visible to farmers</span>
         </div>
 
-        <div className="rounded-2xl bg-white/[0.07] border border-amber-400/25 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-amber-300/80 text-xs font-bold uppercase mb-1">
+        <div className="rounded-2xl bg-white border border-slate-200 p-5 shadow-xs">
+          <div className="flex items-center justify-between text-amber-800 text-xs font-bold uppercase mb-1">
             <span>Low-Stock Alerts</span>
-            <AlertTriangle className="w-4 h-4 text-amber-400" />
+            <AlertTriangle className="w-4 h-4 text-amber-600" />
           </div>
-          <p className="text-3xl font-extrabold text-amber-300">{metrics.lowStockCount}</p>
-          <span className="text-[11px] text-white/50">At or below alert threshold</span>
+          <p className="text-3xl font-extrabold text-amber-700">{metrics.lowStockCount}</p>
+          <span className="text-[11px] text-slate-400">At or below alert threshold</span>
         </div>
 
-        <div className="rounded-2xl bg-white/[0.07] border border-red-400/25 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-red-300/80 text-xs font-bold uppercase mb-1">
+        <div className="rounded-2xl bg-white border border-slate-200 p-5 shadow-xs">
+          <div className="flex items-center justify-between text-rose-800 text-xs font-bold uppercase mb-1">
             <span>Out of Stock</span>
-            <XCircle className="w-4 h-4 text-red-400" />
+            <XCircle className="w-4 h-4 text-rose-600" />
           </div>
-          <p className="text-3xl font-extrabold text-red-300">{metrics.outOfStockCount}</p>
-          <span className="text-[11px] text-white/50">Requires restocking</span>
+          <p className="text-3xl font-extrabold text-rose-700">{metrics.outOfStockCount}</p>
+          <span className="text-[11px] text-slate-400">Requires restocking</span>
         </div>
 
         {/* Stage 9: Order Fulfilment & Sales KPI Row */}
@@ -471,14 +471,14 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
             setPortalTab('orders');
             setOrderFilter('pending');
           }}
-          className="rounded-2xl bg-white/[0.07] border border-amber-400/30 p-5 backdrop-blur-xl cursor-pointer hover:bg-white/[0.11] transition-all"
+          className="rounded-2xl bg-amber-50/80 border border-amber-200 p-5 cursor-pointer hover:bg-amber-100/70 transition-all shadow-xs"
         >
-          <div className="flex items-center justify-between text-amber-300/80 text-xs font-bold uppercase mb-1">
+          <div className="flex items-center justify-between text-amber-800 text-xs font-bold uppercase mb-1">
             <span>Pending Orders</span>
-            <Clock className="w-4 h-4 text-amber-400" />
+            <Clock className="w-4 h-4 text-amber-600" />
           </div>
-          <p className="text-3xl font-extrabold text-amber-300">{orderMetrics.pendingOrders}</p>
-          <span className="text-[11px] text-white/50">Awaiting supplier acceptance</span>
+          <p className="text-3xl font-extrabold text-amber-900">{orderMetrics.pendingOrders}</p>
+          <span className="text-[11px] text-amber-700/80">Awaiting supplier acceptance</span>
         </div>
 
         <div
@@ -486,14 +486,14 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
             setPortalTab('orders');
             setOrderFilter('active');
           }}
-          className="rounded-2xl bg-white/[0.07] border border-sky-400/30 p-5 backdrop-blur-xl cursor-pointer hover:bg-white/[0.11] transition-all"
+          className="rounded-2xl bg-teal-50/80 border border-teal-200 p-5 cursor-pointer hover:bg-teal-100/70 transition-all shadow-xs"
         >
-          <div className="flex items-center justify-between text-sky-300/80 text-xs font-bold uppercase mb-1">
+          <div className="flex items-center justify-between text-teal-800 text-xs font-bold uppercase mb-1">
             <span>Active Fulfilment</span>
-            <Truck className="w-4 h-4 text-sky-400" />
+            <Truck className="w-4 h-4 text-teal-600" />
           </div>
-          <p className="text-3xl font-extrabold text-sky-300">{orderMetrics.activeOrders}</p>
-          <span className="text-[11px] text-white/50">Accepted / Preparing / Dispatched</span>
+          <p className="text-3xl font-extrabold text-teal-900">{orderMetrics.activeOrders}</p>
+          <span className="text-[11px] text-teal-700/80">Accepted / Preparing / Dispatched</span>
         </div>
 
         <div
@@ -501,38 +501,38 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
             setPortalTab('orders');
             setOrderFilter('completed');
           }}
-          className="rounded-2xl bg-white/[0.07] border border-emerald-400/30 p-5 backdrop-blur-xl cursor-pointer hover:bg-white/[0.11] transition-all"
+          className="rounded-2xl bg-emerald-50/80 border border-emerald-200 p-5 cursor-pointer hover:bg-emerald-100/70 transition-all shadow-xs"
         >
-          <div className="flex items-center justify-between text-emerald-300/80 text-xs font-bold uppercase mb-1">
+          <div className="flex items-center justify-between text-emerald-800 text-xs font-bold uppercase mb-1">
             <span>Completed Orders</span>
-            <ClipboardList className="w-4 h-4 text-emerald-400" />
+            <ClipboardList className="w-4 h-4 text-emerald-600" />
           </div>
-          <p className="text-3xl font-extrabold text-emerald-300">{orderMetrics.completedOrders}</p>
-          <span className="text-[11px] text-white/50">Successfully delivered</span>
+          <p className="text-3xl font-extrabold text-emerald-900">{orderMetrics.completedOrders}</p>
+          <span className="text-[11px] text-emerald-700/80">Successfully delivered</span>
         </div>
 
-        <div className="rounded-2xl bg-white/[0.07] border border-emerald-400/35 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-emerald-300/80 text-xs font-bold uppercase mb-1">
+        <div className="rounded-2xl bg-white border border-slate-200 p-5 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-bold uppercase mb-1">
             <span>Delivered Revenue</span>
-            <DollarSign className="w-4 h-4 text-emerald-400" />
+            <DollarSign className="w-4 h-4 text-emerald-600" />
           </div>
-          <p className="text-3xl font-extrabold text-emerald-300">
+          <p className="text-3xl font-black text-slate-950">
             ${Number(orderMetrics.totalRevenue || 0).toFixed(2)}
           </p>
-          <span className="text-[11px] text-white/50">Verified supplier sales total</span>
+          <span className="text-[11px] text-slate-400">Verified supplier sales total</span>
         </div>
       </div>
 
       {/* Stage 9: Supplier Portal Section Switcher Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/15 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3">
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setPortalTab('catalog')}
-            className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all cursor-pointer ${
+            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
               portalTab === 'catalog'
-                ? 'bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/25'
-                : 'bg-white/10 hover:bg-white/20 text-white/80'
+                ? 'bg-[#0b3b2c] text-white shadow-xs font-extrabold'
+                : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs font-semibold'
             }`}
           >
             <Package className="w-4 h-4" />
@@ -542,10 +542,10 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
           <button
             type="button"
             onClick={() => setPortalTab('orders')}
-            className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all cursor-pointer ${
+            className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
               portalTab === 'orders'
-                ? 'bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-400/25'
-                : 'bg-white/10 hover:bg-white/20 text-white/80'
+                ? 'bg-[#0b3b2c] text-white shadow-xs font-extrabold'
+                : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs font-semibold'
             }`}
           >
             <Truck className="w-4 h-4" />
