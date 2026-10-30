@@ -12,23 +12,25 @@ import {
 } from 'lucide-react';
 
 interface HeaderProps {
-  activeIndex: number;
-  onSelectSlide: (index: number) => void;
+  activeIndex?: number;
+  onSelectSlide?: (index: number) => void;
   currentUser?: any;
   onOpenLogin?: () => void;
   onGoToDashboard?: () => void;
   onLogout?: () => void;
   onSelectModule?: (moduleId: string) => void;
+  onNavigateHome?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  activeIndex,
+  activeIndex = 0,
   onSelectSlide,
   currentUser,
   onOpenLogin,
   onGoToDashboard,
   onLogout,
   onSelectModule,
+  onNavigateHome,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -79,9 +81,21 @@ export const Header: React.FC<HeaderProps> = ({
     },
   ];
 
-  const handleDropdownSelect = (index: number) => {
-    onSelectSlide(index);
+  const handleDropdownSelect = (item: typeof dropdownItems[0]) => {
     setIsDropdownOpen(false);
+    if (onSelectModule) {
+      onSelectModule(item.id);
+    } else if (onSelectSlide) {
+      onSelectSlide(item.index);
+    }
+  };
+
+  const handleGoHome = () => {
+    if (onNavigateHome) {
+      onNavigateHome();
+    } else if (onSelectSlide) {
+      onSelectSlide(0);
+    }
   };
 
   return (
@@ -89,7 +103,7 @@ export const Header: React.FC<HeaderProps> = ({
       <header className="relative z-30 flex items-center justify-between px-6 sm:px-12 pt-6 pb-3 w-full max-w-7xl mx-auto">
         {/* Left: Brand with leaf icon */}
         <div
-          onClick={() => onSelectSlide(0)}
+          onClick={handleGoHome}
           className="flex items-center gap-2.5 cursor-pointer group"
         >
           <div className="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/30 shadow-md group-hover:bg-white/25 transition-all">
@@ -115,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
         <nav className="hidden md:flex items-center gap-1 lg:gap-2">
           {/* Home Link */}
           <button
-            onClick={() => onSelectSlide(0)}
+            onClick={handleGoHome}
             className="px-4 py-2 rounded-full text-sm font-semibold text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
             Home
@@ -151,7 +165,7 @@ export const Header: React.FC<HeaderProps> = ({
                     return (
                       <button
                         key={item.id}
-                        onClick={() => handleDropdownSelect(item.index)}
+                        onClick={() => handleDropdownSelect(item)}
                         className={`w-full flex items-start gap-3 p-2.5 rounded-xl text-left transition-all cursor-pointer ${
                           isCurrent
                             ? 'bg-white/20 border border-white/30 text-white'
@@ -184,12 +198,7 @@ export const Header: React.FC<HeaderProps> = ({
                               <span
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  setIsDropdownOpen(false);
-                                  if (onSelectModule) {
-                                    onSelectModule(item.id);
-                                  } else {
-                                    onSelectSlide(item.index);
-                                  }
+                                  handleDropdownSelect(item);
                                 }}
                                 className="text-[9.5px] px-2 py-0.5 rounded-md bg-white/15 hover:bg-emerald-400 hover:text-emerald-950 font-bold transition-all text-white/90"
                               >

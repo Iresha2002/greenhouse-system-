@@ -170,6 +170,11 @@ export function App() {
           onLogout={handleLogout}
           onNavigateHome={() => setCurrentView('home')}
           onOpenLogin={() => setIsAuthModalOpen(true)}
+          onGoToDashboard={() => setCurrentView('dashboard')}
+          onSelectModule={(moduleId) => {
+            setSelectedDashboardTab(moduleId);
+            setCurrentView('dashboard');
+          }}
         />
 
         <main className="relative z-10 dashboard-main max-w-7xl mx-auto px-4 sm:px-8 py-6 w-full flex-1">
