@@ -253,7 +253,7 @@ export const SLIDES: SlideData[] = [
     subheadline: 'Science-Backed Agricultural Consultation',
     description: 'Diagnose crop nutrition deficiencies, plant diseases, pest outbreaks, and hydroponic EC/pH challenges with certified greenhouse agronomists and specialists.',
     tagline: 'SmartGrow ExpertConnect',
-    image: '/assets/hydroponics.jpg',
+    image: '/assets/expertconnect.jpg',
     accentColor: '#38bdf8', // Sky
     floatingTags: [
       {
@@ -320,7 +320,7 @@ export const SLIDES: SlideData[] = [
       description: 'Greenhouse & crop consultation',
       metric: '14 Domains • 1-on-1',
       icon: 'droplet',
-      imageThumbnail: '/assets/hydroponics.jpg',
+      imageThumbnail: '/assets/expertconnect.jpg',
     },
   },
 ];
