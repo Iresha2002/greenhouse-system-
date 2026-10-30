@@ -488,7 +488,7 @@ export const MarketplaceView = ({ currentUser }) => {
           <button
             type="button"
             onClick={() => setIsCartDrawerOpen(true)}
-            className="px-4 py-2 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 font-bold text-xs cursor-pointer transition-colors flex items-center gap-1.5 shadow-sm"
+            className="px-4 py-2 rounded-full bg-[#f59e0b] hover:bg-[#d97706] text-slate-950 font-bold text-xs cursor-pointer transition-colors flex items-center gap-1.5 shadow-sm"
           >
             <span>Basket ({cartItems.reduce((acc, it) => acc + (it.quantity || 1), 0)})</span>
           </button>
@@ -505,7 +505,7 @@ export const MarketplaceView = ({ currentUser }) => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search crops"
+              placeholder="Search crop, grower or place"
               className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/[0.06] border border-white/15 text-white placeholder-white/40 text-xs sm:text-sm focus:outline-none focus:border-[#4de1b7] transition-all"
             />
             {searchQuery && (
