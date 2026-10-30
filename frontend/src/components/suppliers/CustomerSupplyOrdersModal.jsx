@@ -180,12 +180,12 @@ export const CustomerSupplyOrdersModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#071f19]/95 backdrop-blur-xl animate-in fade-in duration-200 text-white pt-20 sm:pt-24">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#f6f9f8] animate-in fade-in duration-200 text-slate-900 pt-20 sm:pt-24">
       {/* Top Action Bar */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-2">
         <button
           onClick={onClose}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-xs sm:text-sm font-semibold text-[#4de1b7] hover:text-white transition-all cursor-pointer shadow-sm group"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-xs sm:text-sm font-bold text-slate-800 transition-all cursor-pointer shadow-2xs group"
         >
           <span className="group-hover:-translate-x-0.5 transition-transform">&larr;</span>
           <span>Back to supplies</span>
@@ -196,24 +196,24 @@ export const CustomerSupplyOrdersModal = ({
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Title & Subtitle */}
         <div className="mb-6">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            My supply orders
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            My orders
           </h1>
-          <p className="text-white/60 text-sm mt-1">
+          <p className="text-slate-600 text-sm mt-1">
             See where your order is, check what you bought, or cancel a pending order. Total orders: {orders.length}
           </p>
         </div>
 
         {/* Action Alerts */}
         {actionSuccess && (
-          <div className="mb-5 p-3 rounded-2xl bg-white/[0.08] border border-[#4de1b7]/40 text-[#4de1b7] text-xs flex items-center gap-2">
+          <div className="mb-5 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
             <CheckCircle className="w-4 h-4 shrink-0" />
             <span>{actionSuccess}</span>
           </div>
         )}
 
         {actionError && (
-          <div className="mb-5 p-3 rounded-2xl bg-rose-500/20 border border-rose-400/40 text-rose-200 text-xs flex items-center gap-2">
+          <div className="mb-5 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{actionError}</span>
           </div>
@@ -227,8 +227,8 @@ export const CustomerSupplyOrdersModal = ({
               onClick={() => setActiveTab('all')}
               className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'all'
-                  ? 'bg-[#4de1b7] text-slate-950 shadow-md'
-                  : 'bg-white/[0.07] border border-white/15 text-white/80 hover:bg-white/10'
+                  ? 'bg-[#0b3b2c] text-white shadow-xs font-extrabold'
+                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs font-semibold'
               }`}
             >
               All orders ({orders.length})
@@ -237,8 +237,8 @@ export const CustomerSupplyOrdersModal = ({
               onClick={() => setActiveTab('active')}
               className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'active'
-                  ? 'bg-[#4de1b7] text-slate-950 shadow-md'
-                  : 'bg-white/[0.07] border border-white/15 text-white/80 hover:bg-white/10'
+                  ? 'bg-[#0b3b2c] text-white shadow-xs font-extrabold'
+                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs font-semibold'
               }`}
             >
               Active ({countActive})
@@ -247,8 +247,8 @@ export const CustomerSupplyOrdersModal = ({
               onClick={() => setActiveTab('delivered')}
               className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'delivered'
-                  ? 'bg-[#4de1b7] text-slate-950 shadow-md'
-                  : 'bg-white/[0.07] border border-white/15 text-white/80 hover:bg-white/10'
+                  ? 'bg-[#0b3b2c] text-white shadow-xs font-extrabold'
+                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs font-semibold'
               }`}
             >
               Delivered ({countDelivered})
@@ -257,8 +257,8 @@ export const CustomerSupplyOrdersModal = ({
               onClick={() => setActiveTab('cancelled')}
               className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'cancelled'
-                  ? 'bg-[#4de1b7] text-slate-950 shadow-md'
-                  : 'bg-white/[0.07] border border-white/15 text-white/80 hover:bg-white/10'
+                  ? 'bg-[#0b3b2c] text-white shadow-xs font-extrabold'
+                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-2xs font-semibold'
               }`}
             >
               Cancelled ({countCancelled})
@@ -279,12 +279,12 @@ export const CustomerSupplyOrdersModal = ({
                 placeholder="Phone number"
                 value={searchPhone}
                 onChange={(e) => setSearchPhone(e.target.value)}
-                className="w-full bg-white/[0.06] border border-white/15 rounded-full px-4 py-2 text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#4de1b7]"
+                className="w-full bg-white border border-slate-200 rounded-full px-4 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 shadow-2xs"
               />
             </div>
             <button
               type="submit"
-              className="px-5 py-2 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 font-bold text-xs transition-all cursor-pointer shadow-md"
+              className="px-5 py-2 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white font-extrabold text-xs transition-all cursor-pointer shadow-xs"
             >
               Find
             </button>
@@ -293,20 +293,20 @@ export const CustomerSupplyOrdersModal = ({
 
         {/* Content Area */}
         {loading ? (
-          <div className="py-20 flex flex-col items-center justify-center text-white/50">
-            <Loader2 className="w-8 h-8 animate-spin text-[#4de1b7] mb-2" />
+          <div className="py-20 flex flex-col items-center justify-center text-slate-500">
+            <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mb-2" />
             <span className="text-xs">Loading supply orders...</span>
           </div>
         ) : filteredOrders.length === 0 ? (
           /* Empty State matching Page 9 */
-          <div className="bg-white/[0.07] border border-white/15 backdrop-blur-md rounded-2xl p-12 sm:p-16 text-center max-w-lg mx-auto">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">No supply orders yet</h2>
-            <p className="text-sm text-white/60 mb-6">
+          <div className="bg-white border border-slate-200 rounded-3xl p-12 sm:p-16 text-center max-w-lg mx-auto shadow-xs">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">No orders yet</h2>
+            <p className="text-sm text-slate-500 mb-6">
               Orders that match this filter will show up here.
             </p>
             <button
               onClick={onClose}
-              className="px-6 py-2.5 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 font-bold text-sm transition-all cursor-pointer shadow-lg inline-flex items-center gap-2"
+              className="px-6 py-2.5 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white font-extrabold text-sm transition-all cursor-pointer shadow-xs inline-flex items-center gap-2"
             >
               <span>Browse supplies</span>
               <span>&rarr;</span>
@@ -323,18 +323,18 @@ export const CustomerSupplyOrdersModal = ({
               return (
                 <div
                   key={order._id}
-                  className="bg-white/[0.07] border border-white/15 backdrop-blur-md rounded-2xl p-5 sm:p-6 transition-all"
+                  className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 transition-all shadow-sm hover:shadow-md"
                 >
                   {/* Order Card Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-sm sm:text-base text-white">
+                        <span className="font-extrabold text-sm sm:text-base text-slate-900">
                           Supply Order #{order._id?.slice(-6)?.toUpperCase()}
                         </span>
                         {getStatusBadge(order.orderStatus)}
                       </div>
-                      <span className="text-xs text-white/50 mt-0.5 block">
+                      <span className="text-xs text-slate-500 mt-0.5 block">
                         {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'short',
@@ -347,14 +347,14 @@ export const CustomerSupplyOrdersModal = ({
 
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <span className="text-xs text-white/50 block">Total</span>
-                        <span className="text-base sm:text-lg font-bold text-[#4de1b7]">
+                        <span className="text-xs text-slate-400 block font-semibold">Total</span>
+                        <span className="text-base sm:text-lg font-black text-slate-950">
                           ${Number(order.totalAmount || 0).toFixed(2)}
                         </span>
                       </div>
                       <button
                         onClick={() => setExpandedOrderId(isExpanded ? null : order._id)}
-                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer"
+                        className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
                         title="Toggle details"
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -363,22 +363,22 @@ export const CustomerSupplyOrdersModal = ({
                   </div>
 
                   {/* Summary row */}
-                  <div className="pt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-white/70">
+                  <div className="pt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
                     <span>
                       {order.items?.length || 0} supplies &middot; {order.deliveryMethod === 'pickup' ? 'Warehouse Pickup' : 'Agri Courier'}
                     </span>
-                    <span className="text-white/50">
+                    <span className="text-slate-500">
                       Customer: {order.customerName} ({order.customerPhone})
                     </span>
                   </div>
 
                   {/* Expanded Details */}
                   {isExpanded && (
-                    <div className="mt-5 pt-5 border-t border-white/10 space-y-6">
+                    <div className="mt-5 pt-5 border-t border-slate-100 space-y-6">
                       {/* Timeline steps */}
                       {order.orderStatus !== 'cancelled' && (
                         <div>
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
                             Fulfillment Progress
                           </h4>
                           <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
@@ -390,10 +390,10 @@ export const CustomerSupplyOrdersModal = ({
                                   key={step.key}
                                   className={`p-2.5 rounded-xl border text-center transition-all ${
                                     isCurrent
-                                      ? 'bg-white/[0.12] border-[#4de1b7] text-[#4de1b7]'
+                                      ? 'bg-emerald-50 border-emerald-600 text-emerald-800 font-bold'
                                       : isPast
-                                      ? 'bg-white/[0.06] border-white/20 text-white'
-                                      : 'bg-white/[0.02] border-white/5 text-white/30'
+                                      ? 'bg-slate-50 border-slate-200 text-slate-800'
+                                      : 'bg-slate-50/50 border-slate-100 text-slate-400'
                                   }`}
                                 >
                                   <div className="text-xs font-bold">{step.label}</div>
@@ -407,22 +407,22 @@ export const CustomerSupplyOrdersModal = ({
 
                       {/* Items */}
                       <div>
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-white/50 mb-2">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
                           Supplies Ordered
                         </h4>
                         <div className="space-y-2">
                           {order.items?.map((it, i) => (
                             <div
                               key={i}
-                              className="p-3 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-between text-xs"
+                              className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs text-slate-900"
                             >
                               <div>
-                                <span className="font-bold text-white">{it.name}</span>
-                                <span className="text-white/50 block text-[11px]">
+                                <span className="font-bold text-slate-900">{it.name}</span>
+                                <span className="text-slate-500 block text-[11px]">
                                   {it.quantity} {it.unit || 'unit'} &times; ${Number(it.unitPrice || 0).toFixed(2)}
                                 </span>
                               </div>
-                              <span className="font-bold text-white">
+                              <span className="font-extrabold text-slate-950">
                                 ${Number(it.totalPrice || (it.unitPrice * it.quantity) || 0).toFixed(2)}
                               </span>
                             </div>
@@ -432,7 +432,7 @@ export const CustomerSupplyOrdersModal = ({
 
                       {/* Delivery and cancel */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-                        <div className="text-xs text-white/60">
+                        <div className="text-xs text-slate-600">
                           <span>Address: {order.deliveryAddress || 'Warehouse Depot Collection'}</span>
                         </div>
 
@@ -445,7 +445,7 @@ export const CustomerSupplyOrdersModal = ({
                                   placeholder="Reason for cancellation"
                                   value={cancelReason}
                                   onChange={(e) => setCancelReason(e.target.value)}
-                                  className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                                  className="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none"
                                 />
                                 <button
                                   onClick={() => handleConfirmCancel(order._id)}

@@ -59,20 +59,20 @@ export const CartDrawer = ({
   const itemCount = cartItems.length;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#071f19]/95 backdrop-blur-xl animate-in fade-in duration-200 text-white">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#f6f9f8] animate-in fade-in duration-200 text-slate-900">
       {/* Top Header Bar matching Page 4 */}
-      <div className="border-b border-white/10 bg-[#0a2720]/80 sticky top-0 z-10 backdrop-blur-md">
+      <div className="border-b border-slate-200 bg-white/90 sticky top-0 z-10 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#4de1b7]/20 border border-[#4de1b7]/40 flex items-center justify-center text-[#4de1b7] font-black text-sm">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-800 font-black text-sm">
               SG
             </div>
-            <span className="text-lg font-bold text-white tracking-tight">SmartGrow</span>
+            <span className="text-lg font-bold text-slate-900 tracking-tight">SmartGrow</span>
           </div>
 
           <button
             onClick={onClose}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#4de1b7] hover:text-[#3bc7a1] transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-950 transition-colors cursor-pointer"
           >
             <span>&larr;</span>
             <span>Continue shopping</span>
@@ -83,26 +83,26 @@ export const CartDrawer = ({
       {/* Main Container */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Your produce basket
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            Basket
           </h1>
-          <p className="text-white/60 text-sm mt-1">
+          <p className="text-slate-500 text-sm mt-1">
             {itemCount} {itemCount === 1 ? 'crop selected' : 'crops selected'}
           </p>
         </div>
 
         {cartItems.length === 0 ? (
-          <div className="bg-white/[0.07] border border-white/15 backdrop-blur-md rounded-2xl p-12 text-center max-w-lg mx-auto">
-            <div className="w-16 h-16 rounded-full bg-white/10 text-3xl flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center max-w-lg mx-auto shadow-xs">
+            <div className="w-16 h-16 rounded-full bg-slate-100 text-3xl flex items-center justify-center mx-auto mb-4">
               🧺
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">Your basket is empty</h3>
-            <p className="text-sm text-white/60 mb-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Your basket is empty</h3>
+            <p className="text-sm text-slate-500 mb-6">
               Fresh greenhouse crops are waiting for you in the marketplace.
             </p>
             <button
               onClick={onClose}
-              className="px-6 py-2.5 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 font-bold text-sm transition-all cursor-pointer shadow-lg"
+              className="px-6 py-2.5 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white font-extrabold text-sm transition-all cursor-pointer shadow-xs"
             >
               Explore fresh produce &rarr;
             </button>
@@ -113,8 +113,8 @@ export const CartDrawer = ({
             <div className="lg:col-span-7 space-y-6">
               {/* Multi-grower alert if applicable */}
               {uniqueFarmers.length > 1 && (
-                <div className="p-3.5 rounded-2xl bg-white/[0.06] border border-[#4de1b7]/30 text-xs text-[#4de1b7] flex items-center gap-2.5">
-                  <Store className="w-4 h-4 shrink-0" />
+                <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs text-xs text-slate-700 flex items-center gap-2.5">
+                  <Store className="w-4 h-4 text-emerald-700 shrink-0" />
                   <span>Items from {uniqueFarmers.length} verified growers bundled for dispatch.</span>
                 </div>
               )}
@@ -131,11 +131,11 @@ export const CartDrawer = ({
                   return (
                     <div
                       key={id}
-                      className="bg-white/[0.07] border border-white/15 backdrop-blur-md rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4 transition-all hover:border-white/25"
+                      className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all"
                     >
                       {/* Image + Title + Grower Info */}
                       <div className="flex items-center gap-4 min-w-0">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-black/30 border border-white/10 shrink-0 flex items-center justify-center">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center">
                           {item.image ? (
                             <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                           ) : (
@@ -144,21 +144,21 @@ export const CartDrawer = ({
                         </div>
 
                         <div className="min-w-0">
-                          <h3 className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                          <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-snug">
                             {item.name}
                           </h3>
-                          <p className="text-xs sm:text-sm text-white/60 mt-0.5">
+                          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
                             {item.farmerName || 'farmer_john'} &middot; ${unitPrice.toFixed(2)} per {unitName}
                           </p>
 
                           {/* Stepper matching Page 4: "− 2 kg +" */}
                           <div className="flex items-center gap-2.5 mt-3">
-                            <div className="inline-flex items-center gap-3 bg-white/[0.08] border border-white/15 rounded-lg px-2.5 py-1 text-sm font-semibold text-white">
+                            <div className="inline-flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-sm font-semibold text-slate-900">
                               <button
                                 type="button"
                                 onClick={() => onUpdateQuantity(id, Math.max(1, qty - 1))}
                                 disabled={qty <= 1}
-                                className="text-white/60 hover:text-white disabled:opacity-30 cursor-pointer text-base leading-none"
+                                className="text-slate-500 hover:text-slate-900 disabled:opacity-30 cursor-pointer text-base leading-none font-bold"
                                 title="Decrease"
                               >
                                 &minus;
@@ -170,7 +170,7 @@ export const CartDrawer = ({
                                 type="button"
                                 onClick={() => onUpdateQuantity(id, qty + 1)}
                                 disabled={item.availableStock !== undefined && qty >= item.availableStock}
-                                className="text-white/60 hover:text-white disabled:opacity-30 cursor-pointer text-base leading-none"
+                                className="text-slate-500 hover:text-slate-900 disabled:opacity-30 cursor-pointer text-base leading-none font-bold"
                                 title="Increase"
                               >
                                 +
@@ -179,7 +179,7 @@ export const CartDrawer = ({
                           </div>
 
                           {item.stockWarning && (
-                            <p className="text-[11px] text-amber-300 font-medium mt-1 flex items-center gap-1">
+                            <p className="text-[11px] text-amber-700 font-medium mt-1 flex items-center gap-1">
                               <AlertTriangle className="w-3 h-3 shrink-0" />
                               {item.stockWarning}
                             </p>
@@ -189,12 +189,12 @@ export const CartDrawer = ({
 
                       {/* Total Price & Remove Button */}
                       <div className="flex flex-col items-end justify-between shrink-0 self-stretch py-1">
-                        <span className="text-lg sm:text-xl font-bold text-white tracking-tight">
+                        <span className="text-lg sm:text-xl font-black text-slate-950 tracking-tight">
                           ${itemTotal.toFixed(2)}
                         </span>
                         <button
                           onClick={() => onRemoveItem(id)}
-                          className="text-xs text-white/50 hover:text-rose-300 transition-colors cursor-pointer"
+                          className="text-xs text-slate-400 hover:text-rose-600 font-semibold transition-colors cursor-pointer"
                         >
                           Remove
                         </button>
@@ -205,23 +205,23 @@ export const CartDrawer = ({
               </div>
 
               {/* Delivery or pickup selector matching Page 4 */}
-              <div className="bg-white/[0.07] border border-white/15 backdrop-blur-md rounded-2xl p-5 sm:p-6 space-y-4">
-                <h3 className="text-base font-bold text-white">Delivery or pickup?</h3>
+              <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+                <h3 className="text-base font-bold text-slate-900">Delivery or pickup?</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {/* Eco Delivery Card */}
                   <div
                     onClick={() => setDeliveryMethod('delivery')}
                     className={`p-4 rounded-xl border cursor-pointer transition-all ${
                       deliveryMethod === 'delivery'
-                        ? 'bg-white/[0.12] border-[#4de1b7] ring-1 ring-[#4de1b7]'
-                        : 'bg-white/[0.04] border-white/10 hover:border-white/20'
+                        ? 'bg-emerald-50/70 border-emerald-600 ring-1 ring-emerald-600'
+                        : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-sm text-white">Eco Delivery</span>
-                      <span className="text-xs font-bold text-[#4de1b7]">$2.50</span>
+                      <span className="font-bold text-sm text-slate-900">Eco Delivery</span>
+                      <span className="text-xs font-bold text-emerald-800">$2.50</span>
                     </div>
-                    <p className="text-xs text-white/60">1–2 days</p>
+                    <p className="text-xs text-slate-500">1–2 days</p>
                   </div>
 
                   {/* Farm Pickup Card */}
@@ -229,15 +229,15 @@ export const CartDrawer = ({
                     onClick={() => setDeliveryMethod('pickup')}
                     className={`p-4 rounded-xl border cursor-pointer transition-all ${
                       deliveryMethod === 'pickup'
-                        ? 'bg-white/[0.12] border-[#4de1b7] ring-1 ring-[#4de1b7]'
-                        : 'bg-white/[0.04] border-white/10 hover:border-white/20'
+                        ? 'bg-emerald-50/70 border-emerald-600 ring-1 ring-emerald-600'
+                        : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-sm text-white">Farm Pickup</span>
-                      <span className="text-xs font-bold text-[#4de1b7]">Free</span>
+                      <span className="font-bold text-sm text-slate-900">Farm Pickup</span>
+                      <span className="text-xs font-bold text-emerald-800">Free</span>
                     </div>
-                    <p className="text-xs text-white/60">Same day</p>
+                    <p className="text-xs text-slate-500">Same day</p>
                   </div>
                 </div>
               </div>
@@ -245,27 +245,27 @@ export const CartDrawer = ({
 
             {/* Right Column: Order Total Card matching Page 4 */}
             <div className="lg:col-span-5">
-              <div className="bg-white/[0.07] border border-white/15 backdrop-blur-md rounded-2xl p-6 sm:p-7 space-y-5 sticky top-24">
-                <h3 className="text-lg font-bold text-white tracking-tight">Order total</h3>
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-5 sticky top-24 shadow-sm">
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight">Order total</h3>
 
                 <div className="space-y-3 text-sm">
-                  <div className="flex justify-between text-white/70">
+                  <div className="flex justify-between text-slate-600">
                     <span>Produce subtotal</span>
-                    <span className="font-semibold text-white">
+                    <span className="font-bold text-slate-900">
                       {calculating ? '...' : `$${subtotal.toFixed(2)}`}
                     </span>
                   </div>
 
-                  <div className="flex justify-between text-white/70">
+                  <div className="flex justify-between text-slate-600">
                     <span>Delivery charge</span>
-                    <span className="font-semibold text-white">
+                    <span className="font-bold text-slate-900">
                       {deliveryFee === 0 ? 'Free' : `$${deliveryFee.toFixed(2)}`}
                     </span>
                   </div>
 
-                  <div className="border-t border-white/15 pt-4 flex justify-between items-baseline">
-                    <span className="text-base font-bold text-white">Total</span>
-                    <span className="text-3xl font-extrabold text-[#4de1b7]">
+                  <div className="border-t border-slate-200 pt-4 flex justify-between items-baseline">
+                    <span className="text-base font-bold text-slate-900">Total</span>
+                    <span className="text-3xl font-black text-slate-950">
                       ${total.toFixed(2)}
                     </span>
                   </div>
@@ -284,13 +284,13 @@ export const CartDrawer = ({
                       uniqueFarmers,
                     })
                   }
-                  className="w-full py-3.5 px-6 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 font-extrabold text-sm transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer hover:shadow-[#4de1b7]/25 hover:shadow-xl"
+                  className="w-full py-3.5 px-6 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white font-extrabold text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Proceed to checkout</span>
                   <span>&rarr;</span>
                 </button>
 
-                <p className="text-xs text-center text-white/50 pt-1">
+                <p className="text-xs text-center text-slate-400 pt-1">
                   Prices are checked on our server before you pay.
                 </p>
               </div>

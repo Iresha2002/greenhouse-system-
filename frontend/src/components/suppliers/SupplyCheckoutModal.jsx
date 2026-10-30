@@ -122,7 +122,7 @@ export const SupplyCheckoutModal = ({
     }
 
     if (displayItems.length === 0) {
-      return setErrorMessage('Your Supplies Basket is empty.');
+      return setErrorMessage('Your Basket is empty.');
     }
 
     const orderPayload = {

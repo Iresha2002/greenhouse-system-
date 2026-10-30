@@ -536,7 +536,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
       return [...prev, { ...supply, cartQuantity: Math.min(supply.quantity, quantity) }];
     });
 
-    showToast(`Added ${quantity} × ${supply.name} to your Supplies Basket`);
+    showToast(`Added ${quantity} × ${supply.name} to your Basket`);
   };
 
   const handleUpdateCartQuantity = (supplyId, nextQty) => {
