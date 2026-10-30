@@ -37,8 +37,21 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
     .map((w) => w[0].toUpperCase())
     .join('');
 
+  // Dynamic light avatar palette matching screenshot
+  const AVATAR_PALETTES = [
+    'bg-sky-100 text-sky-950',
+    'bg-emerald-100 text-emerald-950',
+    'bg-amber-100 text-amber-950',
+    'bg-purple-100 text-purple-950',
+    'bg-teal-100 text-teal-950',
+  ];
+  const charSum = (expert.fullName || 'E')
+    .split('')
+    .reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const avatarClass = AVATAR_PALETTES[charSum % AVATAR_PALETTES.length];
+
   return (
-    <div className="flex flex-col justify-between rounded-2xl bg-[#0f3830]/80 border border-emerald-500/20 p-5 shadow-lg hover:border-emerald-400/40 transition-all">
+    <div className="flex flex-col justify-between rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-5 shadow-lg shadow-black/10 hover:border-white/25 transition-all">
       <div className="space-y-3.5">
         {/* Top: Avatar, Name, Verification Badge */}
         <div className="flex items-start gap-3.5">
@@ -46,91 +59,99 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
             <img
               src={expert.profilePhoto}
               alt={expert.fullName}
-              className="w-14 h-14 rounded-full object-cover border-2 border-emerald-400/30 shrink-0"
+              className="w-13 h-13 rounded-full object-cover border border-white/20 shrink-0"
             />
           ) : (
-            <div className="w-14 h-14 rounded-full bg-emerald-700/50 border border-emerald-400/30 flex items-center justify-center text-emerald-200 font-extrabold text-lg shrink-0">
+            <div
+              className={`w-13 h-13 rounded-full ${avatarClass} font-extrabold text-base flex items-center justify-center shrink-0 shadow-sm`}
+            >
               {initials}
             </div>
           )}
 
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <h3 className="text-base font-bold text-white truncate">
-                {expert.fullName}
-              </h3>
-            </div>
+            <h3 className="text-base font-bold text-white truncate">
+              {expert.fullName}
+            </h3>
 
-            <div className="flex items-center gap-2 text-[11px] text-emerald-300 font-semibold mt-0.5">
+            <div className="text-xs text-emerald-400 font-medium mt-0.5">
               <span>{expert.isVerified ? 'Verified' : 'Pending'}</span>
-              <span>•</span>
-              <span className={isAvailable ? 'text-emerald-300' : 'text-amber-300'}>
+              <span> · </span>
+              <span className={isAvailable ? 'text-emerald-400' : 'text-amber-300'}>
                 {isAvailable ? 'Available' : 'Busy'}
               </span>
             </div>
-
-            <p className="text-xs text-white/70 line-clamp-1 mt-1">
-              {expert.professionalTitle}
-            </p>
           </div>
         </div>
 
-        {/* Experience & Location */}
-        <div className="text-xs text-white/60 flex items-center gap-2 flex-wrap">
-          {expert.yearsOfExperience !== undefined && (
-            <span>{expert.yearsOfExperience}+ years experience</span>
-          )}
-          {expert.location && (
-            <>
-              <span>•</span>
-              <span className="truncate">{expert.location}</span>
-            </>
-          )}
+        {/* Title */}
+        <div>
+          <p className="text-xs sm:text-sm font-semibold text-[#4de1b7] line-clamp-1">
+            {expert.professionalTitle}
+          </p>
+
+          {/* Experience & Location */}
+          <div className="text-xs text-white/70 mt-1">
+            {expert.yearsOfExperience !== undefined && (
+              <span>{expert.yearsOfExperience}+ years experience</span>
+            )}
+            {expert.location && (
+              <span> · {expert.location}</span>
+            )}
+          </div>
         </div>
 
         {/* Specialization Tags */}
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1.5 pt-1">
           {(expert.specializations || []).slice(0, 3).map((spec) => (
             <span
               key={spec}
-              className="px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/25 text-[11px] font-medium text-emerald-200"
+              className="px-3 py-1 rounded-full bg-white/[0.10] border border-white/10 text-xs font-medium text-white/90"
             >
               {spec}
             </span>
           ))}
           {(expert.specializations || []).length > 3 && (
-            <span className="px-2 py-0.5 rounded-full bg-white/5 text-[10px] text-white/60">
+            <span className="px-2.5 py-1 rounded-full bg-white/[0.08] text-[11px] text-white/60">
               +{expert.specializations.length - 3}
             </span>
           )}
         </div>
 
         {/* Consultation Formats */}
-        <div className="text-[11px] text-white/50">
+        <div className="text-xs text-white/60 pt-0.5">
           {(expert.consultationTypes || [])
-            .map((t) => (t === 'in_person' ? 'Farm visit' : t === 'video' ? 'Video' : t === 'text' ? 'Text' : 'Phone'))
+            .map((t) =>
+              t === 'in_person'
+                ? 'Farm visit'
+                : t === 'video'
+                ? 'Video'
+                : t === 'text'
+                ? 'Text'
+                : 'Phone'
+            )
             .join(' · ')}
         </div>
       </div>
 
       {/* Bottom: Fee, Rating & Actions */}
-      <div className="pt-4 mt-3 border-t border-emerald-500/15 flex flex-col gap-3">
+      <div className="pt-4 mt-3 border-t border-white/10 flex flex-col gap-3">
         <div className="flex items-baseline justify-between">
           <div>
-            <span className="text-xl font-extrabold text-white">
+            <span className="text-2xl font-extrabold text-white">
               ${Number(expert.consultationFee || 0).toFixed(0)}
             </span>
-            <span className="text-xs text-white/50 ml-1">per session</span>
+            <span className="text-xs text-white/70 ml-1">per session</span>
           </div>
 
           {hasGenuineRating ? (
             <div className="flex items-center gap-1 text-xs text-amber-300 font-bold">
               <span>★</span>
               <span>{Number(expert.averageRating).toFixed(1)}</span>
-              <span className="text-white/40">({reviewsCount})</span>
+              <span className="text-white/50">({reviewsCount})</span>
             </div>
           ) : (
-            <span className="text-[11px] text-emerald-400 font-medium">
+            <span className="text-xs text-white/60">
               {expert.completedConsultationsCount > 0
                 ? `${expert.completedConsultationsCount} completed`
                 : 'Verified'}
@@ -142,7 +163,7 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
           <button
             type="button"
             onClick={() => onViewProfile && onViewProfile(expert)}
-            className="py-2 px-3 rounded-full border border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/10 text-xs font-semibold cursor-pointer text-center transition-colors"
+            className="py-2 px-4 rounded-full border border-white/25 bg-white/[0.06] hover:bg-white/[0.14] text-white text-xs font-bold text-center cursor-pointer transition-colors"
           >
             Profile
           </button>
@@ -150,9 +171,9 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
             type="button"
             onClick={() => onRequestConsultation && onRequestConsultation(expert)}
             disabled={!isAvailable}
-            className={`py-2 px-3 rounded-full text-xs font-bold text-center transition-colors ${
+            className={`py-2 px-4 rounded-full text-xs font-bold text-center transition-colors shadow-sm ${
               isAvailable
-                ? 'bg-emerald-400 hover:bg-emerald-300 text-slate-950 cursor-pointer'
+                ? 'bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 cursor-pointer'
                 : 'bg-white/10 text-white/30 cursor-not-allowed'
             }`}
           >

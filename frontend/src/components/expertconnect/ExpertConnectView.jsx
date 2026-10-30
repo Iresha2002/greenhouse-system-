@@ -347,7 +347,7 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
       </div>
 
       {/* Sub-Navigation Pill Bar matching Page 11 Reference */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-emerald-500/15 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div className="flex flex-wrap items-center gap-2">
           {[
             { id: 'overview', label: 'Overview' },
@@ -356,20 +356,24 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
             { id: 'consultations', label: 'My consultations' },
             { id: 'apply', label: 'Become an expert' },
             ...(currentUser?.role === 'admin'
-              ? [{ id: 'admin', label: 'Admin: approve experts' }]
+              ? [{ id: 'admin', label: 'Admin: approve experts', isAdmin: true }]
               : []),
           ].map((tab) => {
             const isActive = activeSubTab === tab.id;
+            let pillClass = '';
+            if (isActive) {
+              pillClass = 'bg-[#4de1b7] text-slate-950 font-bold shadow';
+            } else if (tab.isAdmin) {
+              pillClass = 'border border-amber-400/50 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20';
+            } else {
+              pillClass = 'bg-white/[0.08] hover:bg-white/[0.14] text-white/90 border border-white/10';
+            }
             return (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveSubTab(tab.id)}
-                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-[#4de1b7] text-slate-950 font-bold shadow'
-                    : 'bg-[#0f3830]/80 text-emerald-100/80 hover:text-white hover:bg-[#14473d] border border-emerald-500/20'
-                }`}
+                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${pillClass}`}
               >
                 {tab.label}
               </button>
@@ -385,7 +389,7 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                 setShowNotificationsPanel((prev) => !prev);
                 fetchNotifications();
               }}
-              className="relative px-3.5 py-2 rounded-full bg-[#0f3830]/80 hover:bg-[#14473d] text-emerald-100/80 hover:text-white text-xs font-semibold flex items-center gap-1.5 border border-emerald-500/20 cursor-pointer"
+              className="relative px-3.5 py-2 rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-white/90 text-xs font-semibold flex items-center gap-1.5 border border-white/10 cursor-pointer transition-colors"
             >
               <Bell className="w-3.5 h-3.5 text-emerald-300" />
               <span>Notifications</span>
@@ -401,7 +405,7 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
             type="button"
             onClick={fetchExperts}
             title="Refresh expert directory"
-            className="px-3.5 py-2 rounded-full bg-[#0f3830]/80 hover:bg-[#14473d] text-emerald-100/80 hover:text-white text-xs font-semibold flex items-center gap-1.5 border border-emerald-500/20 cursor-pointer"
+            className="px-3.5 py-2 rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-white/90 text-xs font-semibold flex items-center gap-1.5 border border-white/10 cursor-pointer transition-colors"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loadingExperts ? 'animate-spin text-emerald-300' : ''}`} />
             <span>Refresh experts</span>
@@ -489,119 +493,127 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
       {/* ========================================================= */}
       {activeSubTab === 'overview' && (
         <div className="space-y-8">
-          {/* Quick Action Feature Cards - Minimalist Forest Aesthetic (Page 11) */}
+          {/* Quick Action Feature Cards - Light White Glassy Look */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-2xl bg-[#0f3830] border border-emerald-500/20 p-5 flex flex-col justify-between shadow-sm">
+            <div className="rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-6 flex flex-col justify-between shadow-lg shadow-black/10 hover:border-white/25 transition-all min-h-[175px]">
               <div>
-                <h3 className="text-base font-bold text-white mb-1.5">
+                <h3 className="text-lg font-bold text-white mb-2">
                   Find an expert
                 </h3>
-                <p className="text-xs text-emerald-100/70 leading-relaxed mb-4">
-                  Browse verified greenhouse specialists, filter by specialty or consultation type, and request help.
+                <p className="text-xs sm:text-sm text-white/70 leading-relaxed mb-4">
+                  Browse plant, pest, hydroponic and sensor specialists.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveSubTab('directory')}
-                className="w-full py-2 px-4 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+                className="text-xs sm:text-sm font-bold text-[#4de1b7] hover:text-[#3cd0a6] flex items-center gap-1 cursor-pointer transition-colors mt-auto text-left"
               >
-                <span>Browse experts ({experts.length})</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>See experts →</span>
               </button>
             </div>
 
-            <div className="rounded-2xl bg-[#0f3830] border border-emerald-500/20 p-5 flex flex-col justify-between shadow-sm">
+            <div className="rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-6 flex flex-col justify-between shadow-lg shadow-black/10 hover:border-white/25 transition-all min-h-[175px]">
               <div>
-                <h3 className="text-base font-bold text-white mb-1.5">
+                <h3 className="text-lg font-bold text-white mb-2">
                   Describe your problem
                 </h3>
-                <p className="text-xs text-emerald-100/70 leading-relaxed mb-4">
-                  Tell us what's happening to your plants. We'll suggest relevant specialties and match you with experts.
+                <p className="text-xs sm:text-sm text-white/70 leading-relaxed mb-4">
+                  Tell us what you see. We match you with the right expert.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveSubTab('problem')}
-                className="w-full py-2 px-4 rounded-full border border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/10 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+                className="text-xs sm:text-sm font-bold text-[#4de1b7] hover:text-[#3cd0a6] flex items-center gap-1 cursor-pointer transition-colors mt-auto text-left"
               >
-                <span>Submit problem</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Report a problem →</span>
               </button>
             </div>
 
-            <div className="rounded-2xl bg-[#0f3830] border border-emerald-500/20 p-5 flex flex-col justify-between shadow-sm">
+            <div className="rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-6 flex flex-col justify-between shadow-lg shadow-black/10 hover:border-white/25 transition-all min-h-[175px]">
               <div>
-                <h3 className="text-base font-bold text-white mb-1.5">
+                <h3 className="text-lg font-bold text-white mb-2">
                   My consultations
                 </h3>
-                <p className="text-xs text-emerald-100/70 leading-relaxed mb-4">
-                  Track requested, scheduled, and completed consultations. Chat with experts and review notes.
+                <p className="text-xs sm:text-sm text-white/70 leading-relaxed mb-4">
+                  Your bookings, messages and treatment plans.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveSubTab('consultations')}
-                className="w-full py-2 px-4 rounded-full border border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/10 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+                className="text-xs sm:text-sm font-bold text-[#4de1b7] hover:text-[#3cd0a6] flex items-center gap-1 cursor-pointer transition-colors mt-auto text-left"
               >
-                <span>View consultations</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Open →</span>
               </button>
             </div>
 
-            <div className="rounded-2xl bg-[#0f3830] border border-emerald-500/20 p-5 flex flex-col justify-between shadow-sm">
+            <div className="rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-6 flex flex-col justify-between shadow-lg shadow-black/10 hover:border-white/25 transition-all min-h-[175px]">
               <div>
-                <h3 className="text-base font-bold text-white mb-1.5">
+                <h3 className="text-lg font-bold text-white mb-2">
                   Become an expert
                 </h3>
-                <p className="text-xs text-emerald-100/70 leading-relaxed mb-4">
-                  Are you an agronomist, researcher, or greenhouse specialist? Apply to offer consultations on SmartGrow.
+                <p className="text-xs sm:text-sm text-white/70 leading-relaxed mb-4">
+                  Have farming qualifications? Apply to be verified.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveSubTab('apply')}
-                className="w-full py-2 px-4 rounded-full border border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/10 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+                className="text-xs sm:text-sm font-bold text-[#4de1b7] hover:text-[#3cd0a6] flex items-center gap-1 cursor-pointer transition-colors mt-auto text-left"
               >
-                <span>Apply now</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Apply →</span>
               </button>
             </div>
           </div>
 
-          {/* Featured Verified Experts Section (Backed by Real MongoDB Records) */}
-          {experts.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-                <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-white">
-                    Featured experts
-                  </h3>
-                  <p className="text-xs text-emerald-100/70 mt-0.5">
-                    Verified specialists available for crop pathology, nutrient planning, and farm advisory.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveSubTab('directory')}
-                  className="text-xs font-semibold text-emerald-300 hover:text-white flex items-center gap-1 cursor-pointer"
-                >
-                  <span>View all ({experts.length})</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
+          {/* Experts Section - Matching Exact Screenshot Layout */}
+          <div className="space-y-4 pt-2">
+            <h2 className="text-2xl font-bold text-white">
+              {experts.length} experts ready to help
+            </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {experts.slice(0, 4).map((expert) => (
-                  <ExpertCard
-                    key={expert._id}
-                    expert={expert}
-                    onViewProfile={(exp) => setSelectedExpertProfile(exp)}
-                    onRequestConsultation={handleRequestConsultationClick}
-                  />
-                ))}
-              </div>
+            {/* Filter Pills */}
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { id: 'video', label: 'Video call' },
+                { id: 'text', label: 'Text and photos' },
+                { id: 'phone', label: 'Phone call' },
+                { id: 'in_person', label: 'Farm visit' },
+              ].map((type) => {
+                const isSelected = selectedConsultationType === type.id;
+                return (
+                  <button
+                    key={type.id}
+                    type="button"
+                    onClick={() =>
+                      setSelectedConsultationType(isSelected ? 'All' : type.id)
+                    }
+                    className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#4de1b7] text-slate-950 font-bold border-transparent'
+                        : 'bg-white/[0.08] hover:bg-white/[0.15] text-white/90 border-white/10'
+                    }`}
+                  >
+                    {type.label}
+                  </button>
+                );
+              })}
             </div>
-          )}
+
+            {/* Expert Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {experts.map((expert) => (
+                <ExpertCard
+                  key={expert._id}
+                  expert={expert}
+                  onViewProfile={(exp) => setSelectedExpertProfile(exp)}
+                  onRequestConsultation={handleRequestConsultationClick}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
@@ -610,7 +622,7 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
       {/* ========================================================= */}
       {activeSubTab === 'directory' && (
         <div className="space-y-4">
-          {/* Top Consultation Type Filter Pills (Page 11 Layout) */}
+          {/* Top Consultation Type Filter Pills */}
           <div className="flex flex-wrap items-center gap-2">
             {[
               { id: 'All', label: 'All types' },
@@ -627,8 +639,8 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                   onClick={() => setSelectedConsultationType(type.id)}
                   className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-[#4de1b7] text-slate-950 font-bold'
-                      : 'bg-[#0f3830] text-emerald-100/75 hover:text-white border border-emerald-500/20'
+                      ? 'bg-[#4de1b7] text-slate-950 font-bold border-transparent'
+                      : 'bg-white/[0.08] hover:bg-white/[0.15] text-white/90 border border-white/10'
                   }`}
                 >
                   {type.label}
@@ -638,18 +650,18 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
           </div>
 
           {/* Search, Qualification, Specialty & Sort Controls */}
-          <div className="rounded-2xl bg-[#0f3830] border border-emerald-500/20 p-4 space-y-3">
+          <div className="rounded-2xl bg-white/[0.07] border border-white/15 backdrop-blur-md p-4 space-y-3 shadow-lg shadow-black/10">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
               {/* Search by Expert Name, Qualification, or Topic */}
               <div className="md:col-span-5 relative">
-                <Search className="w-4 h-4 text-emerald-100/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by name, qualification, or topic..."
                   aria-label="Search agricultural experts"
-                  className="w-full pl-9 pr-8 py-2 rounded-xl bg-[#0a2720] border border-emerald-500/25 text-xs sm:text-sm text-white placeholder:text-emerald-100/40 focus:outline-none focus:border-[#4de1b7]"
+                  className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/[0.06] border border-white/15 text-xs sm:text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#4de1b7]"
                 />
                 {searchQuery && (
                   <button
@@ -668,13 +680,13 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                   value={selectedSpecialization}
                   onChange={(e) => setSelectedSpecialization(e.target.value)}
                   aria-label="Filter by specialization"
-                  className="w-full px-3 py-2 rounded-xl bg-[#0a2720] border border-emerald-500/25 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-white/[0.06] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
                 >
-                  <option value="All" className="bg-slate-900 text-white">
+                  <option value="All" className="bg-[#0b2821] text-white">
                     All Specializations
                   </option>
                   {EXPERT_SPECIALIZATIONS.map((spec) => (
-                    <option key={spec.id} value={spec.id} className="bg-slate-900 text-white">
+                    <option key={spec.id} value={spec.id} className="bg-[#0b2821] text-white">
                       {spec.label}
                     </option>
                   ))}
@@ -687,18 +699,18 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                   value={selectedQualification}
                   onChange={(e) => setSelectedQualification(e.target.value)}
                   aria-label="Filter by qualification"
-                  className="w-full px-3 py-2 rounded-xl bg-[#0a2720] border border-emerald-500/25 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-white/[0.06] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
                 >
-                  <option value="All" className="bg-slate-900 text-white">
+                  <option value="All" className="bg-[#0b2821] text-white">
                     All Degrees
                   </option>
-                  <option value="PhD" className="bg-slate-900 text-white">
+                  <option value="PhD" className="bg-[#0b2821] text-white">
                     Doctorate (PhD)
                   </option>
-                  <option value="MSc" className="bg-slate-900 text-white">
+                  <option value="MSc" className="bg-[#0b2821] text-white">
                     Master's (MSc)
                   </option>
-                  <option value="BSc" className="bg-slate-900 text-white">
+                  <option value="BSc" className="bg-[#0b2821] text-white">
                     Bachelor's (BSc)
                   </option>
                 </select>
@@ -710,21 +722,21 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   aria-label="Sort experts"
-                  className="w-full px-3 py-2 rounded-xl bg-[#0a2720] border border-emerald-500/25 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-white/[0.06] border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] cursor-pointer"
                 >
-                  <option value="availability" className="bg-slate-900 text-white">
+                  <option value="availability" className="bg-[#0b2821] text-white">
                     Available First
                   </option>
-                  <option value="experience" className="bg-slate-900 text-white">
-                    Most Experience
+                  <option value="experience" className="bg-[#0b2821] text-white">
+                    Most Experienced
                   </option>
-                  <option value="rating" className="bg-slate-900 text-white">
+                  <option value="rating" className="bg-[#0b2821] text-white">
                     Top Rated
                   </option>
-                  <option value="feeAsc" className="bg-slate-900 text-white">
+                  <option value="fee_asc" className="bg-[#0b2821] text-white">
                     Fee: Low to High
                   </option>
-                  <option value="feeDesc" className="bg-slate-900 text-white">
+                  <option value="fee_desc" className="bg-[#0b2821] text-white">
                     Fee: High to Low
                   </option>
                 </select>
