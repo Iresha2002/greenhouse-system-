@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   CheckCircle,
@@ -17,6 +17,7 @@ import {
   BookOpen,
   Briefcase,
 } from 'lucide-react';
+import { getExpertReviews } from '../../services/api';
 
 const CONSULTATION_TYPE_DETAILS = {
   video: {
@@ -46,13 +47,42 @@ export const ExpertProfileModal = ({
   onClose,
   onRequestConsultation,
 }) => {
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+
+  useEffect(() => {
+    if (!expert?._id) {
+      setReviews([]);
+      return;
+    }
+    let active = true;
+    setLoadingReviews(true);
+    getExpertReviews(expert._id)
+      .then((res) => {
+        if (active && res && res.success) {
+          setReviews(res.reviews || []);
+        }
+      })
+      .catch(() => {
+        if (active) setReviews([]);
+      })
+      .finally(() => {
+        if (active) setLoadingReviews(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [expert?._id]);
+
   if (!expert) return null;
 
   const isAvailable = expert.isAvailable !== false;
+  const reviewsCount =
+    reviews.length || expert.reviewsCount || expert.reviewCount || 0;
   const hasGenuineRating =
     typeof expert.averageRating === 'number' &&
     expert.averageRating > 0 &&
-    expert.reviewCount > 0;
+    reviewsCount > 0;
 
   const schedule = expert.availabilitySchedule || {};
   const availableDays = schedule.availableDays || [
@@ -192,7 +222,8 @@ export const ExpertProfileModal = ({
               {hasGenuineRating ? (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-400/35 text-amber-300 text-xs font-extrabold">
                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  {Number(expert.averageRating).toFixed(1)} ({expert.reviewCount} reviews)
+                  {Number(expert.averageRating).toFixed(1)} ({reviewsCount} review
+                  {reviewsCount === 1 ? '' : 's'})
                 </span>
               ) : (
                 <span className="text-xs text-white/60">
@@ -314,6 +345,61 @@ export const ExpertProfileModal = ({
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Genuine Farmer Reviews Section (Stage 10 — Section 14) */}
+        <div className="rounded-2xl bg-black/30 border border-white/10 p-5 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              Verified Farmer Reviews ({reviews.length})
+            </h4>
+            <span className="text-[11px] text-white/50">
+              Only farmers with completed consultations can submit ratings
+            </span>
+          </div>
+
+          {loadingReviews ? (
+            <p className="text-xs text-white/60">Loading verified reviews...</p>
+          ) : reviews.length === 0 ? (
+            <p className="text-xs text-white/60">
+              No post-consultation farmer reviews submitted yet.
+            </p>
+          ) : (
+            <div className="space-y-2.5 max-h-52 overflow-y-auto pr-1">
+              {reviews.map((rev) => (
+                <div
+                  key={rev._id}
+                  className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 space-y-1.5 text-xs"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-white">
+                        {rev.farmerName}
+                      </span>
+                      {rev.affectedCrop && (
+                        <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
+                          Crop: {rev.affectedCrop}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 text-amber-400 font-extrabold">
+                      {'★'.repeat(rev.rating)}
+                      <span className="text-white/40">
+                        {'★'.repeat(Math.max(0, 5 - rev.rating))}
+                      </span>
+                      <span className="text-[11px] text-white/60 ml-1">
+                        ({new Date(rev.createdAt).toLocaleDateString()})
+                      </span>
+                    </div>
+                  </div>
+                  {rev.comment && (
+                    <p className="text-white/80 leading-relaxed">{rev.comment}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Bottom Action Footer */}

@@ -26,8 +26,14 @@ import {
   X,
   RefreshCw,
   ArrowUpDown,
+  Bell,
 } from 'lucide-react';
-import { getExpertsDirectory } from '../../services/api';
+import {
+  getExpertsDirectory,
+  getMyNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+} from '../../services/api';
 import ExpertCard from './ExpertCard';
 import ExpertProfileModal from './ExpertProfileModal';
 import ExpertApplicationPortal from './ExpertApplicationPortal';
@@ -174,9 +180,59 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
   const [preselectedProblem, setPreselectedProblem] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
 
+  // Stage 10: In-App Notifications State (Section 13)
+  const [notifications, setNotifications] = useState([]);
+  const [unreadNotifCount, setUnreadNotifCount] = useState(0);
+  const [showNotificationsPanel, setShowNotificationsPanel] = useState(false);
+
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3500);
+  };
+
+  const fetchNotifications = useCallback(async () => {
+    if (!currentUser) {
+      setNotifications([]);
+      setUnreadNotifCount(0);
+      return;
+    }
+    try {
+      const res = await getMyNotifications();
+      if (res && res.success) {
+        setNotifications(res.notifications || []);
+        setUnreadNotifCount(res.unreadCount || 0);
+      }
+    } catch {
+      // ignore if unauthenticated
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications, activeSubTab]);
+
+  const handleMarkNotifRead = async (notif) => {
+    if (!notif.isRead) {
+      try {
+        await markNotificationAsRead(notif._id);
+        fetchNotifications();
+      } catch {
+        // ignore
+      }
+    }
+    if (notif.linkTab) {
+      setActiveSubTab(notif.linkTab);
+    }
+    setShowNotificationsPanel(false);
+  };
+
+  const handleMarkAllNotifsRead = async () => {
+    try {
+      await markAllNotificationsAsRead();
+      fetchNotifications();
+    } catch {
+      // ignore
+    }
   };
 
   // Debounce search input
@@ -423,15 +479,112 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
           })}
         </div>
 
-        <button
-          type="button"
-          onClick={fetchExperts}
-          className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loadingExperts ? 'animate-spin text-cyan-400' : ''}`} />
-          <span>Sync Directory</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {currentUser && (
+            <button
+              type="button"
+              onClick={() => {
+                setShowNotificationsPanel((prev) => !prev);
+                fetchNotifications();
+              }}
+              className="relative px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/85 hover:text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+            >
+              <Bell className="w-3.5 h-3.5 text-cyan-300" />
+              <span>Notifications</span>
+              {unreadNotifCount > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px]">
+                  {unreadNotifCount}
+                </span>
+              )}
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={fetchExperts}
+            className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loadingExperts ? 'animate-spin text-cyan-400' : ''}`} />
+            <span>Sync Directory</span>
+          </button>
+        </div>
       </div>
+
+      {/* Stage 10: Collapsible In-App Notifications Drawer (Section 13) */}
+      {showNotificationsPanel && currentUser && (
+        <div className="rounded-3xl bg-[#0b2f2b]/95 border border-cyan-400/35 p-5 shadow-2xl space-y-3 backdrop-blur-xl">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-cyan-400" />
+              <h4 className="text-sm font-extrabold text-white">
+                In-App Consultation &amp; Platform Notifications (
+                {notifications.length})
+              </h4>
+            </div>
+            <div className="flex items-center gap-2">
+              {unreadNotifCount > 0 && (
+                <button
+                  type="button"
+                  onClick={handleMarkAllNotifsRead}
+                  className="px-3 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/30 text-cyan-200 text-xs font-bold cursor-pointer"
+                >
+                  Mark All as Read
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setShowNotificationsPanel(false)}
+                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {notifications.length === 0 ? (
+            <p className="text-xs text-white/60 py-4 text-center">
+              You have no notifications yet.
+            </p>
+          ) : (
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+              {notifications.map((n) => (
+                <button
+                  key={n._id}
+                  type="button"
+                  onClick={() => handleMarkNotifRead(n)}
+                  className={`w-full text-left p-3 rounded-2xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
+                    n.isRead
+                      ? 'bg-black/25 border-white/10 text-white/70'
+                      : 'bg-cyan-500/15 border-cyan-400/40 text-white shadow-md'
+                  }`}
+                >
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      {!n.isRead && (
+                        <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0" />
+                      )}
+                      <span className="text-xs font-extrabold text-white">
+                        {n.title}
+                      </span>
+                    </div>
+                    <p className="text-xs text-white/75 leading-relaxed">
+                      {n.message}
+                    </p>
+                  </div>
+                  <span className="text-[10px] text-white/50 font-mono shrink-0">
+                    {new Date(n.createdAt).toLocaleString([], {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ========================================================= */}
       {/* VIEW 1: PLATFORM OVERVIEW (Categories, Featured, Workflow)*/}
@@ -960,6 +1113,10 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
           onClearPreselection={() => {
             setPreselectedExpert(null);
             setPreselectedProblem(null);
+          }}
+          onDirectoryUpdated={() => {
+            fetchExperts();
+            fetchNotifications();
           }}
         />
       )}

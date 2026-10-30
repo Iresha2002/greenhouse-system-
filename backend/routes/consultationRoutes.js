@@ -4,8 +4,11 @@ const mongoose = require('mongoose');
 const Consultation = require('../models/Consultation');
 const ConsultationMessage = require('../models/ConsultationMessage');
 const ExpertProfile = require('../models/ExpertProfile');
+const ExpertReview = require('../models/ExpertReview');
+const Notification = require('../models/Notification');
 const ProblemReport = require('../models/ProblemReport');
 const { protect } = require('../middleware/authMiddleware');
+const { createNotification } = require('../utils/notificationHelper');
 
 // Helper: Resolve weekday name from YYYY-MM-DD
 const getWeekdayName = (dateStr) => {
@@ -272,6 +275,16 @@ router.post('/', protect, async (req, res) => {
       ]
     });
 
+    // Stage 10 (Section 13): Notify assigned expert of new consultation request
+    await createNotification({
+      recipient: expert.user,
+      type: 'consultation_requested',
+      title: `New Consultation Request (${consultationNumber})`,
+      message: `${created.farmerName} requested a ${created.consultationType} consultation on ${preferredDate} at ${timeSlot} regarding "${created.affectedCrop || created.problemCategory}".`,
+      linkTab: 'consultations',
+      referenceId: created._id.toString()
+    });
+
     return res.status(201).json({
       success: true,
       message: `Consultation ${consultationNumber} requested with ${expert.fullName}!`,
@@ -315,6 +328,88 @@ router.get('/my-consultations', protect, async (req, res) => {
     return res.status(500).json({
       success: false,
       error: 'Failed to retrieve consultations'
+    });
+  }
+});
+
+// ============================================================================
+// STAGE 10: IN-APP NOTIFICATIONS ENDPOINTS (Section 13)
+// ============================================================================
+
+// 3a. GET /api/consultations/notifications/my — List logged-in user's notifications & unread count
+router.get('/notifications/my', protect, async (req, res) => {
+  try {
+    const notifications = await Notification.find({ recipient: req.user._id })
+      .sort({ createdAt: -1 })
+      .limit(30);
+
+    const unreadCount = await Notification.countDocuments({
+      recipient: req.user._id,
+      isRead: false
+    });
+
+    return res.status(200).json({
+      success: true,
+      unreadCount,
+      count: notifications.length,
+      notifications
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve notifications'
+    });
+  }
+});
+
+// 3b. PATCH /api/consultations/notifications/read-all — Mark all user's notifications as read
+router.patch('/notifications/read-all', protect, async (req, res) => {
+  try {
+    await Notification.updateMany(
+      { recipient: req.user._id, isRead: false },
+      { $set: { isRead: true } }
+    );
+    return res.status(200).json({
+      success: true,
+      message: 'All notifications marked as read'
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to mark notifications as read'
+    });
+  }
+});
+
+// 3c. PATCH /api/consultations/notifications/:notifId/read — Mark a single notification as read
+router.patch('/notifications/:notifId/read', protect, async (req, res) => {
+  try {
+    const { notifId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(notifId)) {
+      return res.status(404).json({
+        success: false,
+        error: 'Notification not found'
+      });
+    }
+    const notif = await Notification.findOneAndUpdate(
+      { _id: notifId, recipient: req.user._id },
+      { $set: { isRead: true } },
+      { returnDocument: 'after' }
+    );
+    if (!notif) {
+      return res.status(404).json({
+        success: false,
+        error: 'Notification not found'
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      notification: notif
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to update notification'
     });
   }
 });
@@ -498,6 +593,39 @@ router.patch('/:id/status', protect, async (req, res) => {
 
     consultation.updatedAt = new Date();
     const saved = await consultation.save();
+
+    // Stage 10 (Section 13): Send in-app notification to counterpart
+    const recipientId = isAssignedExpert ? saved.farmer : saved.expertUser;
+    let notifType = 'consultation_accepted';
+    let notifTitle = `Consultation ${saved.consultationNumber} Updated`;
+    let notifMessage = `Consultation status changed to "${saved.status}".`;
+
+    if (saved.status === 'confirmed' || saved.status === 'accepted') {
+      notifType = 'consultation_accepted';
+      notifTitle = `Consultation Confirmed (${saved.consultationNumber})`;
+      notifMessage = `${saved.expertName} accepted and confirmed your appointment for ${saved.preferredDate} at ${saved.timeSlot}.`;
+    } else if (saved.status === 'rejected') {
+      notifType = 'consultation_rejected';
+      notifTitle = `Consultation Request Declined (${saved.consultationNumber})`;
+      notifMessage = `${saved.expertName} was unable to accept the requested slot. Please choose another available time or specialist.`;
+    } else if (saved.status === 'reschedule_requested') {
+      notifType = 'consultation_rescheduled';
+      notifTitle = `Reschedule Proposed (${saved.consultationNumber})`;
+      notifMessage = `New appointment slot proposed: ${saved.preferredDate} at ${saved.timeSlot}.`;
+    } else if (saved.status === 'completed') {
+      notifType = 'consultation_completed';
+      notifTitle = `Consultation Completed (${saved.consultationNumber})`;
+      notifMessage = `${saved.expertName} marked your consultation as completed. You can now review recommendations and rate your experience.`;
+    }
+
+    await createNotification({
+      recipient: recipientId,
+      type: notifType,
+      title: notifTitle,
+      message: notifMessage,
+      linkTab: 'consultations',
+      referenceId: saved._id.toString()
+    });
 
     return res.status(200).json({
       success: true,
@@ -731,6 +859,21 @@ router.post('/:id/messages', protect, async (req, res) => {
     consultation.updatedAt = new Date();
     await consultation.save();
 
+    // Stage 10 (Section 13): Notify counterpart of new consultation message
+    const msgRecipient = isAssignedExpert
+      ? consultation.farmer
+      : consultation.expertUser;
+    await createNotification({
+      recipient: msgRecipient,
+      type: 'consultation_message',
+      title: `New Message in ${consultation.consultationNumber}`,
+      message: `${senderName}: "${cleanText.slice(0, 90)}${
+        cleanText.length > 90 ? '...' : ''
+      }"`,
+      linkTab: 'consultations',
+      referenceId: consultation._id.toString()
+    });
+
     return res.status(201).json({
       success: true,
       message: 'Message sent',
@@ -869,6 +1012,16 @@ router.put('/:id/recommendation', protect, async (req, res) => {
       }`
     });
 
+    // Stage 10 (Section 13): Notify farmer that expert recommendation is ready
+    await createNotification({
+      recipient: saved.farmer,
+      type: 'consultation_completed',
+      title: `Official Recommendation Ready (${saved.consultationNumber})`,
+      message: `${saved.expertName} published your greenhouse treatment recommendation and marked the consultation completed.`,
+      linkTab: 'consultations',
+      referenceId: saved._id.toString()
+    });
+
     return res.status(200).json({
       success: true,
       message: markCompleted
@@ -881,6 +1034,140 @@ router.put('/:id/recommendation', protect, async (req, res) => {
     return res.status(500).json({
       success: false,
       error: error.message || 'Failed to save expert recommendation'
+    });
+  }
+});
+
+// ============================================================================
+// STAGE 10: GENUINE POST-CONSULTATION REVIEWS & RATINGS (Section 14)
+// ============================================================================
+
+// 9. POST /api/consultations/:id/review — Farmer submits a 1-5 star review for a completed consultation
+router.post('/:id/review', protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rating, comment } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        error: 'Consultation not found'
+      });
+    }
+
+    const consultation = await Consultation.findById(id);
+    if (!consultation) {
+      return res.status(404).json({
+        success: false,
+        error: 'Consultation not found'
+      });
+    }
+
+    const userIdStr = req.user._id.toString();
+    const isFarmerOwner = consultation.farmer.toString() === userIdStr;
+
+    // Security & Integrity Rule 1: Only the farmer who booked the consultation can review it
+    if (!isFarmerOwner) {
+      return res.status(403).json({
+        success: false,
+        error:
+          'Forbidden: Only the farmer who participated in this consultation may submit a review'
+      });
+    }
+
+    // Security & Integrity Rule 2: Prevent self-reviews
+    if (consultation.expertUser.toString() === userIdStr) {
+      return res.status(403).json({
+        success: false,
+        error: 'Forbidden: Experts cannot submit reviews for themselves'
+      });
+    }
+
+    // Security & Integrity Rule 3: Consultation MUST be completed first
+    if (consultation.status !== 'completed') {
+      return res.status(400).json({
+        success: false,
+        error:
+          'Reviews can only be submitted after the consultation has been marked as completed'
+      });
+    }
+
+    // Security & Integrity Rule 4: Prevent duplicate reviews for the same consultation
+    const existingReview = await ExpertReview.findOne({
+      consultation: consultation._id
+    });
+    if (consultation.hasReview || existingReview) {
+      return res.status(409).json({
+        success: false,
+        error: 'You have already submitted a review for this consultation'
+      });
+    }
+
+    const numRating = Number(rating);
+    if (!Number.isFinite(numRating) || numRating < 1 || numRating > 5) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please provide a valid rating between 1 and 5 stars'
+      });
+    }
+
+    const createdReview = await ExpertReview.create({
+      consultation: consultation._id,
+      expertProfile: consultation.expertProfile,
+      expertUser: consultation.expertUser,
+      farmer: req.user._id,
+      farmerName: consultation.farmerName || req.user.username || 'Verified Farmer',
+      rating: Math.round(numRating),
+      comment: String(comment || '').trim(),
+      affectedCrop: consultation.affectedCrop || '',
+      consultationType: consultation.consultationType || 'video'
+    });
+
+    consultation.hasReview = true;
+    consultation.updatedAt = new Date();
+    await consultation.save();
+
+    // Recalculate expert's genuine averageRating & reviewsCount from all verified reviews
+    const allExpertReviews = await ExpertReview.find({
+      expertProfile: consultation.expertProfile
+    });
+    const reviewsCount = allExpertReviews.length;
+    const sumRatings = allExpertReviews.reduce(
+      (sum, r) => sum + (Number(r.rating) || 0),
+      0
+    );
+    const averageRating =
+      reviewsCount > 0 ? Number((sumRatings / reviewsCount).toFixed(2)) : 0;
+
+    await ExpertProfile.findByIdAndUpdate(consultation.expertProfile, {
+      averageRating,
+      reviewsCount,
+      updatedAt: new Date()
+    });
+
+    // Notify expert of the new farmer review
+    await createNotification({
+      recipient: consultation.expertUser,
+      type: 'expert_review_received',
+      title: `New ${createdReview.rating}★ Review on ${consultation.consultationNumber}`,
+      message: `${createdReview.farmerName} rated your consultation ${createdReview.rating}/5 stars${
+        createdReview.comment ? `: "${createdReview.comment.slice(0, 80)}"` : '.'
+      }`,
+      linkTab: 'consultations',
+      referenceId: consultation._id.toString()
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Thank you! Your verified consultation review has been published.',
+      review: createdReview,
+      expertStats: { averageRating, reviewsCount }
+    });
+  } catch (error) {
+    console.error('Submit consultation review error:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to submit consultation review'
     });
   }
 });

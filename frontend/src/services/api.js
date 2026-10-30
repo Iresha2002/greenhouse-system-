@@ -382,3 +382,44 @@ export const submitConsultationRecommendation = async (consultationId, payload) 
     );
     return response.data;
 };
+
+// 23. ExpertConnect — In-App Notifications & Post-Consultation Reviews APIs (Stage 10)
+export const getMyNotifications = async () => {
+    const response = await axios.get(
+        `${API_URL}/consultations/notifications/my`,
+        getAuthHeaders()
+    );
+    return response.data;
+};
+
+export const markNotificationAsRead = async (notifId) => {
+    const response = await axios.patch(
+        `${API_URL}/consultations/notifications/${notifId}/read`,
+        {},
+        getAuthHeaders()
+    );
+    return response.data;
+};
+
+export const markAllNotificationsAsRead = async () => {
+    const response = await axios.patch(
+        `${API_URL}/consultations/notifications/read-all`,
+        {},
+        getAuthHeaders()
+    );
+    return response.data;
+};
+
+export const submitConsultationReview = async (consultationId, payload) => {
+    const response = await axios.post(
+        `${API_URL}/consultations/${consultationId}/review`,
+        payload,
+        getAuthHeaders()
+    );
+    return response.data;
+};
+
+export const getExpertReviews = async (expertId) => {
+    const response = await axios.get(`${API_URL}/experts/${expertId}/reviews`);
+    return response.data;
+};

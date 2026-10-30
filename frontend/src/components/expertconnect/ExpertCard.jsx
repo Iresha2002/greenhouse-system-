@@ -23,10 +23,11 @@ const CONSULTATION_TYPE_LABELS = {
 
 export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => {
   const isAvailable = expert.isAvailable !== false;
+  const reviewsCount = expert.reviewsCount ?? expert.reviewCount ?? 0;
   const hasGenuineRating =
     typeof expert.averageRating === 'number' &&
     expert.averageRating > 0 &&
-    expert.reviewCount > 0;
+    reviewsCount > 0;
 
   return (
     <div className="group relative flex flex-col justify-between rounded-3xl bg-white/[0.07] hover:bg-white/[0.11] border border-white/15 hover:border-cyan-400/45 p-5 sm:p-6 backdrop-blur-xl transition-all duration-300 shadow-xl">
@@ -170,7 +171,7 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
                 <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                 <span>{Number(expert.averageRating).toFixed(1)}</span>
                 <span className="text-[10px] text-white/60">
-                  ({expert.reviewCount})
+                  ({reviewsCount})
                 </span>
               </div>
             ) : (

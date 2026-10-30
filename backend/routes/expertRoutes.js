@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const ExpertProfile = require('../models/ExpertProfile');
+const ExpertReview = require('../models/ExpertReview');
 const User = require('../models/User');
 const { protect, authorizeRoles } = require('../middleware/authMiddleware');
+const { createNotification } = require('../utils/notificationHelper');
 
 const escapeRegex = (text = '') => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -448,6 +450,28 @@ router.patch(
         }
       }
 
+      // Stage 10 (Section 13): Notify applicant about expert application verification decision
+      if (application.user) {
+        await createNotification({
+          recipient: application.user,
+          type: 'expert_application_status',
+          title:
+            status === 'approved'
+              ? 'Expert Application Approved!'
+              : status === 'rejected'
+              ? 'Expert Application Update'
+              : 'Expert Application Under Review',
+          message:
+            status === 'approved'
+              ? `Congratulations ${application.fullName}! Your agricultural expert profile has been verified and published in the ExpertConnect directory.`
+              : `Your expert application status has been updated to "${status}". ${
+                  application.verificationNotes || ''
+                }`.trim(),
+          linkTab: 'apply',
+          referenceId: application._id.toString()
+        });
+      }
+
       return res.status(200).json({
         success: true,
         message:
@@ -465,7 +489,35 @@ router.patch(
   }
 );
 
-// 8. GET /api/experts/:id — Retrieve detailed public profile for a single verified expert
+// 8. GET /api/experts/:id/reviews — Retrieve genuine completed-consultation reviews for an expert (Stage 10)
+router.get('/:id/reviews', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        error: 'Expert profile not found'
+      });
+    }
+
+    const reviews = await ExpertReview.find({ expertProfile: id }).sort({
+      createdAt: -1
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: reviews.length,
+      reviews
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to retrieve expert reviews'
+    });
+  }
+});
+
+// 9. GET /api/experts/:id — Retrieve detailed public profile for a single verified expert
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;

@@ -17,6 +17,7 @@ import {
   Sprout,
   Save,
   ClipboardCheck,
+  Star,
 } from 'lucide-react';
 import {
   getExpertAvailableSlots,
@@ -26,6 +27,7 @@ import {
   getMyProblemReports,
   getMyExpertApplication,
   updateMyExpertProfile,
+  submitConsultationReview,
 } from '../../services/api';
 import ConsultationChatModal from './ConsultationChatModal';
 import ConsultationRecommendationModal from './ConsultationRecommendationModal';
@@ -67,6 +69,7 @@ export const ConsultationBookingPortal = ({
   preselectedProblem = null,
   onOpenLogin,
   onClearPreselection,
+  onDirectoryUpdated,
 }) => {
   // Booking Form State (Section 10.1)
   const [selectedExpertId, setSelectedExpertId] = useState(
@@ -114,6 +117,12 @@ export const ConsultationBookingPortal = ({
   // Stage 9: Active Expert Recommendation Modal State
   const [activeRecommendationConsultation, setActiveRecommendationConsultation] =
     useState(null);
+
+  // Stage 10: Post-Consultation Review State (Section 14)
+  const [reviewTargetId, setReviewTargetId] = useState(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   // Expert Availability Management State (Section 10.3)
   const [myExpertProfile, setMyExpertProfile] = useState(null);
@@ -322,6 +331,32 @@ export const ConsultationBookingPortal = ({
       );
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handleSubmitReview = async (consultationId) => {
+    setSubmittingReview(true);
+    setErrorMsg('');
+    setSuccessMsg('');
+    try {
+      const res = await submitConsultationReview(consultationId, {
+        rating: reviewRating,
+        comment: reviewComment.trim(),
+      });
+      if (res && res.success) {
+        setSuccessMsg(res.message);
+        setReviewTargetId(null);
+        setReviewRating(5);
+        setReviewComment('');
+        await fetchPortalData();
+        if (onDirectoryUpdated) onDirectoryUpdated();
+      }
+    } catch (err) {
+      setErrorMsg(
+        err.response?.data?.error || 'Failed to submit consultation review.'
+      );
+    } finally {
+      setSubmittingReview(false);
     }
   };
 
@@ -1018,6 +1053,62 @@ export const ConsultationBookingPortal = ({
                     </div>
                   )}
 
+                  {/* Stage 10: Inline Post-Consultation Review Editor (Section 14) */}
+                  {reviewTargetId === con._id && (
+                    <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-400/40 space-y-3 text-xs">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                          Rate Your Completed Consultation with {con.expertName}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((starVal) => (
+                            <button
+                              key={starVal}
+                              type="button"
+                              onClick={() => setReviewRating(starVal)}
+                              className={`px-2.5 py-1 rounded-lg font-extrabold cursor-pointer transition-all ${
+                                reviewRating >= starVal
+                                  ? 'bg-amber-400 text-slate-950'
+                                  : 'bg-white/10 text-white/50'
+                              }`}
+                            >
+                              {starVal} ★
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <textarea
+                        rows={2}
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        placeholder="Share how this agricultural consultation helped your greenhouse crop (optional)..."
+                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-xs text-white focus:outline-none focus:border-amber-400"
+                      />
+
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setReviewTargetId(null)}
+                          className="px-3 py-1.5 rounded-lg bg-white/10 text-white cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          disabled={submittingReview}
+                          onClick={() => handleSubmitReview(con._id)}
+                          className="px-4 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold cursor-pointer"
+                        >
+                          {submittingReview
+                            ? 'Publishing Review...'
+                            : `Submit ${reviewRating}★ Review`}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Action Controls for Assigned Expert & Requesting Farmer */}
                   <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
@@ -1052,6 +1143,28 @@ export const ConsultationBookingPortal = ({
                           >
                             <ClipboardCheck className="w-3.5 h-3.5 text-emerald-300" />
                             <span>View Full Treatment Recommendation</span>
+                          </button>
+                        )
+                      )}
+
+                      {isFarmerOwner && con.status === 'completed' && (
+                        con.hasReview ? (
+                          <span className="px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-extrabold flex items-center gap-1">
+                            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                            <span>Reviewed</span>
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReviewTargetId(con._id);
+                              setReviewRating(5);
+                              setReviewComment('');
+                            }}
+                            className="px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold flex items-center gap-1.5 cursor-pointer transition-all"
+                          >
+                            <Star className="w-3.5 h-3.5 fill-slate-950" />
+                            <span>Rate &amp; Review Consultation</span>
                           </button>
                         )
                       )}
