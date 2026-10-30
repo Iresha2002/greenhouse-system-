@@ -22,7 +22,7 @@ router.post('/register', async (req, res) => {
         }
 
         // Security check: only allow valid roles
-        const allowedRoles = ['farmer', 'supplier', 'customer'];
+        const allowedRoles = ['farmer', 'supplier', 'customer', 'expert', 'admin'];
         const safeRole = allowedRoles.includes(role) ? role : 'farmer';
 
         const hashedPassword = await bcrypt.hash(password, 10);
