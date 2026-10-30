@@ -318,3 +318,39 @@ export const updateProblemReportStatus = async (id, status) => {
     );
     return response.data;
 };
+
+// 20. ExpertConnect — Consultation Booking & Availability APIs (Stage 7)
+export const getExpertAvailableSlots = async (expertId, date = '') => {
+    const url = date
+        ? `${API_URL}/consultations/slots/${expertId}?date=${encodeURIComponent(date)}`
+        : `${API_URL}/consultations/slots/${expertId}`;
+    const response = await axios.get(url);
+    return response.data;
+};
+
+export const createConsultationBooking = async (bookingData) => {
+    const response = await axios.post(`${API_URL}/consultations`, bookingData, getAuthHeaders());
+    return response.data;
+};
+
+export const getMyConsultations = async (roleView = '') => {
+    const url = roleView
+        ? `${API_URL}/consultations/my-consultations?roleView=${encodeURIComponent(roleView)}`
+        : `${API_URL}/consultations/my-consultations`;
+    const response = await axios.get(url, getAuthHeaders());
+    return response.data;
+};
+
+export const getConsultationById = async (id) => {
+    const response = await axios.get(`${API_URL}/consultations/${id}`, getAuthHeaders());
+    return response.data;
+};
+
+export const updateConsultationStatus = async (id, payload) => {
+    const response = await axios.patch(
+        `${API_URL}/consultations/${id}/status`,
+        payload,
+        getAuthHeaders()
+    );
+    return response.data;
+};

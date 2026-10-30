@@ -32,6 +32,7 @@ import ExpertCard from './ExpertCard';
 import ExpertProfileModal from './ExpertProfileModal';
 import ExpertApplicationPortal from './ExpertApplicationPortal';
 import ProblemSubmissionPortal from './ProblemSubmissionPortal';
+import ConsultationBookingPortal from './ConsultationBookingPortal';
 
 // 14 Configurable Expert Specializations (Section 5.1)
 export const EXPERT_SPECIALIZATIONS = [
@@ -169,6 +170,8 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
 
   // Detailed Expert Profile Modal & Consultation Selection
   const [selectedExpertProfile, setSelectedExpertProfile] = useState(null);
+  const [preselectedExpert, setPreselectedExpert] = useState(null);
+  const [preselectedProblem, setPreselectedProblem] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
 
   const showToast = (msg) => {
@@ -240,11 +243,13 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
     setSortBy('availability');
   };
 
-  const handleRequestConsultationClick = (expert) => {
+  const handleRequestConsultationClick = (expert, problem = null) => {
+    setPreselectedExpert(expert || null);
+    setPreselectedProblem(problem || null);
     showToast(
-      `Selected ${expert.fullName} for consultation. Opening problem & booking workflow...`
+      `Selected ${expert.fullName} for consultation booking. Opening Consultations tab...`
     );
-    setActiveSubTab('problem');
+    setActiveSubTab('consultations');
   };
 
   return (
@@ -936,39 +941,27 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
           currentUser={currentUser}
           onOpenLogin={onOpenLogin}
           onViewExpertProfile={(exp) => setSelectedExpertProfile(exp)}
-          onSelectExpertForBooking={(exp) => {
-            showToast(
-              `Selected ${exp.fullName} for consultation booking. Opening Consultations tab...`
-            );
-            setActiveSubTab('consultations');
+          onSelectExpertForBooking={(exp, problemReport = null) => {
+            handleRequestConsultationClick(exp, problemReport);
           }}
         />
       )}
 
       {/* ========================================================= */}
-      {/* VIEW 4: MY CONSULTATIONS (Stages 7–9 Next)                */}
+      {/* VIEW 4: MY CONSULTATIONS & BOOKING (Stage 7)              */}
       {/* ========================================================= */}
       {activeSubTab === 'consultations' && (
-        <div className="rounded-3xl bg-white/[0.07] border border-white/15 p-8 sm:p-12 text-center space-y-4 backdrop-blur-xl">
-          <div className="w-16 h-16 rounded-2xl bg-sky-500/20 border border-sky-400/35 text-sky-300 flex items-center justify-center mx-auto">
-            <CalendarCheck className="w-8 h-8" />
-          </div>
-          <h3 className="text-xl sm:text-2xl font-extrabold text-white">
-            My Consultations & Expert Recommendations
-          </h3>
-          <p className="text-xs sm:text-sm text-white/70 max-w-lg mx-auto leading-relaxed">
-            Your scheduled appointments, consultation chat history, and expert treatment recommendations will appear here once Consultation Booking, Messaging, and Recommendations are enabled in Stages 7–9.
-          </p>
-          <div className="pt-2">
-            <button
-              type="button"
-              onClick={() => setActiveSubTab('overview')}
-              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold cursor-pointer"
-            >
-              ← Back to Overview
-            </button>
-          </div>
-        </div>
+        <ConsultationBookingPortal
+          currentUser={currentUser}
+          experts={experts}
+          preselectedExpert={preselectedExpert}
+          preselectedProblem={preselectedProblem}
+          onOpenLogin={onOpenLogin}
+          onClearPreselection={() => {
+            setPreselectedExpert(null);
+            setPreselectedProblem(null);
+          }}
+        />
       )}
 
       {/* ========================================================= */}
