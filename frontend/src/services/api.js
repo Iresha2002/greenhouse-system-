@@ -372,3 +372,13 @@ export const sendConsultationMessage = async (consultationId, payload) => {
     );
     return response.data;
 };
+
+// 22. ExpertConnect — Expert Recommendations & Consultation Notes API (Stage 9)
+export const submitConsultationRecommendation = async (consultationId, payload) => {
+    const response = await axios.put(
+        `${API_URL}/consultations/${consultationId}/recommendation`,
+        payload,
+        getAuthHeaders()
+    );
+    return response.data;
+};

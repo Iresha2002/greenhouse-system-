@@ -130,6 +130,7 @@ const consultationSchema = new mongoose.Schema({
     observations: { type: String, default: '' },
     possibleCauses: { type: String, default: '' },
     recommendedActions: { type: String, default: '' },
+    preventiveMeasures: { type: String, default: '' },
     safetyPrecautions: { type: String, default: '' },
     followUpRecommendations: { type: String, default: '' },
     authoredAt: { type: Date, default: null },

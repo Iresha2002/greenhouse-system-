@@ -16,6 +16,7 @@ import {
   ExternalLink,
   Sprout,
   Save,
+  ClipboardCheck,
 } from 'lucide-react';
 import {
   getExpertAvailableSlots,
@@ -27,6 +28,7 @@ import {
   updateMyExpertProfile,
 } from '../../services/api';
 import ConsultationChatModal from './ConsultationChatModal';
+import ConsultationRecommendationModal from './ConsultationRecommendationModal';
 
 const WEEKDAYS = [
   'Monday',
@@ -108,6 +110,10 @@ export const ConsultationBookingPortal = ({
 
   // Stage 8: Active Consultation Chat Modal State
   const [activeChatConsultation, setActiveChatConsultation] = useState(null);
+
+  // Stage 9: Active Expert Recommendation Modal State
+  const [activeRecommendationConsultation, setActiveRecommendationConsultation] =
+    useState(null);
 
   // Expert Availability Management State (Section 10.3)
   const [myExpertProfile, setMyExpertProfile] = useState(null);
@@ -968,6 +974,50 @@ export const ConsultationBookingPortal = ({
                     </div>
                   )}
 
+                  {/* Stage 9: Inline Expert Recommendation & Treatment Summary (Section 12) */}
+                  {con.recommendation?.observations && (
+                    <div className="rounded-2xl bg-emerald-950/35 border border-emerald-400/35 p-4 space-y-2.5 text-xs">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="font-extrabold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
+                          <ClipboardCheck className="w-4 h-4" />
+                          Official Expert Recommendation ({con.expertName})
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[10px] font-extrabold uppercase text-emerald-200">
+                          {con.recommendation.diagnosisType === 'confirmed_diagnosis'
+                            ? 'Confirmed Diagnosis'
+                            : 'Preliminary Opinion'}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                        <div className="p-2.5 rounded-xl bg-black/30 border border-white/10">
+                          <span className="text-[10px] font-bold uppercase text-emerald-300 block mb-0.5">
+                            Observation
+                          </span>
+                          <p className="text-white/85 line-clamp-3">
+                            {con.recommendation.observations}
+                          </p>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-black/30 border border-white/10">
+                          <span className="text-[10px] font-bold uppercase text-cyan-300 block mb-0.5">
+                            Possible Cause
+                          </span>
+                          <p className="text-white/85 line-clamp-3">
+                            {con.recommendation.possibleCauses}
+                          </p>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-black/30 border border-white/10">
+                          <span className="text-[10px] font-bold uppercase text-amber-300 block mb-0.5">
+                            Recommended Action
+                          </span>
+                          <p className="text-white/85 line-clamp-3">
+                            {con.recommendation.recommendedActions}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Action Controls for Assigned Expert & Requesting Farmer */}
                   <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
@@ -979,6 +1029,32 @@ export const ConsultationBookingPortal = ({
                         <MessageSquare className="w-3.5 h-3.5 text-cyan-300" />
                         <span>Open Consultation Chat</span>
                       </button>
+
+                      {isAssignedExpert ? (
+                        <button
+                          type="button"
+                          onClick={() => setActiveRecommendationConsultation(con)}
+                          className="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/35 border border-emerald-400/40 text-emerald-200 text-xs font-extrabold flex items-center gap-1.5 cursor-pointer transition-all"
+                        >
+                          <ClipboardCheck className="w-3.5 h-3.5 text-emerald-300" />
+                          <span>
+                            {con.recommendation?.observations
+                              ? 'Update Recommendation & Notes'
+                              : 'Write Recommendation & Notes'}
+                          </span>
+                        </button>
+                      ) : (
+                        con.recommendation?.observations && (
+                          <button
+                            type="button"
+                            onClick={() => setActiveRecommendationConsultation(con)}
+                            className="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/35 border border-emerald-400/40 text-emerald-200 text-xs font-extrabold flex items-center gap-1.5 cursor-pointer transition-all"
+                          >
+                            <ClipboardCheck className="w-3.5 h-3.5 text-emerald-300" />
+                            <span>View Full Treatment Recommendation</span>
+                          </button>
+                        )
+                      )}
                     </div>
 
                     {!['cancelled', 'rejected', 'completed'].includes(con.status) && (
@@ -1077,6 +1153,19 @@ export const ConsultationBookingPortal = ({
           currentUser={currentUser}
           onClose={() => setActiveChatConsultation(null)}
           onStatusUpdated={() => {
+            fetchPortalData();
+          }}
+        />
+      )}
+
+      {/* Stage 9: Expert Recommendation & Consultation Notes Modal */}
+      {activeRecommendationConsultation && (
+        <ConsultationRecommendationModal
+          consultation={activeRecommendationConsultation}
+          currentUser={currentUser}
+          onClose={() => setActiveRecommendationConsultation(null)}
+          onSaved={(_updatedCon, msg) => {
+            if (msg) setSuccessMsg(msg);
             fetchPortalData();
           }}
         />

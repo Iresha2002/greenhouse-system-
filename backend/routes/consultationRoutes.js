@@ -746,4 +746,143 @@ router.post('/:id/messages', protect, async (req, res) => {
   }
 });
 
+// ============================================================================
+// STAGE 9: EXPERT RECOMMENDATIONS & CONSULTATION NOTES (Section 12 & Workflow 4)
+// ============================================================================
+
+// 8. PUT /api/consultations/:id/recommendation — Assigned Expert records notes & structured recommendation
+router.put('/:id/recommendation', protect, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      expertNotes,
+      diagnosisType,
+      problemSummary,
+      observations,
+      possibleCauses,
+      recommendedActions,
+      preventiveMeasures,
+      safetyPrecautions,
+      followUpRecommendations,
+      markCompleted = true
+    } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        error: 'Consultation not found'
+      });
+    }
+
+    const consultation = await Consultation.findById(id);
+    if (!consultation) {
+      return res.status(404).json({
+        success: false,
+        error: 'Consultation not found'
+      });
+    }
+
+    const userIdStr = req.user._id.toString();
+    const isAssignedExpert = consultation.expertUser.toString() === userIdStr;
+    const isAdmin = req.user.role === 'admin';
+
+    // WORKFLOW 7: Reject any unassigned expert or farmer attempting to author/update recommendations
+    if (!isAssignedExpert && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error:
+          'Forbidden: Only the assigned agricultural expert may submit consultation notes and recommendations'
+      });
+    }
+
+    if (
+      !String(observations || '').trim() ||
+      !String(possibleCauses || '').trim() ||
+      !String(recommendedActions || '').trim()
+    ) {
+      return res.status(400).json({
+        success: false,
+        error:
+          'Please provide expert observations, possible causes, and recommended actions'
+      });
+    }
+
+    const now = new Date();
+    if (expertNotes !== undefined) {
+      consultation.expertNotes = String(expertNotes || '').trim();
+    }
+
+    consultation.recommendation = {
+      diagnosisType:
+        diagnosisType === 'confirmed_diagnosis'
+          ? 'confirmed_diagnosis'
+          : 'preliminary_opinion',
+      problemSummary:
+        String(problemSummary || consultation.problemSummary || '').trim(),
+      observations: String(observations).trim(),
+      possibleCauses: String(possibleCauses).trim(),
+      recommendedActions: String(recommendedActions).trim(),
+      preventiveMeasures: String(preventiveMeasures || '').trim(),
+      safetyPrecautions: String(safetyPrecautions || '').trim(),
+      followUpRecommendations: String(followUpRecommendations || '').trim(),
+      authoredAt: consultation.recommendation?.authoredAt || now,
+      updatedAt: now
+    };
+
+    const wasAlreadyCompleted = consultation.status === 'completed';
+
+    if (markCompleted && !wasAlreadyCompleted) {
+      consultation.status = 'completed';
+      consultation.statusHistory.push({
+        status: 'completed',
+        changedByRole: isAssignedExpert ? 'expert' : 'admin',
+        note: `Expert recommendation submitted and consultation marked completed by ${consultation.expertName}`,
+        changedAt: now
+      });
+
+      await ExpertProfile.findByIdAndUpdate(consultation.expertProfile, {
+        $inc: { completedConsultationsCount: 1 }
+      });
+
+      if (consultation.problemReport) {
+        await ProblemReport.findByIdAndUpdate(consultation.problemReport, {
+          status: 'resolved',
+          updatedAt: now
+        });
+      }
+    }
+
+    consultation.updatedAt = now;
+    const saved = await consultation.save();
+
+    // Post a structured diagnostic note into the consultation message thread
+    await ConsultationMessage.create({
+      consultation: consultation._id,
+      sender: req.user._id,
+      senderName: consultation.expertName || req.user.username || 'Assigned Expert',
+      senderRole: 'expert',
+      messageType: 'diagnostic_note',
+      text: `📋 Official Expert Recommendation Submitted:\n• Observations: ${saved.recommendation.observations}\n• Possible Cause: ${saved.recommendation.possibleCauses}\n• Recommended Action: ${saved.recommendation.recommendedActions}${
+        saved.recommendation.safetyPrecautions
+          ? `\n• Safety Precautions: ${saved.recommendation.safetyPrecautions}`
+          : ''
+      }`
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: markCompleted
+        ? 'Expert recommendation saved and consultation marked completed!'
+        : 'Expert recommendation draft saved!',
+      consultation: saved
+    });
+  } catch (error) {
+    console.error('Submit expert recommendation error:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to save expert recommendation'
+    });
+  }
+});
+
 module.exports = router;
