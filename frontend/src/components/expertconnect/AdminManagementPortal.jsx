@@ -182,30 +182,26 @@ export const AdminManagementPortal = ({ currentUser, onDirectoryUpdated }) => {
 
   if (currentUser?.role !== 'admin') {
     return (
-      <div className="p-8 rounded-3xl bg-rose-950/40 border border-rose-400/40 text-center space-y-3">
-        <ShieldAlert className="w-12 h-12 text-rose-400 mx-auto" />
-        <h3 className="text-lg font-extrabold text-white">Administrator Access Required</h3>
-        <p className="text-xs text-white/70 max-w-md mx-auto">
-          You must be logged in with platform administrator credentials to view management statistics and moderation tools.
+      <div className="p-8 rounded-2xl bg-[#0f3830] border border-emerald-500/20 text-center space-y-2">
+        <ShieldAlert className="w-10 h-10 text-emerald-400 mx-auto" />
+        <h3 className="text-base font-bold text-white">Administrator access required</h3>
+        <p className="text-xs text-emerald-100/70 max-w-sm mx-auto">
+          You must be signed in with administrator privileges to access platform moderation tools.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Top Banner */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-cyan-950/80 via-emerald-950/70 to-slate-900 border border-cyan-400/30 shadow-2xl flex flex-wrap items-center justify-between gap-4">
+      <div className="p-5 rounded-2xl bg-[#0f3830] border border-emerald-500/20 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-black uppercase tracking-wider mb-2">
-            <ShieldAlert className="w-3.5 h-3.5" />
-            <span>Platform Governance &amp; Moderation</span>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-black text-white">
-            SmartGrow ExpertConnect — Administrator Operations
+          <h2 className="text-lg sm:text-xl font-bold text-white">
+            Admin operations &amp; moderation
           </h2>
-          <p className="text-xs text-white/75 mt-1">
-            Monitor consultation throughput, manage platform reviews, review accounts, and safeguard community standards.
+          <p className="text-xs text-emerald-100/70 mt-0.5">
+            Monitor consultations, moderate reviews, and govern accounts.
           </p>
         </div>
 
@@ -217,49 +213,47 @@ export const AdminManagementPortal = ({ currentUser, onDirectoryUpdated }) => {
             if (activeTab === 'reviews') fetchReviews();
             if (activeTab === 'users') fetchUsers();
           }}
-          className="px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-2 cursor-pointer transition-all"
+          className="px-3.5 py-1.5 rounded-full bg-[#0a2720] hover:bg-[#14473d] text-emerald-100 text-xs font-semibold flex items-center gap-1.5 border border-emerald-500/20 cursor-pointer"
         >
-          <RefreshCw className={`w-4 h-4 ${loadingStats ? 'animate-spin text-cyan-400' : ''}`} />
-          <span>Refresh Data</span>
+          <RefreshCw className={`w-3.5 h-3.5 ${loadingStats ? 'animate-spin text-emerald-300' : ''}`} />
+          <span>Refresh</span>
         </button>
       </div>
 
       {/* Notifications / Feedback */}
       {feedbackMsg && (
-        <div className="p-3.5 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs font-bold flex items-center gap-2">
+        <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-400/30 text-emerald-200 text-xs font-semibold flex items-center gap-2">
           <CheckCircle className="w-4 h-4 shrink-0" />
           <span>{feedbackMsg}</span>
         </div>
       )}
       {errorMsg && (
-        <div className="p-3.5 rounded-2xl bg-rose-500/20 border border-rose-400/40 text-rose-200 text-xs font-bold flex items-center gap-2">
+        <div className="p-3 rounded-xl bg-red-500/15 border border-red-400/30 text-red-200 text-xs font-semibold flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {/* Tab Switcher */}
-      <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-white/[0.06] border border-white/10">
+      <div className="flex flex-wrap items-center gap-1.5 border-b border-emerald-500/15 pb-3">
         {[
-          { id: 'stats', label: 'Platform Analytics', icon: Activity },
-          { id: 'consultations', label: 'All Consultations', icon: CalendarCheck },
-          { id: 'reviews', label: 'Review Moderation', icon: Star },
-          { id: 'users', label: 'User Governance', icon: Users }
+          { id: 'stats', label: 'Platform analytics' },
+          { id: 'consultations', label: 'All consultations' },
+          { id: 'reviews', label: 'Review moderation' },
+          { id: 'users', label: 'User governance' }
         ].map((tab) => {
-          const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 isActive
-                  ? 'bg-cyan-400 text-slate-950 shadow-md'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
+                  ? 'bg-[#4de1b7] text-slate-950 font-bold'
+                  : 'bg-[#0f3830] text-emerald-100/75 hover:text-white border border-emerald-500/20'
               }`}
             >
-              <Icon className="w-4 h-4" />
               <span>{tab.label}</span>
             </button>
           );
@@ -268,71 +262,69 @@ export const AdminManagementPortal = ({ currentUser, onDirectoryUpdated }) => {
 
       {/* VIEW 1: STATS & ANALYTICS */}
       {activeTab === 'stats' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
             {[
-              { label: 'Total Users', value: stats?.totalUsers ?? '—', color: 'text-cyan-300' },
-              { label: 'Approved Experts', value: stats?.totalExperts ?? '—', color: 'text-emerald-300' },
-              { label: 'Pending Apps', value: stats?.pendingApplications ?? '—', color: 'text-amber-300' },
-              { label: 'Problem Reports', value: stats?.totalProblems ?? '—', color: 'text-purple-300' },
-              { label: 'Total Consultations', value: stats?.totalConsultations ?? '—', color: 'text-sky-300' },
-              { label: 'Completed Sessions', value: stats?.completedConsultations ?? '—', color: 'text-teal-300' },
-              { label: 'Farmer Reviews', value: stats?.totalReviews ?? '—', color: 'text-amber-400' }
+              { label: 'Total Users', value: stats?.totalUsers ?? '—' },
+              { label: 'Approved Experts', value: stats?.totalExperts ?? '—' },
+              { label: 'Pending Apps', value: stats?.pendingApplications ?? '—' },
+              { label: 'Problem Reports', value: stats?.totalProblems ?? '—' },
+              { label: 'Consultations', value: stats?.totalConsultations ?? '—' },
+              { label: 'Completed', value: stats?.completedConsultations ?? '—' },
+              { label: 'Farmer Reviews', value: stats?.totalReviews ?? '—' }
             ].map((k, i) => (
-              <div key={i} className="p-4 rounded-2xl bg-black/35 border border-white/10 space-y-1">
-                <span className="text-[10px] uppercase font-bold text-white/50 block">
+              <div key={i} className="p-3 rounded-xl bg-[#0f3830] border border-emerald-500/20 space-y-0.5">
+                <span className="text-[10px] font-bold text-emerald-100/60 block">
                   {k.label}
                 </span>
-                <span className={`text-2xl font-black ${k.color}`}>
+                <span className="text-xl font-bold text-white">
                   {k.value}
                 </span>
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {/* Consultation breakdown */}
-            <div className="p-5 rounded-3xl bg-black/30 border border-white/10 space-y-3">
-              <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
-                <CalendarCheck className="w-4 h-4 text-cyan-400" />
-                <span>Consultations by Lifecycle Status</span>
+            <div className="p-4 rounded-xl bg-[#0f3830] border border-emerald-500/20 space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-300">
+                Consultations by status
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {stats?.consultationsByStatus && Object.keys(stats.consultationsByStatus).length > 0 ? (
                   Object.entries(stats.consultationsByStatus).map(([st, cnt]) => (
-                    <div key={st} className="flex items-center justify-between p-2 rounded-xl bg-white/[0.04]">
-                      <span className="text-xs font-semibold text-white/80 capitalize">
+                    <div key={st} className="flex items-center justify-between p-2 rounded-lg bg-[#0a2720]">
+                      <span className="text-xs text-emerald-100 capitalize">
                         {st.replace('_', ' ')}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-lg bg-cyan-500/20 text-cyan-300 text-xs font-black">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold">
                         {cnt}
                       </span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-white/50">No consultation records yet.</p>
+                  <p className="text-xs text-emerald-100/50">No consultation records yet.</p>
                 )}
               </div>
             </div>
 
             {/* Top Categories */}
-            <div className="p-5 rounded-3xl bg-black/30 border border-white/10 space-y-3">
-              <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
-                <FileText className="w-4 h-4 text-emerald-400" />
-                <span>Top Reported Problem Categories</span>
+            <div className="p-4 rounded-xl bg-[#0f3830] border border-emerald-500/20 space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-300">
+                Top reported categories
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {stats?.topProblemCategories && stats.topProblemCategories.length > 0 ? (
                   stats.topProblemCategories.map((c) => (
-                    <div key={c._id} className="flex items-center justify-between p-2 rounded-xl bg-white/[0.04]">
-                      <span className="text-xs font-semibold text-white/80">{c._id}</span>
-                      <span className="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 text-xs font-black">
+                    <div key={c._id} className="flex items-center justify-between p-2 rounded-lg bg-[#0a2720]">
+                      <span className="text-xs text-emerald-100">{c._id}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold">
                         {c.count} reports
                       </span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-white/50">No problem reports recorded yet.</p>
+                  <p className="text-xs text-emerald-100/50">No problem reports recorded yet.</p>
                 )}
               </div>
             </div>
@@ -342,23 +334,23 @@ export const AdminManagementPortal = ({ currentUser, onDirectoryUpdated }) => {
 
       {/* VIEW 2: ALL CONSULTATIONS */}
       {activeTab === 'consultations' && (
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-black/30 border border-white/10">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-[#0f3830] border border-emerald-500/20">
             <div className="flex items-center gap-2 flex-1 max-w-md">
-              <Search className="w-4 h-4 text-white/40 shrink-0" />
+              <Search className="w-3.5 h-3.5 text-emerald-100/40 shrink-0" />
               <input
                 type="text"
                 placeholder="Search by ID, farmer, expert, or crop..."
                 value={consultationSearch}
                 onChange={(e) => setConsultationSearch(e.target.value)}
-                className="w-full px-3 py-1.5 rounded-xl bg-black/50 border border-white/15 text-xs text-white focus:outline-none focus:border-cyan-400"
+                className="w-full px-3 py-1.5 rounded-lg bg-[#0a2720] border border-emerald-500/25 text-xs text-white placeholder:text-emerald-100/40 focus:outline-none focus:border-[#4de1b7]"
               />
             </div>
 
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-1.5 rounded-xl bg-black/50 border border-white/15 text-xs text-white focus:outline-none cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-[#0a2720] border border-emerald-500/25 text-xs text-white focus:outline-none cursor-pointer"
             >
               <option value="all">All Statuses</option>
               <option value="pending">Pending</option>
@@ -370,32 +362,32 @@ export const AdminManagementPortal = ({ currentUser, onDirectoryUpdated }) => {
           </div>
 
           {loadingConsultations ? (
-            <p className="text-xs text-white/60 text-center py-8">Loading consultations...</p>
+            <p className="text-xs text-emerald-100/60 text-center py-6">Loading consultations...</p>
           ) : consultations.length === 0 ? (
-            <p className="text-xs text-white/60 text-center py-8">No consultations match the filter.</p>
+            <p className="text-xs text-emerald-100/60 text-center py-6">No consultations match the filter.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {consultations.map((c) => (
                 <div
                   key={c._id}
-                  className="p-4 rounded-2xl bg-black/35 border border-white/10 space-y-2 text-xs"
+                  className="p-3.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 space-y-1.5 text-xs"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-cyan-300 font-extrabold">{c.consultationNumber}</span>
-                      <span className="px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-bold uppercase text-white/80">
+                      <span className="font-mono text-emerald-300 font-bold">{c.consultationNumber}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-[#0a2720] text-[10px] font-semibold uppercase text-emerald-100 border border-emerald-500/20">
                         {c.consultationType}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-[10px] font-black uppercase text-cyan-200">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-[10px] font-bold uppercase text-emerald-200">
                         {c.status}
                       </span>
                     </div>
-                    <span className="text-white/50 font-mono text-[11px]">
+                    <span className="text-emerald-100/50 font-mono text-[11px]">
                       {c.preferredDate} • {c.timeSlot}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-white/80">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-emerald-100/80">
                     <div>
                       Farmer: <strong className="text-white">{c.farmerName}</strong> ({c.farmer?.email || 'N/A'})
                     </div>
@@ -404,8 +396,8 @@ export const AdminManagementPortal = ({ currentUser, onDirectoryUpdated }) => {
                     </div>
                   </div>
 
-                  <p className="text-white/70 line-clamp-1">
-                    <span className="text-emerald-300 font-bold">[{c.affectedCrop || c.problemCategory}]</span>{' '}
+                  <p className="text-emerald-100/70 line-clamp-1">
+                    <span className="text-emerald-300 font-semibold">[{c.affectedCrop || c.problemCategory}]</span>{' '}
                     {c.problemSummary}
                   </p>
                 </div>
@@ -417,32 +409,32 @@ export const AdminManagementPortal = ({ currentUser, onDirectoryUpdated }) => {
 
       {/* VIEW 3: REVIEW MODERATION */}
       {activeTab === 'reviews' && (
-        <div className="space-y-4">
-          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-400/30 text-xs text-amber-200">
-            Administrators can inspect all farmer reviews across the platform. Inappropriate, spam, or abusive reviews can be removed. Removing a review automatically updates the expert&apos;s genuine average rating score.
+        <div className="space-y-3">
+          <div className="p-3 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs text-emerald-100/80 leading-relaxed">
+            Administrators can inspect farmer reviews. Inappropriate or abusive reviews can be removed, which automatically recalculates the expert&apos;s average rating.
           </div>
 
           {loadingReviews ? (
-            <p className="text-xs text-white/60 text-center py-8">Loading reviews...</p>
+            <p className="text-xs text-emerald-100/60 text-center py-6">Loading reviews...</p>
           ) : reviews.length === 0 ? (
-            <p className="text-xs text-white/60 text-center py-8">No reviews submitted yet.</p>
+            <p className="text-xs text-emerald-100/60 text-center py-6">No reviews submitted yet.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {reviews.map((r) => (
                 <div
                   key={r._id}
-                  className="p-4 rounded-2xl bg-black/35 border border-white/10 space-y-2 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  className="p-3.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 space-y-1.5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
-                  <div className="space-y-1 max-w-2xl">
+                  <div className="space-y-0.5 max-w-2xl">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-extrabold text-white">{r.farmerName}</span>
-                      <span className="text-amber-400 font-black">{'★'.repeat(r.rating)}</span>
-                      <span className="text-white/50 font-mono text-[10px]">
+                      <strong className="text-white">{r.farmerName}</strong>
+                      <span className="text-amber-400 font-bold">{'★'.repeat(r.rating)}</span>
+                      <span className="text-emerald-100/50 text-[11px]">
                         reviewed {r.expertProfile?.fullName || 'Expert'}
                       </span>
                     </div>
-                    {r.comment && <p className="text-white/80 italic">&ldquo;{r.comment}&rdquo;</p>}
-                    <span className="text-[10px] text-white/40 block">
+                    {r.comment && <p className="text-emerald-100/80 italic">&ldquo;{r.comment}&rdquo;</p>}
+                    <span className="text-[10px] text-emerald-100/40 block">
                       Ref: {r.consultation?.consultationNumber || 'Completed Session'} • {new Date(r.createdAt).toLocaleDateString()}
                     </span>
                   </div>
@@ -451,10 +443,10 @@ export const AdminManagementPortal = ({ currentUser, onDirectoryUpdated }) => {
                     type="button"
                     disabled={deletingReviewId === r._id}
                     onClick={() => handleDeleteReview(r._id)}
-                    className="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/35 border border-rose-400/40 text-rose-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer self-start sm:self-auto shrink-0 transition-all"
+                    className="px-3 py-1 rounded-full border border-red-500/30 text-red-300 hover:bg-red-500/10 text-xs font-semibold flex items-center gap-1 cursor-pointer self-start sm:self-auto shrink-0 transition-all"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>{deletingReviewId === r._id ? 'Removing...' : 'Remove Review'}</span>
+                    <Trash2 className="w-3 h-3" />
+                    <span>{deletingReviewId === r._id ? 'Removing...' : 'Remove'}</span>
                   </button>
                 </div>
               ))}
@@ -465,23 +457,23 @@ export const AdminManagementPortal = ({ currentUser, onDirectoryUpdated }) => {
 
       {/* VIEW 4: USER GOVERNANCE & SUSPENSION */}
       {activeTab === 'users' && (
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-black/30 border border-white/10">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-[#0f3830] border border-emerald-500/20">
             <div className="flex items-center gap-2 flex-1 max-w-md">
-              <Search className="w-4 h-4 text-white/40 shrink-0" />
+              <Search className="w-3.5 h-3.5 text-emerald-100/40 shrink-0" />
               <input
                 type="text"
-                placeholder="Search by username, email, or hub..."
+                placeholder="Search by username or email..."
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
-                className="w-full px-3 py-1.5 rounded-xl bg-black/50 border border-white/15 text-xs text-white focus:outline-none focus:border-cyan-400"
+                className="w-full px-3 py-1.5 rounded-lg bg-[#0a2720] border border-emerald-500/25 text-xs text-white placeholder:text-emerald-100/40 focus:outline-none focus:border-[#4de1b7]"
               />
             </div>
 
             <select
               value={userRoleFilter}
               onChange={(e) => setUserRoleFilter(e.target.value)}
-              className="px-3 py-1.5 rounded-xl bg-black/50 border border-white/15 text-xs text-white focus:outline-none cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-[#0a2720] border border-emerald-500/25 text-xs text-white focus:outline-none cursor-pointer"
             >
               <option value="all">All Roles</option>
               <option value="farmer">Farmers</option>
@@ -493,39 +485,39 @@ export const AdminManagementPortal = ({ currentUser, onDirectoryUpdated }) => {
           </div>
 
           {loadingUsers ? (
-            <p className="text-xs text-white/60 text-center py-8">Loading users...</p>
+            <p className="text-xs text-emerald-100/60 text-center py-6">Loading users...</p>
           ) : users.length === 0 ? (
-            <p className="text-xs text-white/60 text-center py-8">No users match criteria.</p>
+            <p className="text-xs text-emerald-100/60 text-center py-6">No users match criteria.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {users.map((u) => {
                 const isCurrentAdmin = u._id === currentUser?._id;
                 return (
                   <div
                     key={u._id}
-                    className={`p-4 rounded-2xl border space-y-2 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                    className={`p-3.5 rounded-xl border space-y-1.5 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                       u.isSuspended
-                        ? 'bg-rose-950/30 border-rose-400/40'
-                        : 'bg-black/35 border-white/10'
+                        ? 'bg-[#181313] border-red-500/30'
+                        : 'bg-[#0f3830] border-emerald-500/20'
                     }`}
                   >
-                    <div className="space-y-1">
+                    <div className="space-y-0.5">
                       <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-white text-sm">{u.username}</span>
-                        <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-200 text-[10px] font-black uppercase">
+                        <strong className="text-white text-xs sm:text-sm">{u.username}</strong>
+                        <span className="px-2 py-0.2 rounded-full bg-[#0a2720] text-emerald-300 text-[10px] font-bold uppercase border border-emerald-500/20">
                           {u.role}
                         </span>
                         {u.isSuspended && (
-                          <span className="px-2 py-0.5 rounded-full bg-rose-500/25 border border-rose-400/40 text-rose-300 text-[10px] font-black uppercase">
+                          <span className="px-2 py-0.2 rounded-full bg-red-500/20 text-red-300 text-[10px] font-bold uppercase">
                             Suspended
                           </span>
                         )}
                       </div>
-                      <div className="text-white/70">
-                        {u.email} • {u.location || 'Sri Lanka'} • Tel: {u.phoneNumber}
+                      <div className="text-emerald-100/70">
+                        {u.email} • {u.location || 'Sri Lanka'}
                       </div>
                       {u.isSuspended && u.suspensionReason && (
-                        <p className="text-rose-300 text-[11px] font-semibold">
+                        <p className="text-red-300 text-[11px]">
                           Reason: {u.suspensionReason}
                         </p>
                       )}
@@ -536,21 +528,21 @@ export const AdminManagementPortal = ({ currentUser, onDirectoryUpdated }) => {
                         type="button"
                         disabled={updatingUserId === u._id}
                         onClick={() => handleToggleSuspend(u)}
-                        className={`px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 cursor-pointer shrink-0 transition-all ${
+                        className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 cursor-pointer shrink-0 transition-all ${
                           u.isSuspended
-                            ? 'bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200'
-                            : 'bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/40 text-rose-200'
+                            ? 'bg-[#4de1b7] text-slate-950 font-bold'
+                            : 'border border-red-400/30 text-red-300 hover:bg-red-500/10'
                         }`}
                       >
                         {u.isSuspended ? (
                           <>
-                            <UserCheck className="w-3.5 h-3.5" />
-                            <span>Reactivate Account</span>
+                            <UserCheck className="w-3 h-3" />
+                            <span>Reactivate</span>
                           </>
                         ) : (
                           <>
-                            <UserX className="w-3.5 h-3.5" />
-                            <span>Suspend Account</span>
+                            <UserX className="w-3 h-3" />
+                            <span>Suspend</span>
                           </>
                         )}
                       </button>

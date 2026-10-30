@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>SmartGrow OS - Project Summary</title>
+<style>
+  @page { size: A4; margin: 18mm; }
+  body { font-family: Segoe UI, Arial, sans-serif; color:#1b2b27; font-size: 11pt; line-height:1.45; }
+  h1 { color:#0b5d52; border-bottom:3px solid #14b8a6; padding-bottom:6px; font-size:22pt; margin-bottom:4px; }
+  h2 { color:#0b5d52; margin-top:20px; font-size:14pt; border-left:5px solid #14b8a6; padding-left:8px; }
+  .meta { color:#555; font-size:10pt; margin-bottom:10px; }
+  table { border-collapse:collapse; width:100%; margin:8px 0; font-size:10pt; }
+  th { background:#0b5d52; color:#fff; text-align:left; padding:6px 8px; }
+  td { border:1px solid #cfe3de; padding:6px 8px; vertical-align:top; }
+  tr:nth-child(even) td { background:#f3faf8; }
+  code { background:#eef5f3; padding:1px 4px; border-radius:3px; font-size:9.5pt; }
+  ul { margin:4px 0 4px 18px; padding:0; }
+</style></head><body>
+<h1>SmartGrow OS &mdash; Project Summary</h1>
+<div class="meta"><b>Stack:</b> React + Vite + Tailwind CSS v4 (frontend), Node.js + Express + MongoDB/Mongoose (backend), JWT authentication<br>
+<b>Repository:</b> github.com/Iresha2002/greenhouse-system- (branch <code>main</code>)</div>
+
+<h2>The 4 Modules</h2>
+<table>
+<tr><th>#</th><th>Module</th><th>What it does</th></tr>
+<tr><td>1</td><td>Smart Greenhouse</td><td>Live sensor monitoring, climate zones and actuator control (already existed).</td></tr>
+<tr><td>2</td><td>Crop Marketplace</td><td>Farmers sell fresh harvests. Customers get a cart, checkout and order history; farmers have a fulfilment portal (already existed).</td></tr>
+<tr><td>3</td><td>Agricultural Suppliers Marketplace</td><td>Built in an earlier session (11 stages).</td></tr>
+<tr><td>4</td><td>ExpertConnect</td><td>Replaced the old Hydroponic Bay. Built in 12 stages.</td></tr>
+</table>
+
+<h2>Suppliers Marketplace (Stages 1&ndash;11)</h2>
+<ul>
+<li><b>Catalog:</b> 10 product categories; search by chemical formula (NPK, EC, pH) or protocol (RS485, LoRaWAN).</li>
+<li><b>Customer side:</b> server-verified basket, checkout (cash on delivery or warehouse pickup), order tracking and cancellation with stock restored, profile page.</li>
+<li><b>Supplier portal:</b> 8 KPI cards, product editor, inline stock controls, order workflow (Pending to Delivered).</li>
+<li><b>Rankings:</b> best sellers computed from real orders, with no fake ratings.</li>
+</ul>
+
+<h2>ExpertConnect (Stages 1&ndash;12)</h2>
+<table>
+<tr><th>Stage</th><th>What was built</th></tr>
+<tr><td>1&ndash;2</td><td>Landing page; navigation renamed from Hydroponic Bay.</td></tr>
+<tr><td>3</td><td><code>expert</code> role, ExpertProfile model, directory with search and filters, profile cards and modal, 4 seeded experts.</td></tr>
+<tr><td>4</td><td>Expert application form and admin approve/reject. Nobody can verify themselves.</td></tr>
+<tr><td>5&ndash;6</td><td>Problem reports with up to 5 photos (max 2 MB each) and rule-based expert matching that explains each suggestion.</td></tr>
+<tr><td>7</td><td>Booking with live slots (Sri Lanka time), expert availability editor, double-booking blocked (409).</td></tr>
+<tr><td>8</td><td>Private chat per consultation, with photos and highlighted diagnostic notes.</td></tr>
+<tr><td>9</td><td>Structured expert recommendation (observations, causes, actions, safety, follow-up) with an advice disclaimer.</td></tr>
+<tr><td>10</td><td>In-app notifications; 1&ndash;5 star reviews only after a completed consultation, updating the expert's rating.</td></tr>
+<tr><td>11</td><td>Admin moderation tab: analytics, all consultations, review removal, account suspension.</td></tr>
+<tr><td>12</td><td>Full 8-workflow test run and README documentation.</td></tr>
+</table>
+
+<h2>Security Built In</h2>
+<ul>
+<li>Role-based access for farmer, expert, supplier, customer and admin.</li>
+<li>Farmers cannot see each other's consultations; experts can only act on their own.</li>
+<li>Suspended accounts are blocked at login and on every request.</li>
+<li>Image uploads validated for type and size.</li>
+</ul>
+
+<h2>Test Accounts</h2>
+<table>
+<tr><th>Role</th><th>Email</th><th>Password</th></tr>
+<tr><td>Admin</td><td>admin@smartgrow.lk</td><td>admin123</td></tr>
+<tr><td>Experts</td><td>kavinda.expert@, tharushi.expert@, roshan.expert@, nadeesha.expert@smartgrow.lk</td><td>expert123</td></tr>
+<tr><td>Farmers / suppliers</td><td>supplier@smartgrow.lk, nutrients@ceylonagritech.lk</td><td>supplier123</td></tr>
+</table>
+</body></html>

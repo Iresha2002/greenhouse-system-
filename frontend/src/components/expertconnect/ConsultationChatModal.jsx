@@ -184,35 +184,32 @@ export const ConsultationChatModal = ({
       ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md">
-      <div className="relative w-full max-w-4xl h-[88vh] rounded-3xl bg-gradient-to-b from-[#0b2e2b] via-[#0d2730] to-[#081c24] border border-cyan-400/35 shadow-2xl flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm">
+      <div className="relative w-full max-w-4xl h-[86vh] rounded-2xl bg-[#0b2821] border border-emerald-500/25 shadow-2xl flex flex-col overflow-hidden">
         {/* Top Header */}
-        <div className="p-4 sm:p-6 border-b border-white/15 bg-black/30 flex flex-wrap items-start justify-between gap-4">
+        <div className="p-4 sm:p-5 border-b border-emerald-500/20 bg-[#0f3830] flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-lg bg-cyan-500/20 border border-cyan-400/35 font-mono text-xs font-extrabold text-cyan-300">
+              <span className="px-2.5 py-0.5 rounded-full bg-[#0a2720] border border-emerald-500/30 font-mono text-xs font-bold text-emerald-300">
                 {consultation.consultationNumber}
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[11px] font-extrabold uppercase text-emerald-300">
-                Status: {String(consultation.status || '').replace('_', ' ')}
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-[11px] font-bold uppercase text-emerald-200">
+                {String(consultation.status || '').replace('_', ' ')}
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-xs font-semibold text-white/80 flex items-center gap-1">
-                <Clock className="w-3 h-3 text-cyan-300" />
-                {consultation.preferredDate} • {consultation.timeSlot}
+              <span className="text-xs text-emerald-100/70">
+                📅 {consultation.preferredDate} • ⏰ {consultation.timeSlot}
               </span>
             </div>
 
-            <h3 className="text-base sm:text-xl font-extrabold text-white flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-cyan-400 shrink-0" />
+            <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
               <span>
-                Consultation Thread: {consultation.expertName} &amp;{' '}
-                {consultation.farmerName}
+                {consultation.expertName} &amp; {consultation.farmerName}
               </span>
             </h3>
 
-            <p className="text-xs text-white/70 line-clamp-1">
+            <p className="text-xs text-emerald-100/70 line-clamp-1">
               {consultation.affectedCrop && (
-                <strong className="text-emerald-300 mr-1.5">
+                <strong className="text-emerald-300 mr-1">
                   [{consultation.affectedCrop}]
                 </strong>
               )}
@@ -226,10 +223,10 @@ export const ConsultationChatModal = ({
                 href={consultation.meetingLink}
                 target="_blank"
                 rel="noreferrer"
-                className="px-3 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 text-cyan-200 text-xs font-extrabold flex items-center gap-1.5"
+                className="px-3.5 py-1.5 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/30 text-emerald-200 text-xs font-bold flex items-center gap-1.5"
               >
                 <Video className="w-3.5 h-3.5" />
-                <span>Join Video Room</span>
+                <span>Join video</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             )}
@@ -237,57 +234,53 @@ export const ConsultationChatModal = ({
             <button
               type="button"
               onClick={() => fetchMessages(false)}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white cursor-pointer"
+              className="p-1.5 rounded-full bg-[#0a2720] hover:bg-[#14473d] text-emerald-100/80 hover:text-white border border-emerald-500/20 cursor-pointer"
               title="Refresh messages"
             >
               <RefreshCw
-                className={`w-4 h-4 ${loading ? 'animate-spin text-cyan-400' : ''}`}
+                className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-emerald-300' : ''}`}
               />
             </button>
 
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl bg-white/10 hover:bg-rose-500/30 text-white/80 hover:text-rose-200 cursor-pointer"
+              className="p-1.5 rounded-full bg-[#0a2720] hover:bg-red-500/20 text-emerald-100/80 hover:text-red-200 border border-emerald-500/20 cursor-pointer"
               aria-label="Close consultation chat"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Privacy Notice Bar */}
-        <div className="px-5 py-2 bg-cyan-950/60 border-b border-white/10 flex flex-wrap items-center justify-between gap-2 text-[11px] text-cyan-200/85">
+        <div className="px-4 py-2 bg-[#09221b] border-b border-emerald-500/15 flex flex-wrap items-center justify-between gap-2 text-[11px] text-emerald-100/70">
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            Private Encrypted Consultation Channel — Accessible only to the
-            farmer ({consultation.farmerName}), assigned expert (
-            {consultation.expertName}), and platform moderators.
+            Private consultation channel between farmer and verified expert.
           </span>
-          <span className="font-semibold text-white/60">
+          <span className="font-medium text-emerald-100/50">
             {messages.length} message{messages.length === 1 ? '' : 's'}
           </span>
         </div>
 
         {/* Message Thread Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 bg-[#0a251e]">
           {loading ? (
-            <div className="py-16 text-center space-y-2">
-              <div className="w-8 h-8 border-3 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin mx-auto" />
-              <p className="text-xs font-bold text-cyan-300">
-                Loading consultation messages...
+            <div className="py-12 text-center space-y-2">
+              <div className="w-7 h-7 border-2 border-emerald-400/20 border-t-[#4de1b7] rounded-full animate-spin mx-auto" />
+              <p className="text-xs text-emerald-200">
+                Loading messages...
               </p>
             </div>
           ) : messages.length === 0 ? (
-            <div className="rounded-2xl bg-white/[0.04] border border-white/10 p-8 text-center space-y-2 max-w-lg mx-auto my-6">
-              <MessageSquare className="w-9 h-9 text-cyan-400/70 mx-auto" />
-              <h4 className="text-sm font-extrabold text-white">
-                Start the Agricultural Consultation Discussion
+            <div className="rounded-xl bg-[#0f3830] border border-emerald-500/20 p-6 text-center space-y-1.5 max-w-md mx-auto my-6">
+              <MessageSquare className="w-8 h-8 text-emerald-400/60 mx-auto mb-1" />
+              <h4 className="text-xs sm:text-sm font-bold text-white">
+                Start the consultation discussion
               </h4>
-              <p className="text-xs text-white/65 leading-relaxed">
-                Share greenhouse temperature/humidity logs, EC/pH readings, or
-                upload close-up leaf/root photographs below to begin working
-                through this crop problem together.
+              <p className="text-xs text-emerald-100/65 leading-relaxed">
+                Send a question, record readings, or share close-up plant photos.
               </p>
             </div>
           ) : (
@@ -304,37 +297,35 @@ export const ConsultationChatModal = ({
                   }`}
                 >
                   <div
-                    className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 space-y-2.5 border ${
+                    className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-3.5 space-y-2 border ${
                       isDiagNote
-                        ? 'bg-emerald-950/80 border-emerald-400/50 text-emerald-100'
+                        ? 'bg-[#124235] border-emerald-400/40 text-emerald-100'
                         : isMine
-                        ? 'bg-cyan-500/20 border-cyan-400/40 text-white'
-                        : 'bg-white/[0.08] border-white/15 text-white'
+                        ? 'bg-[#185344] border-emerald-400/30 text-white'
+                        : 'bg-[#0f3830] border-emerald-500/20 text-white'
                     }`}
                   >
                     {/* Sender Header */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 text-[11px]">
-                      <div className="flex items-center gap-1.5 font-extrabold">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                      <div className="flex items-center gap-1.5 font-bold">
                         {isExpertMsg ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/25 border border-emerald-400/40 text-emerald-300">
-                            <Stethoscope className="w-3 h-3" />
-                            {msg.senderName} • Verified Expert
+                          <span className="text-emerald-300">
+                            {msg.senderName} • Expert
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-cyan-500/20 border border-cyan-400/30 text-cyan-200">
-                            <Sprout className="w-3 h-3" />
+                          <span className="text-emerald-200">
                             {msg.senderName} • Farmer
                           </span>
                         )}
 
                         {isDiagNote && (
-                          <span className="px-2 py-0.5 rounded bg-amber-500/25 border border-amber-400/40 text-amber-300 uppercase text-[10px] font-black">
-                            Diagnostic Note
+                          <span className="px-2 py-0.2 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold">
+                            Diagnostic note
                           </span>
                         )}
                       </div>
 
-                      <span className="text-white/50 font-mono text-[10px]">
+                      <span className="text-emerald-100/40 font-mono text-[10px]">
                         {new Date(msg.createdAt).toLocaleString([], {
                           month: 'short',
                           day: 'numeric',
@@ -352,19 +343,19 @@ export const ConsultationChatModal = ({
                     {/* Image Attachments */}
                     {Array.isArray(msg.attachments) &&
                       msg.attachments.length > 0 && (
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                        <div className="flex flex-wrap gap-2 pt-1">
                           {msg.attachments.map((imgUrl, idx) => (
                             <a
                               key={idx}
                               href={imgUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="block rounded-xl overflow-hidden border border-white/20 bg-black/40 hover:border-cyan-400 transition-all"
+                              className="block w-20 h-20 rounded-xl overflow-hidden border border-emerald-500/30 hover:opacity-90"
                             >
                               <img
                                 src={imgUrl}
-                                alt={`Consultation attachment ${idx + 1}`}
-                                className="w-full h-32 object-cover"
+                                alt={`Attachment ${idx + 1}`}
+                                className="w-full h-full object-cover"
                               />
                             </a>
                           ))}
@@ -381,19 +372,19 @@ export const ConsultationChatModal = ({
         {/* Composer Footer */}
         <form
           onSubmit={handleSend}
-          className="p-4 sm:p-5 border-t border-white/15 bg-black/40 space-y-3"
+          className="p-3 sm:p-4 border-t border-emerald-500/20 bg-[#0f3830] space-y-2.5"
         >
           {errorMsg && (
-            <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-400/40 text-rose-200 text-xs flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0" />
+            <div className="p-2.5 rounded-xl bg-red-500/15 border border-red-400/30 text-red-200 text-xs flex items-center gap-2">
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {/* Quick Prompt Chips */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-            <span className="text-[10px] font-extrabold uppercase text-white/50 shrink-0 mr-1">
-              Quick Prompts:
+            <span className="text-[10px] text-emerald-100/50 font-bold uppercase shrink-0 mr-1">
+              Quick:
             </span>
             {quickTemplates.map((tpl, idx) => (
               <button
@@ -402,9 +393,9 @@ export const ConsultationChatModal = ({
                 onClick={() =>
                   setText((prev) => (prev ? `${prev} ${tpl}` : tpl))
                 }
-                className="shrink-0 px-2.5 py-1 rounded-lg bg-white/[0.07] hover:bg-white/[0.14] border border-white/10 text-[11px] text-cyan-200 cursor-pointer transition-all"
+                className="shrink-0 px-2.5 py-1 rounded-full bg-[#0a2720] hover:bg-[#14473d] border border-emerald-500/20 text-[11px] text-emerald-100/80 hover:text-white cursor-pointer"
               >
-                {tpl.slice(0, 52)}...
+                {tpl.slice(0, 45)}...
               </button>
             ))}
           </div>
@@ -415,7 +406,7 @@ export const ConsultationChatModal = ({
               {attachments.map((src, idx) => (
                 <div
                   key={idx}
-                  className="relative w-16 h-16 rounded-xl overflow-hidden border border-cyan-400/40 bg-black/40"
+                  className="relative w-14 h-14 rounded-lg overflow-hidden border border-emerald-500/30 bg-[#0a2720]"
                 >
                   <img
                     src={src}
@@ -425,9 +416,9 @@ export const ConsultationChatModal = ({
                   <button
                     type="button"
                     onClick={() => handleRemoveAttachment(idx)}
-                    className="absolute top-1 right-1 p-1 rounded-full bg-black/80 text-rose-300 hover:text-rose-200 cursor-pointer"
+                    className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-600 text-white flex items-center justify-center cursor-pointer"
                   >
-                    <Trash2 className="w-3 h-3" />
+                    <Trash2 className="w-2.5 h-2.5" />
                   </button>
                 </div>
               ))}
@@ -435,7 +426,7 @@ export const ConsultationChatModal = ({
           )}
 
           {/* Textarea & Send Controls */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2.5">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2">
             <div className="flex-1 space-y-2">
               <textarea
                 rows={2}
@@ -446,15 +437,15 @@ export const ConsultationChatModal = ({
                     ? 'Write diagnostic questions, observations, or treatment instructions for the farmer...'
                     : 'Describe crop symptoms, EC/pH readings, or ask your assigned expert a question...'
                 }
-                className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs sm:text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-cyan-400"
+                className="w-full px-3.5 py-2 rounded-xl bg-[#0a2720] border border-emerald-500/25 text-xs sm:text-sm text-white placeholder:text-emerald-100/40 focus:outline-none focus:border-[#4de1b7]"
               />
 
               {/* Attachment & Message Type Bar */}
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <label className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-bold text-cyan-200 flex items-center gap-1.5 cursor-pointer">
-                    <ImageIcon className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Attach Photo (≤2MB)</span>
+                  <label className="px-3 py-1 rounded-full bg-[#0a2720] hover:bg-[#14473d] border border-emerald-500/25 text-xs font-semibold text-emerald-200 flex items-center gap-1.5 cursor-pointer">
+                    <ImageIcon className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Attach photo (≤2MB)</span>
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp"
@@ -469,13 +460,13 @@ export const ConsultationChatModal = ({
                       type="url"
                       value={imageUrlInput}
                       onChange={(e) => setImageUrlInput(e.target.value)}
-                      placeholder="Or paste photo URL..."
-                      className="px-2.5 py-1 rounded-lg bg-black/40 border border-white/15 text-xs text-white w-36 sm:w-44"
+                      placeholder="Or photo URL..."
+                      className="px-2.5 py-1 rounded-full bg-[#0a2720] border border-emerald-500/25 text-xs text-white w-32 sm:w-40 placeholder:text-emerald-100/40"
                     />
                     <button
                       type="button"
                       onClick={handleAddImageUrl}
-                      className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold text-white cursor-pointer"
+                      className="px-2.5 py-1 rounded-full bg-[#0a2720] hover:bg-[#14473d] border border-emerald-500/25 text-xs font-semibold text-white cursor-pointer"
                     >
                       + URL
                     </button>
@@ -483,7 +474,7 @@ export const ConsultationChatModal = ({
                 </div>
 
                 {isAssignedExpert && (
-                  <label className="flex items-center gap-1.5 text-xs font-bold text-emerald-300 cursor-pointer">
+                  <label className="flex items-center gap-1.5 text-xs font-semibold text-emerald-300 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={messageType === 'diagnostic_note'}
@@ -492,9 +483,9 @@ export const ConsultationChatModal = ({
                           e.target.checked ? 'diagnostic_note' : 'text'
                         )
                       }
-                      className="accent-emerald-400"
+                      className="accent-[#4de1b7]"
                     />
-                    <span>Highlight as Official Diagnostic Note</span>
+                    <span>Diagnostic note</span>
                   </label>
                 )}
               </div>
@@ -503,10 +494,10 @@ export const ConsultationChatModal = ({
             <button
               type="submit"
               disabled={sending}
-              className="px-5 py-3 rounded-2xl bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 cursor-pointer shrink-0"
+              className="px-5 py-2.5 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] disabled:opacity-50 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow cursor-pointer shrink-0"
             >
-              <Send className="w-4 h-4" />
-              <span>{sending ? 'Sending...' : 'Send Message'}</span>
+              <Send className="w-3.5 h-3.5" />
+              <span>{sending ? 'Sending...' : 'Send'}</span>
             </button>
           </div>
         </form>

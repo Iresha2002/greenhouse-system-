@@ -29,183 +29,134 @@ export const ExpertCard = ({ expert, onViewProfile, onRequestConsultation }) => 
     expert.averageRating > 0 &&
     reviewsCount > 0;
 
+  // Initials for avatar fallback
+  const initials = (expert.fullName || 'Expert')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('');
+
   return (
-    <div className="group relative flex flex-col justify-between rounded-3xl bg-white/[0.07] hover:bg-white/[0.11] border border-white/15 hover:border-cyan-400/45 p-5 sm:p-6 backdrop-blur-xl transition-all duration-300 shadow-xl">
-      <div>
-        {/* Top Row: Avatar, Name, Title, Verification & Availability Badges */}
-        <div className="flex items-start gap-4 mb-4">
-          <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-cyan-950/60 border border-cyan-400/35 shrink-0 flex items-center justify-center">
-            {expert.profilePhoto ? (
-              <img
-                src={expert.profilePhoto}
-                alt={expert.fullName}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            ) : (
-              <span className="text-2xl font-extrabold text-cyan-300">
-                {(expert.fullName || 'E')[0]}
-              </span>
-            )}
-          </div>
+    <div className="flex flex-col justify-between rounded-2xl bg-[#0f3830]/80 border border-emerald-500/20 p-5 shadow-lg hover:border-emerald-400/40 transition-all">
+      <div className="space-y-3.5">
+        {/* Top: Avatar, Name, Verification Badge */}
+        <div className="flex items-start gap-3.5">
+          {expert.profilePhoto ? (
+            <img
+              src={expert.profilePhoto}
+              alt={expert.fullName}
+              className="w-14 h-14 rounded-full object-cover border-2 border-emerald-400/30 shrink-0"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-full bg-emerald-700/50 border border-emerald-400/30 flex items-center justify-center text-emerald-200 font-extrabold text-lg shrink-0">
+              {initials}
+            </div>
+          )}
 
-          <div className="min-w-0 flex-1 space-y-1">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {expert.isVerified && expert.verificationStatus === 'approved' && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-[10px] font-extrabold uppercase tracking-wider">
-                  <CheckCircle className="w-3 h-3 text-cyan-400" />
-                  <span>Verified Expert</span>
-                </span>
-              )}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h3 className="text-base font-bold text-white truncate">
+                {expert.fullName}
+              </h3>
+            </div>
 
-              <span
-                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                  isAvailable
-                    ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
-                    : 'bg-amber-500/20 border-amber-400/40 text-amber-300'
-                }`}
-              >
-                <Clock className="w-2.5 h-2.5" />
-                <span>{isAvailable ? 'Available for Booking' : 'Schedule Busy'}</span>
+            <div className="flex items-center gap-2 text-[11px] text-emerald-300 font-semibold mt-0.5">
+              <span>{expert.isVerified ? 'Verified' : 'Pending'}</span>
+              <span>•</span>
+              <span className={isAvailable ? 'text-emerald-300' : 'text-amber-300'}>
+                {isAvailable ? 'Available' : 'Busy'}
               </span>
             </div>
 
-            <h3 className="text-base sm:text-lg font-extrabold text-white group-hover:text-cyan-300 transition-colors truncate">
-              {expert.fullName}
-            </h3>
-
-            <p className="text-xs font-semibold text-cyan-200/90 line-clamp-1">
+            <p className="text-xs text-white/70 line-clamp-1 mt-1">
               {expert.professionalTitle}
             </p>
           </div>
         </div>
 
-        {/* Qualifications & Experience Summary */}
-        <div className="space-y-2 mb-4 text-xs text-white/75">
-          <div className="flex items-start gap-2">
-            <GraduationCap className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-            <span className="line-clamp-2">{expert.qualifications}</span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-white/65">
-            {expert.yearsOfExperience !== undefined && (
-              <span className="inline-flex items-center gap-1 font-semibold text-emerald-300">
-                <Award className="w-3.5 h-3.5 text-emerald-400" />
-                {expert.yearsOfExperience}+ Years Experience
-              </span>
-            )}
-
-            {expert.location && (
-              <span className="inline-flex items-center gap-1 truncate">
-                <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                {expert.location}
-              </span>
-            )}
-          </div>
+        {/* Experience & Location */}
+        <div className="text-xs text-white/60 flex items-center gap-2 flex-wrap">
+          {expert.yearsOfExperience !== undefined && (
+            <span>{expert.yearsOfExperience}+ years experience</span>
+          )}
+          {expert.location && (
+            <>
+              <span>•</span>
+              <span className="truncate">{expert.location}</span>
+            </>
+          )}
         </div>
 
-        {/* Specializations Pills */}
-        <div className="mb-4">
-          <span className="text-[10px] uppercase tracking-wider text-white/45 font-bold block mb-1.5">
-            Areas of Specialization
-          </span>
-          <div className="flex flex-wrap gap-1.5">
-            {(expert.specializations || []).slice(0, 4).map((spec) => (
-              <span
-                key={spec}
-                className="px-2.5 py-1 rounded-lg bg-white/[0.08] border border-white/15 text-[11px] font-semibold text-white/90"
-              >
-                {spec}
-              </span>
-            ))}
-            {(expert.specializations || []).length > 4 && (
-              <span className="px-2 py-1 rounded-lg bg-cyan-500/15 text-cyan-300 text-[11px] font-bold">
-                +{expert.specializations.length - 4} more
-              </span>
-            )}
-          </div>
+        {/* Specialization Tags */}
+        <div className="flex flex-wrap gap-1.5">
+          {(expert.specializations || []).slice(0, 3).map((spec) => (
+            <span
+              key={spec}
+              className="px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/25 text-[11px] font-medium text-emerald-200"
+            >
+              {spec}
+            </span>
+          ))}
+          {(expert.specializations || []).length > 3 && (
+            <span className="px-2 py-0.5 rounded-full bg-white/5 text-[10px] text-white/60">
+              +{expert.specializations.length - 3}
+            </span>
+          )}
         </div>
 
-        {/* Supported Consultation Methods */}
-        <div className="flex flex-wrap items-center gap-1.5 mb-4">
-          {(expert.consultationTypes || []).map((type) => {
-            const meta = CONSULTATION_TYPE_LABELS[type] || {
-              label: type,
-              icon: MessageSquare,
-            };
-            const TypeIcon = meta.icon;
-            return (
-              <span
-                key={type}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/30 border border-white/10 text-[10px] text-white/75 font-semibold"
-              >
-                <TypeIcon className="w-3 h-3 text-cyan-400" />
-                <span>{meta.label}</span>
-              </span>
-            );
-          })}
+        {/* Consultation Formats */}
+        <div className="text-[11px] text-white/50">
+          {(expert.consultationTypes || [])
+            .map((t) => (t === 'in_person' ? 'Farm visit' : t === 'video' ? 'Video' : t === 'text' ? 'Text' : 'Phone'))
+            .join(' · ')}
         </div>
       </div>
 
-      {/* Bottom Section: Consultation Fee, Genuine Rating, and Action Buttons */}
-      <div className="pt-4 border-t border-white/10 space-y-3">
-        <div className="flex items-center justify-between">
+      {/* Bottom: Fee, Rating & Actions */}
+      <div className="pt-4 mt-3 border-t border-emerald-500/15 flex flex-col gap-3">
+        <div className="flex items-baseline justify-between">
           <div>
-            <span className="text-[10px] uppercase tracking-wider text-white/50 block">
-              Consultation Fee
+            <span className="text-xl font-extrabold text-white">
+              ${Number(expert.consultationFee || 0).toFixed(0)}
             </span>
-            <span className="text-lg font-extrabold text-white">
-              {expert.consultationFee > 0 ? (
-                <>
-                  ${Number(expert.consultationFee).toFixed(2)}{' '}
-                  <span className="text-xs font-normal text-cyan-300">/ session</span>
-                </>
-              ) : (
-                <span className="text-emerald-300">Free Advisory</span>
-              )}
-            </span>
+            <span className="text-xs text-white/50 ml-1">per session</span>
           </div>
 
-          <div className="text-right">
-            {hasGenuineRating ? (
-              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-400/35 text-amber-300 text-xs font-extrabold">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                <span>{Number(expert.averageRating).toFixed(1)}</span>
-                <span className="text-[10px] text-white/60">
-                  ({reviewsCount})
-                </span>
-              </div>
-            ) : (
-              <span className="text-[11px] text-white/50 font-medium">
-                {expert.completedConsultationsCount > 0
-                  ? `${expert.completedConsultationsCount} completed`
-                  : 'Verified Specialist'}
-              </span>
-            )}
-          </div>
+          {hasGenuineRating ? (
+            <div className="flex items-center gap-1 text-xs text-amber-300 font-bold">
+              <span>★</span>
+              <span>{Number(expert.averageRating).toFixed(1)}</span>
+              <span className="text-white/40">({reviewsCount})</span>
+            </div>
+          ) : (
+            <span className="text-[11px] text-emerald-400 font-medium">
+              {expert.completedConsultationsCount > 0
+                ? `${expert.completedConsultationsCount} completed`
+                : 'Verified'}
+            </span>
+          )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => onViewProfile && onViewProfile(expert)}
-            className="flex-1 py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+            className="py-2 px-3 rounded-full border border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/10 text-xs font-semibold cursor-pointer text-center transition-colors"
           >
-            <Eye className="w-3.5 h-3.5 text-cyan-300" />
-            <span>View Profile</span>
+            Profile
           </button>
-
           <button
             type="button"
             onClick={() => onRequestConsultation && onRequestConsultation(expert)}
             disabled={!isAvailable}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all shadow-md ${
+            className={`py-2 px-3 rounded-full text-xs font-bold text-center transition-colors ${
               isAvailable
-                ? 'bg-cyan-400 hover:bg-cyan-300 text-slate-950 cursor-pointer shadow-cyan-500/20'
-                : 'bg-white/5 text-white/30 border border-white/10 cursor-not-allowed'
+                ? 'bg-emerald-400 hover:bg-emerald-300 text-slate-950 cursor-pointer'
+                : 'bg-white/10 text-white/30 cursor-not-allowed'
             }`}
           >
-            <CalendarPlus className="w-3.5 h-3.5" />
-            <span>Request Consultation</span>
+            Request help
           </button>
         </div>
       </div>

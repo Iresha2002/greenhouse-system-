@@ -270,18 +270,18 @@ export const ExpertApplicationPortal = ({
 
   if (!currentUser) {
     return (
-      <div className="rounded-3xl bg-white/[0.07] border border-white/15 p-8 sm:p-12 text-center space-y-4 backdrop-blur-xl">
+      <div className="rounded-2xl bg-[#0f3830] border border-emerald-500/20 p-8 sm:p-12 text-center space-y-4">
         <Lock className="w-12 h-12 text-amber-400 mx-auto" />
         <h3 className="text-xl sm:text-2xl font-extrabold text-white">
           Sign In Required to Apply as an Agricultural Expert
         </h3>
-        <p className="text-xs sm:text-sm text-white/70 max-w-lg mx-auto leading-relaxed">
+        <p className="text-xs sm:text-sm text-emerald-100/70 max-w-lg mx-auto leading-relaxed">
           To protect credential integrity, expert applications must be linked to an authenticated SmartGrow OS account and reviewed by a platform Administrator before appearing in the verified directory.
         </p>
         <button
           type="button"
           onClick={onOpenLogin}
-          className="px-6 py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-extrabold text-xs sm:text-sm cursor-pointer shadow-lg shadow-cyan-500/20"
+          className="px-6 py-2.5 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 font-bold text-xs sm:text-sm cursor-pointer transition-colors"
         >
           Sign In or Register Account
         </button>
@@ -342,17 +342,17 @@ export const ExpertApplicationPortal = ({
       {/* ADMINISTRATOR VERIFICATION PANEL (Visible only when role === 'admin') */}
       {/* ===================================================================== */}
       {isAdmin && (
-        <div className="rounded-3xl bg-gradient-to-br from-[#0e352f] via-[#113d38] to-[#0c2938] border border-amber-400/40 p-6 sm:p-8 shadow-2xl space-y-6">
+        <div className="rounded-2xl bg-[#0f3830] border border-amber-500/30 p-6 sm:p-8 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/35 text-amber-300 text-xs font-extrabold uppercase tracking-wider mb-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider mb-2">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Administrator Expert Verification Desk</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-extrabold text-white">
                 Review & Approve Agricultural Expert Applications
               </h3>
-              <p className="text-xs text-white/70 mt-1">
+              <p className="text-xs text-emerald-100/70 mt-1">
                 Only experts approved here receive the Verified badge and appear in the public Find a Greenhouse Expert directory.
               </p>
             </div>
@@ -360,7 +360,7 @@ export const ExpertApplicationPortal = ({
             <button
               type="button"
               onClick={fetchApplicationData}
-              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 rounded-full border border-emerald-500/30 text-emerald-100 hover:text-white hover:bg-emerald-500/10 text-xs font-semibold flex items-center gap-2 cursor-pointer transition-colors"
             >
               <RefreshCw className={`w-4 h-4 ${loadingMyApp ? 'animate-spin text-amber-400' : ''}`} />
               <span>Refresh Queue</span>
@@ -369,15 +369,15 @@ export const ExpertApplicationPortal = ({
 
           {/* Admin KPI Row */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="rounded-2xl bg-black/30 border border-white/15 p-4">
-              <span className="text-[11px] uppercase text-white/50 font-bold block">
+            <div className="rounded-xl bg-[#0a2720] border border-emerald-500/20 p-4">
+              <span className="text-[11px] uppercase text-emerald-100/50 font-bold block">
                 Total Applications
               </span>
               <span className="text-2xl font-extrabold text-white">
                 {adminMetrics.total}
               </span>
             </div>
-            <div className="rounded-2xl bg-black/30 border border-amber-400/30 p-4">
+            <div className="rounded-xl bg-[#0a2720] border border-amber-500/30 p-4">
               <span className="text-[11px] uppercase text-amber-300/80 font-bold block">
                 Pending Review
               </span>
@@ -385,15 +385,15 @@ export const ExpertApplicationPortal = ({
                 {adminMetrics.pending + adminMetrics.underReview}
               </span>
             </div>
-            <div className="rounded-2xl bg-black/30 border border-emerald-400/30 p-4">
+            <div className="rounded-xl bg-[#0a2720] border border-emerald-500/30 p-4">
               <span className="text-[11px] uppercase text-emerald-300/80 font-bold block">
                 Approved & Verified
               </span>
-              <span className="text-2xl font-extrabold text-emerald-300">
+              <span className="text-2xl font-extrabold text-[#4de1b7]">
                 {adminMetrics.approved}
               </span>
             </div>
-            <div className="rounded-2xl bg-black/30 border border-red-400/30 p-4">
+            <div className="rounded-xl bg-[#0a2720] border border-red-500/30 p-4">
               <span className="text-[11px] uppercase text-red-300/80 font-bold block">
                 Rejected
               </span>
@@ -416,10 +416,10 @@ export const ExpertApplicationPortal = ({
                 key={tab.id}
                 type="button"
                 onClick={() => setAdminFilter(tab.id)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   adminFilter === tab.id
-                    ? 'bg-amber-400 text-slate-950 font-extrabold'
-                    : 'bg-white/10 hover:bg-white/20 text-white/75'
+                    ? 'bg-amber-400 text-slate-950 font-bold'
+                    : 'bg-[#0a2720] hover:bg-[#124235] text-emerald-100/75 border border-emerald-500/20'
                 }`}
               >
                 {tab.label}
@@ -428,9 +428,9 @@ export const ExpertApplicationPortal = ({
           </div>
 
           {/* Applications List */}
-          <div className="divide-y divide-white/10 rounded-2xl bg-black/25 border border-white/10 overflow-hidden">
+          <div className="divide-y divide-emerald-500/15 rounded-xl bg-[#0a2720] border border-emerald-500/20 overflow-hidden">
             {filteredAdminApps.length === 0 ? (
-              <div className="p-8 text-center text-xs text-white/60">
+              <div className="p-8 text-center text-xs text-emerald-100/60">
                 No expert applications match the selected status filter.
               </div>
             ) : (
@@ -453,22 +453,22 @@ export const ExpertApplicationPortal = ({
                             {badge.label}
                           </span>
                         </div>
-                        <p className="text-xs font-semibold text-cyan-300">
+                        <p className="text-xs font-semibold text-[#4de1b7]">
                           {app.professionalTitle} • {app.yearsOfExperience} yrs exp
                         </p>
-                        <p className="text-xs text-white/70 mt-1">
+                        <p className="text-xs text-emerald-100/70 mt-1">
                           <strong>Qualifications:</strong> {app.qualifications} (
                           {app.fieldOfStudy})
                         </p>
                       </div>
 
-                      <div className="text-right text-xs text-white/60">
+                      <div className="text-right text-xs text-emerald-100/60">
                         <p>Applicant: {app.user?.email || 'Registered User'}</p>
                         <p>Fee: ${Number(app.consultationFee || 0).toFixed(2)}</p>
                       </div>
                     </div>
 
-                    <p className="text-xs text-white/75 leading-relaxed">
+                    <p className="text-xs text-emerald-100/75 leading-relaxed">
                       {app.biography}
                     </p>
 
@@ -476,7 +476,7 @@ export const ExpertApplicationPortal = ({
                       {(app.specializations || []).map((s) => (
                         <span
                           key={s}
-                          className="px-2 py-0.5 rounded bg-white/10 text-[11px] text-cyan-200 font-semibold"
+                          className="px-2.5 py-0.5 rounded-full bg-[#124235] text-[11px] text-emerald-200 font-medium"
                         >
                           {s}
                         </span>
@@ -485,14 +485,14 @@ export const ExpertApplicationPortal = ({
 
                     {Array.isArray(app.supportingDocuments) &&
                       app.supportingDocuments.length > 0 && (
-                        <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-amber-200">
+                        <div className="p-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs text-amber-200">
                           <strong>Supporting Credentials (Admin-Only View):</strong>{' '}
                           {app.supportingDocuments.join(' • ')}
                         </div>
                       )}
 
                     {/* Admin Action Controls */}
-                    <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-white/10">
+                    <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-emerald-500/15">
                       <input
                         type="text"
                         value={
@@ -507,7 +507,7 @@ export const ExpertApplicationPortal = ({
                           })
                         }
                         placeholder="Optional administrator review note..."
-                        className="flex-1 px-3 py-1.5 rounded-xl bg-black/40 border border-white/15 text-xs text-white focus:outline-none focus:border-amber-400"
+                        className="flex-1 px-3.5 py-2 rounded-xl bg-[#0f3830] border border-emerald-500/25 text-xs text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
                       />
 
                       <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -515,7 +515,7 @@ export const ExpertApplicationPortal = ({
                           type="button"
                           disabled={isUpdating}
                           onClick={() => handleAdminVerify(app._id, 'under_review')}
-                          className="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/35 border border-sky-400/40 text-sky-300 text-xs font-bold cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-full bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/30 text-sky-300 text-xs font-semibold cursor-pointer transition-colors"
                         >
                           Mark Under Review
                         </button>
@@ -523,7 +523,7 @@ export const ExpertApplicationPortal = ({
                           type="button"
                           disabled={isUpdating}
                           onClick={() => handleAdminVerify(app._id, 'approved')}
-                          className="px-3.5 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs font-extrabold cursor-pointer"
+                          className="px-4 py-1.5 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] text-slate-950 text-xs font-bold cursor-pointer transition-colors"
                         >
                           ✓ Approve & Verify Expert
                         </button>
@@ -531,7 +531,7 @@ export const ExpertApplicationPortal = ({
                           type="button"
                           disabled={isUpdating}
                           onClick={() => handleAdminVerify(app._id, 'rejected')}
-                          className="px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/35 border border-red-400/40 text-red-300 text-xs font-bold cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-full bg-red-500/15 hover:bg-red-500/25 border border-red-400/30 text-red-300 text-xs font-semibold cursor-pointer transition-colors"
                         >
                           ✕ Reject
                         </button>
@@ -549,9 +549,9 @@ export const ExpertApplicationPortal = ({
       {/* APPLICANT STATUS BANNER (If user has already submitted an application)*/}
       {/* ===================================================================== */}
       {myApplication && (
-        <div className="rounded-3xl bg-white/[0.07] border border-cyan-400/35 p-6 backdrop-blur-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="rounded-2xl bg-[#0f3830] border border-emerald-500/30 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 shrink-0">
+            <div className="w-12 h-12 rounded-full bg-[#165042] border border-emerald-500/30 flex items-center justify-center text-[#4de1b7] shrink-0">
               <StatusIcon className="w-6 h-6" />
             </div>
             <div>
@@ -565,13 +565,13 @@ export const ExpertApplicationPortal = ({
                   {currentStatusMeta.label}
                 </span>
               </div>
-              <p className="text-xs text-white/70">
+              <p className="text-xs text-emerald-100/70">
                 {myApplication.verificationStatus === 'approved'
                   ? 'Your profile is approved and publicly visible in the Find a Greenhouse Expert directory. You can update your profile details below.'
                   : 'Your qualifications are stored safely in MongoDB. Once a SmartGrow Administrator approves your application, your profile will automatically appear in the verified directory.'}
               </p>
               {myApplication.verificationNotes && (
-                <p className="text-xs text-cyan-300 mt-1.5 font-semibold">
+                <p className="text-xs text-[#4de1b7] mt-1.5 font-semibold">
                   Reviewer Note: {myApplication.verificationNotes}
                 </p>
               )}
@@ -583,9 +583,9 @@ export const ExpertApplicationPortal = ({
       {/* ===================================================================== */}
       {/* EXPERT APPLICATION & PROFILE SUBMISSION FORM                          */}
       {/* ===================================================================== */}
-      <div className="rounded-3xl bg-white/[0.07] border border-white/15 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
-        <div className="mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 text-xs font-extrabold uppercase tracking-wider mb-2">
+      <div className="rounded-2xl bg-[#0f3830] border border-emerald-500/20 p-6 sm:p-8 space-y-6">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[#4de1b7] text-xs font-bold uppercase tracking-wider mb-2">
             <Award className="w-3.5 h-3.5" />
             <span>
               {myApplication
@@ -596,22 +596,22 @@ export const ExpertApplicationPortal = ({
           <h3 className="text-xl sm:text-2xl font-extrabold text-white">
             Professional Qualifications & Specialization Application
           </h3>
-          <p className="text-xs text-white/65 mt-1">
+          <p className="text-xs text-emerald-100/65 mt-1">
             Provide accurate academic credentials, greenhouse experience, and areas of specialization. Unverified applications are never shown as verified until approved by an administrator.
           </p>
         </div>
 
         <form onSubmit={handleSubmitApplication} className="space-y-6">
           {/* 1. Identity & Academic Credentials */}
-          <div className="rounded-2xl bg-black/25 border border-white/10 p-5 space-y-4">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
+          <div className="rounded-xl bg-[#0a2720] border border-emerald-500/15 p-5 space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#4de1b7] flex items-center gap-1.5">
               <GraduationCap className="w-4 h-4" />
               1. Identity & Educational Qualifications
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-medium text-emerald-100/80 mb-1">
                   Full Name & Academic Title *
                 </label>
                 <input
@@ -622,12 +622,12 @@ export const ExpertApplicationPortal = ({
                     setFormData({ ...formData, fullName: e.target.value })
                   }
                   placeholder="e.g., Dr. Kasun Wijesinghe, PhD"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-medium text-emerald-100/80 mb-1">
                   Professional Title / Role *
                 </label>
                 <input
@@ -641,12 +641,12 @@ export const ExpertApplicationPortal = ({
                     })
                   }
                   placeholder="e.g., Greenhouse Agronomist & Crop Nutrition Specialist"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-medium text-emerald-100/80 mb-1">
                   Educational Qualifications (Degrees & University) *
                 </label>
                 <input
@@ -657,12 +657,12 @@ export const ExpertApplicationPortal = ({
                     setFormData({ ...formData, qualifications: e.target.value })
                   }
                   placeholder="e.g., MSc Protected Horticulture, BSc Agriculture (Hons)"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-medium text-emerald-100/80 mb-1">
                   Primary Field of Study *
                 </label>
                 <input
@@ -673,22 +673,22 @@ export const ExpertApplicationPortal = ({
                     setFormData({ ...formData, fieldOfStudy: e.target.value })
                   }
                   placeholder="e.g., Plant Pathology & Hydroponic Systems"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
                 />
               </div>
             </div>
           </div>
 
           {/* 2. Experience & Biography */}
-          <div className="rounded-2xl bg-black/25 border border-white/10 p-5 space-y-4">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
+          <div className="rounded-xl bg-[#0a2720] border border-emerald-500/15 p-5 space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#4de1b7] flex items-center gap-1.5">
               <Briefcase className="w-4 h-4" />
               2. Agricultural Experience & Professional Biography
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-medium text-emerald-100/80 mb-1">
                   Years of Experience *
                 </label>
                 <input
@@ -703,12 +703,12 @@ export const ExpertApplicationPortal = ({
                       yearsOfExperience: e.target.value,
                     })
                   }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-medium text-emerald-100/80 mb-1">
                   Base Location / Agricultural Station
                 </label>
                 <input
@@ -718,12 +718,12 @@ export const ExpertApplicationPortal = ({
                     setFormData({ ...formData, location: e.target.value })
                   }
                   placeholder="e.g., Peradeniya / Nuwara Eliya"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-medium text-emerald-100/80 mb-1">
                   Languages Spoken (comma-separated)
                 </label>
                 <input
@@ -733,13 +733,13 @@ export const ExpertApplicationPortal = ({
                     setFormData({ ...formData, languages: e.target.value })
                   }
                   placeholder="English, Sinhala, Tamil"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-white/80 mb-1">
+              <label className="block text-xs font-medium text-emerald-100/80 mb-1">
                 Professional Biography (Displayed on your public profile) *
               </label>
               <textarea
@@ -750,12 +750,12 @@ export const ExpertApplicationPortal = ({
                   setFormData({ ...formData, biography: e.target.value })
                 }
                 placeholder="Describe how you help greenhouse farmers diagnose and solve crop, nutrient, pest, or automation problems..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-white/80 mb-1">
+              <label className="block text-xs font-medium text-emerald-100/80 mb-1">
                 Relevant Field & Greenhouse Experience Summary
               </label>
               <textarea
@@ -768,14 +768,14 @@ export const ExpertApplicationPortal = ({
                   })
                 }
                 placeholder="Summarize commercial greenhouses, research institutes, or extension projects you have worked with..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
               />
             </div>
           </div>
 
           {/* 3. Areas of Specialization (Select Multiple) */}
-          <div className="rounded-2xl bg-black/25 border border-white/10 p-5 space-y-3">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
+          <div className="rounded-xl bg-[#0a2720] border border-emerald-500/15 p-5 space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#4de1b7] flex items-center gap-1.5">
               <UserCheck className="w-4 h-4" />
               3. Select Areas of Specialization ({formData.specializations.length} selected) *
             </h4>
@@ -787,10 +787,10 @@ export const ExpertApplicationPortal = ({
                     key={spec}
                     type="button"
                     onClick={() => toggleSpecialization(spec)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-cyan-400 text-slate-950 border-cyan-300 font-extrabold shadow-sm'
-                        : 'bg-white/[0.06] hover:bg-white/[0.12] text-white/75 border-white/15'
+                        ? 'bg-[#4de1b7] text-slate-950 border-transparent font-bold'
+                        : 'bg-[#0f3830] hover:bg-[#124235] text-emerald-100/75 border-emerald-500/20'
                     }`}
                   >
                     {isSelected ? `✓ ${spec}` : spec}
@@ -801,14 +801,14 @@ export const ExpertApplicationPortal = ({
           </div>
 
           {/* 4. Consultation Preferences, Fee & Verification Documents */}
-          <div className="rounded-2xl bg-black/25 border border-white/10 p-5 space-y-4">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+          <div className="rounded-xl bg-[#0a2720] border border-emerald-500/15 p-5 space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
               <FileText className="w-4 h-4" />
               4. Consultation Methods, Fee & Verification Credentials
             </h4>
 
             <div>
-              <label className="block text-xs font-semibold text-white/80 mb-2">
+              <label className="block text-xs font-medium text-emerald-100/80 mb-2">
                 Preferred Consultation Methods *
               </label>
               <div className="flex flex-wrap gap-2">
@@ -819,10 +819,10 @@ export const ExpertApplicationPortal = ({
                       key={m.id}
                       type="button"
                       onClick={() => toggleConsultationMethod(m.id)}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      className={`px-4 py-2 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-emerald-400 text-slate-950 border-emerald-300 font-extrabold'
-                          : 'bg-white/[0.06] hover:bg-white/[0.12] text-white/75 border-white/15'
+                          ? 'bg-[#4de1b7] text-slate-950 border-transparent font-bold'
+                          : 'bg-[#0f3830] hover:bg-[#124235] text-emerald-100/75 border-emerald-500/20'
                       }`}
                     >
                       {isSelected ? `✓ ${m.label}` : m.label}
@@ -834,7 +834,7 @@ export const ExpertApplicationPortal = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-medium text-emerald-100/80 mb-1">
                   Consultation Fee ($ USD per session, 0 for Free)
                 </label>
                 <input
@@ -848,12 +848,12 @@ export const ExpertApplicationPortal = ({
                       consultationFee: e.target.value,
                     })
                   }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-medium text-emerald-100/80 mb-1">
                   Profile Photograph URL (Optional)
                 </label>
                 <input
@@ -863,12 +863,12 @@ export const ExpertApplicationPortal = ({
                     setFormData({ ...formData, profilePhoto: e.target.value })
                   }
                   placeholder="https://images.unsplash.com/..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-white/80 mb-1">
+                <label className="block text-xs font-medium text-emerald-100/80 mb-1">
                   Certificate / Credential Reference (Admin-Only)
                 </label>
                 <input
@@ -881,7 +881,7 @@ export const ExpertApplicationPortal = ({
                     })
                   }
                   placeholder="e.g., Dept. of Agriculture Reg #AG-2041"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0f3830] border border-emerald-500/20 text-xs sm:text-sm text-white focus:outline-none focus:border-[#4de1b7] placeholder:text-emerald-100/35"
                 />
               </div>
             </div>
@@ -891,7 +891,7 @@ export const ExpertApplicationPortal = ({
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-3 rounded-2xl bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-cyan-500/25 cursor-pointer transition-all"
+              className="px-6 py-2.5 rounded-full bg-[#4de1b7] hover:bg-[#3bc7a1] disabled:opacity-50 text-slate-950 font-bold text-xs sm:text-sm flex items-center gap-2 cursor-pointer transition-colors"
             >
               <Send className="w-4 h-4" />
               <span>
