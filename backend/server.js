@@ -26,6 +26,7 @@ app.use('/api/supply-orders', require('./routes/supplyOrderRoutes'));
 app.use('/api/experts', require('./routes/expertRoutes'));
 app.use('/api/problems', require('./routes/problemRoutes'));
 app.use('/api/consultations', require('./routes/consultationRoutes'));
+app.use('/api/admin/expertconnect', require('./routes/adminExpertRoutes'));
 app.use('/api/cart', require('./routes/cartRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 

@@ -423,3 +423,55 @@ export const getExpertReviews = async (expertId) => {
     const response = await axios.get(`${API_URL}/experts/${expertId}/reviews`);
     return response.data;
 };
+
+// 24. ExpertConnect — Admin Management & Platform Moderation APIs (Stage 11)
+export const getAdminPlatformStats = async () => {
+    const response = await axios.get(
+        `${API_URL}/admin/expertconnect/stats`,
+        getAuthHeaders()
+    );
+    return response.data;
+};
+
+export const getAdminConsultations = async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const url = query
+        ? `${API_URL}/admin/expertconnect/consultations?${query}`
+        : `${API_URL}/admin/expertconnect/consultations`;
+    const response = await axios.get(url, getAuthHeaders());
+    return response.data;
+};
+
+export const getAdminReviews = async () => {
+    const response = await axios.get(
+        `${API_URL}/admin/expertconnect/reviews`,
+        getAuthHeaders()
+    );
+    return response.data;
+};
+
+export const deleteAdminReview = async (reviewId) => {
+    const response = await axios.delete(
+        `${API_URL}/admin/expertconnect/reviews/${reviewId}`,
+        getAuthHeaders()
+    );
+    return response.data;
+};
+
+export const getAdminUsers = async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    const url = query
+        ? `${API_URL}/admin/expertconnect/users?${query}`
+        : `${API_URL}/admin/expertconnect/users`;
+    const response = await axios.get(url, getAuthHeaders());
+    return response.data;
+};
+
+export const toggleUserSuspension = async (userId, payload) => {
+    const response = await axios.patch(
+        `${API_URL}/admin/expertconnect/users/${userId}/suspend`,
+        payload,
+        getAuthHeaders()
+    );
+    return response.data;
+};

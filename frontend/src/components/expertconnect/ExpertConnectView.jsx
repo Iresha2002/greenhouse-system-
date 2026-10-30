@@ -39,6 +39,7 @@ import ExpertProfileModal from './ExpertProfileModal';
 import ExpertApplicationPortal from './ExpertApplicationPortal';
 import ProblemSubmissionPortal from './ProblemSubmissionPortal';
 import ConsultationBookingPortal from './ConsultationBookingPortal';
+import AdminManagementPortal from './AdminManagementPortal';
 
 // 14 Configurable Expert Specializations (Section 5.1)
 export const EXPERT_SPECIALIZATIONS = [
@@ -458,6 +459,9 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
             { id: 'problem', label: 'Submit a Problem', icon: FileWarning },
             { id: 'consultations', label: 'My Consultations', icon: CalendarCheck },
             { id: 'apply', label: 'Become an Expert', icon: Award },
+            ...(currentUser?.role === 'admin'
+              ? [{ id: 'admin', label: 'Admin Moderation', icon: ShieldCheck }]
+              : []),
           ].map((tab) => {
             const TabIcon = tab.icon;
             const isActive = activeSubTab === tab.id;
@@ -1129,6 +1133,19 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
           currentUser={currentUser}
           onOpenLogin={onOpenLogin}
           onDirectoryUpdated={fetchExperts}
+        />
+      )}
+
+      {/* ========================================================= */}
+      {/* VIEW 6: ADMIN GOVERNANCE & MODERATION (Stage 11)          */}
+      {/* ========================================================= */}
+      {activeSubTab === 'admin' && currentUser?.role === 'admin' && (
+        <AdminManagementPortal
+          currentUser={currentUser}
+          onDirectoryUpdated={() => {
+            fetchExperts();
+            fetchNotifications();
+          }}
         />
       )}
 

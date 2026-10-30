@@ -24,6 +24,12 @@ const protect = async (req, res, next) => {
       return res.status(401).json({ error: 'User associated with this token no longer exists' });
     }
 
+    if (user.isSuspended) {
+      return res.status(403).json({
+        error: `Account suspended: ${user.suspensionReason || 'Please contact platform administration.'}`
+      });
+    }
+
     req.user = user;
     next();
   } catch (error) {
