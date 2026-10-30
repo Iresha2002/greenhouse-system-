@@ -19,7 +19,43 @@ SmartGrow OS is a full-stack greenhouse automation, hydroponic telemetry, and du
    - Farming Tools
    - Growing Supplies
    - Hydroponic Equipment
-4. **Hydroponic Bay** — Closed-loop NFT/drip nutrient reservoir monitoring, pH/EC dosing targets, and pump automation.
+4. **SmartGrow ExpertConnect (Greenhouse Agricultural Consultation Platform)** — Professional consultation ecosystem connecting protected-culture farmers and hydroponic growers with certified agronomists, plant pathologists, and automation engineers.
+
+---
+
+## SmartGrow ExpertConnect Platform Features
+
+### 1. Verified Expert Directory (`/api/experts`)
+- Filter and search verified specialists by name, qualification (`PhD`, `MSc`, `BSc`), 14 agricultural specializations, consultation format, availability, and fee range.
+- Real-time status badges, experience metrics, verified qualification cards, and modal deep-dives.
+
+### 2. Expert Application & Administrator Verification (`/api/experts/apply`, `/api/experts/admin/applications`)
+- Credentialed professionals apply with educational background, field experience, bio, and certificates.
+- Administrators review, verify, approve, or reject applicants (`403 Forbidden` guard against unauthorized self-verification).
+
+### 3. Greenhouse Problem Diagnostic Intake & Rule-Based Matching (`/api/problems`)
+- Farmers describe symptoms, crop growth stages, environmental/telemetry readings (temperature, RH, VPD, EC, pH), and upload up to 5 photographs ($\le 2\text{ MB}$, JPEG/PNG/WebP).
+- Automatic rule-based expert recommendation engine transparently matches relevant specialists based on domain tags and experience.
+
+### 4. Appointment Booking & Conflict Prevention (`/api/consultations`)
+- Calendar scheduling in Sri Lanka Standard Time (`UTC+5:30`) across 4 formats: **Video**, **Text Advisory**, **Phone Call**, and **Field Visit**.
+- Server-side slot collision detection returning `409 Conflict` on overlapping bookings.
+- Strict cross-farmer and cross-expert access controls (`403 Forbidden`).
+
+### 5. Private Participant Messaging Thread (`/api/consultations/:id/messages`)
+- Chronological in-consultation chat with role badges (**Verified Expert** vs. **Farmer**), high-priority diagnostic notes, and photo uploads ($\le 2\text{ MB}$).
+
+### 6. Structured Expert Recommendations & History (`/api/consultations/:id/recommendation`)
+- Assigned experts record observations, probable root causes, step-by-step treatment plans, preventive practices, and chemical safety precautions.
+- Permanent preservation in farmer's consultation history with Section 19 Agricultural Advice Responsibility Notice.
+
+### 7. Genuine Reviews & In-App Notifications (`/api/consultations/:id/review`, `/api/consultations/notifications`)
+- Only farmers with completed consultations can review specialists (self-reviews and duplicate reviews blocked).
+- Live notification drawer keeping users alerted about appointment bookings, chat messages, approvals, and reviews.
+
+### 8. Platform Governance & Moderation (`/api/admin/expertconnect`)
+- High-level platform analytics (throughput, lifecycle statuses, top problem categories).
+- Full consultation search ledger, review moderation/removal, and account suspension controls.
 
 ---
 
@@ -55,9 +91,10 @@ MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 PORT=5001
 ```
-Seed the initial 10 agricultural supply products and verified supplier accounts (safe and idempotent):
+Seed initial supply catalog and verified agricultural experts (safe and idempotent):
 ```bash
 node utils/seedSupplies.js
+node utils/seedExperts.js
 ```
 Start the backend server:
 ```bash
@@ -77,6 +114,11 @@ npm run build
 
 ---
 
-## Demo Supplier Accounts (Created by `seedSupplies.js`)
-- **Hardware & IoT Supplier:** `supplier@smartgrow.lk` / `supplier123` (*SmartGrow Automation Supplies*)
-- **Nutrients & Seeds Supplier:** `nutrients@ceylonagritech.lk` / `supplier123` (*Ceylon AgriTech Nutrients*)
+## Seeded Demo Accounts (for Testing & Grading)
+- **Platform Administrator:** `admin@smartgrow.lk` / `admin123`
+- **Verified Expert (Hydroponics & Automation):** `kavinda.expert@smartgrow.lk` / `expert123` (*Dr. Kavinda Perera, PhD*)
+- **Verified Expert (Pathology & Diseases):** `tharushi.expert@smartgrow.lk` / `expert123` (*Dr. Tharushi Alwis, PhD*)
+- **Verified Expert (Nutrient Management):** `roshan.expert@smartgrow.lk` / `expert123` (*Eng. Roshan Gunasekara, MSc*)
+- **Verified Expert (Protected Agriculture):** `nadeesha.expert@smartgrow.lk` / `expert123` (*Nadeesha Wickramasinghe, MSc*)
+- **Hardware & IoT Supplier / Farmer:** `supplier@smartgrow.lk` / `supplier123` (*SmartGrow Automation Supplies*)
+- **Nutrients & Seeds Supplier / Farmer:** `nutrients@ceylonagritech.lk` / `supplier123` (*Ceylon AgriTech Nutrients*)
