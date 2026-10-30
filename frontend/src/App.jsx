@@ -15,6 +15,7 @@ import AuthModal from './components/AuthModel';
 import MarketplaceView from './components/marketplace/MarketplaceView';
 import SuppliersMarketplaceView from './components/suppliers/SuppliersMarketplaceView';
 import ExpertConnectView from './components/expertconnect/ExpertConnectView';
+import SupportView from './components/support/SupportView';
 import { getLatestSensorReading, getDevices, updateDevice, deleteDevice } from './services/api';
 
 import { Play, Pause, Thermometer, Droplets, Sprout, Sun } from 'lucide-react';
@@ -167,8 +168,10 @@ export function App() {
 
         <Navbar
           user={currentUser}
+          currentView={currentView}
           onLogout={handleLogout}
           onNavigateHome={() => setCurrentView('home')}
+          onNavigateSupport={() => setCurrentView('support')}
           onOpenLogin={() => setIsAuthModalOpen(true)}
           onGoToDashboard={() => setCurrentView('dashboard')}
           onSelectModule={(moduleId) => {
@@ -294,6 +297,62 @@ export function App() {
     );
   }
 
+  // Render Support Page View
+  if (currentView === 'support') {
+    return (
+      <div className="relative min-h-screen w-full bg-[#184832] overflow-x-hidden flex flex-col font-sans antialiased text-white selection:bg-emerald-400 selection:text-[#0b2b1c] scroll-smooth">
+        {/* Background Atmosphere & Glow */}
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute inset-0 bg-[radial-gradient(130%_105%_at_65%_35%,#286e4d_0%,#1e593d_28%,#15462f_62%,#0f3523_100%)]" />
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none bg-emerald-500/20" />
+          <div className="absolute bottom-10 left-12 w-[450px] h-[450px] bg-[#34a86b]/20 rounded-full blur-[130px] pointer-events-none" />
+        </div>
+
+        <Navbar
+          user={currentUser}
+          currentView={currentView}
+          onLogout={handleLogout}
+          onNavigateHome={() => setCurrentView('home')}
+          onNavigateSupport={() => setCurrentView('support')}
+          onOpenLogin={() => setIsAuthModalOpen(true)}
+          onGoToDashboard={() => setCurrentView('dashboard')}
+          onSelectModule={(moduleId) => {
+            setSelectedDashboardTab(moduleId);
+            setCurrentView('dashboard');
+          }}
+        />
+
+        <main className="relative z-10 flex-1">
+          <SupportView
+            currentUser={currentUser}
+            onNavigateHome={() => setCurrentView('home')}
+            onGoToDashboard={() => setCurrentView('dashboard')}
+            onSelectModule={(moduleId) => {
+              setSelectedDashboardTab(moduleId);
+              setCurrentView('dashboard');
+            }}
+          />
+        </main>
+
+        <Footer
+          onSelectSlide={(index) => {
+            handleSelectSlide(index);
+            setCurrentView('home');
+          }}
+          onNavigateSupport={() => setCurrentView('support')}
+        />
+
+        {/* Authentication Modal */}
+        {isAuthModalOpen && (
+          <AuthModal
+            onLoginSuccess={handleLoginSuccess}
+            onClose={() => setIsAuthModalOpen(false)}
+          />
+        )}
+      </div>
+    );
+  }
+
   // Render SmartGrow Landing Page
   return (
     <div className="relative min-h-screen w-full bg-[#184832] overflow-x-hidden flex flex-col font-sans antialiased text-white selection:bg-emerald-400 selection:text-[#0b2b1c] scroll-smooth">
@@ -317,6 +376,9 @@ export function App() {
           activeIndex={activeIndex}
           onSelectSlide={handleSelectSlide}
           currentUser={currentUser}
+          currentView={currentView}
+          onNavigateHome={() => setCurrentView('home')}
+          onNavigateSupport={() => setCurrentView('support')}
           onOpenLogin={() => setIsAuthModalOpen(true)}
           onGoToDashboard={() => setCurrentView('dashboard')}
           onLogout={handleLogout}
@@ -385,7 +447,10 @@ export function App() {
         }
       }} />
 
-      <Footer onSelectSlide={handleSelectSlide} />
+      <Footer
+        onSelectSlide={handleSelectSlide}
+        onNavigateSupport={() => setCurrentView('support')}
+      />
 
       {/* Authentication Modal */}
       {isAuthModalOpen && (

@@ -21,6 +21,8 @@ interface HeaderProps {
   onLogout?: () => void;
   onSelectModule?: (moduleId: string) => void;
   onNavigateHome?: () => void;
+  onNavigateSupport?: () => void;
+  currentView?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -32,6 +34,8 @@ export const Header: React.FC<HeaderProps> = ({
   onLogout,
   onSelectModule,
   onNavigateHome,
+  onNavigateSupport,
+  currentView = 'home',
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -131,7 +135,11 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Home Link */}
           <button
             onClick={handleGoHome}
-            className="px-4 py-2 rounded-full text-sm font-semibold text-white hover:bg-white/10 transition-colors cursor-pointer"
+            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
+              currentView === 'home'
+                ? 'bg-white/15 text-white font-bold border border-white/20'
+                : 'text-white/80 hover:text-white hover:bg-white/10'
+            }`}
           >
             Home
           </button>
@@ -203,13 +211,19 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Support Link */}
-          <a
-            href="#support"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+          <button
+            onClick={() => {
+              if (onNavigateSupport) onNavigateSupport();
+            }}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
+              currentView === 'support'
+                ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-400/40 shadow-sm font-bold'
+                : 'text-white/80 hover:text-white hover:bg-white/10'
+            }`}
           >
             <LifeBuoy className="w-3.5 h-3.5 text-emerald-300" />
             <span>Support</span>
-          </a>
+          </button>
         </nav>
 
         {/* Right: Login / Profile Button */}

@@ -3,9 +3,10 @@ import { ArrowUp } from 'lucide-react';
 
 interface FooterProps {
   onSelectSlide: (index: number) => void;
+  onNavigateSupport?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onSelectSlide }) => {
+export const Footer: React.FC<FooterProps> = ({ onSelectSlide, onNavigateSupport }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -76,6 +77,17 @@ export const Footer: React.FC<FooterProps> = ({ onSelectSlide }) => {
           >
             ExpertConnect
           </button>
+          {onNavigateSupport && (
+            <button
+              onClick={() => {
+                onNavigateSupport();
+                scrollToTop();
+              }}
+              className="hover:text-emerald-300 text-white/90 font-semibold transition-colors cursor-pointer"
+            >
+              Support
+            </button>
+          )}
         </div>
 
         {/* Copyright & Scroll to Top */}

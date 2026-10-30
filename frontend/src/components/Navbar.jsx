@@ -6,6 +6,8 @@ export const Navbar = ({
   currentUser,
   onLogout,
   onNavigateHome,
+  onNavigateSupport,
+  currentView,
   onOpenLogin,
   onGoToDashboard,
   onSelectModule,
@@ -15,6 +17,8 @@ export const Navbar = ({
       currentUser={user || currentUser}
       onLogout={onLogout}
       onNavigateHome={onNavigateHome}
+      onNavigateSupport={onNavigateSupport}
+      currentView={currentView}
       onOpenLogin={onOpenLogin}
       onGoToDashboard={onGoToDashboard}
       onSelectModule={onSelectModule}
