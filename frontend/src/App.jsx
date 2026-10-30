@@ -183,10 +183,7 @@ export function App() {
                 { id: 'hydroponics', label: 'ExpertConnect' },
               ].map((tab) => {
                 const isActive = selectedDashboardTab === tab.id;
-                const activeStyle =
-                  tab.id === 'marketplace'
-                    ? 'bg-[#f59e0b] text-slate-950 font-bold shadow-md'
-                    : 'bg-[#4de1b7] text-slate-950 font-bold shadow-md';
+                const activeStyle = 'bg-[#f59e0b] text-slate-950 font-bold shadow-md';
 
                 return (
                   <button
