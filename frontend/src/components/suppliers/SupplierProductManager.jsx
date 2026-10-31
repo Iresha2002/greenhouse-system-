@@ -561,7 +561,7 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
         <button
           type="button"
           onClick={fetchSupplierData}
-          className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+          className="px-3.5 py-2 rounded-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs text-xs font-bold flex items-center gap-1.5 cursor-pointer"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-sky-400' : ''}`} />
           <span>Sync Live Data</span>
@@ -617,13 +617,13 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
 
       {/* TAB 2 (Stage 9): Incoming Supply Orders & Fulfilment Lifecycle */}
       {portalTab === 'orders' ? (
-        <div className="rounded-3xl bg-white/[0.07] border border-white/15 backdrop-blur-xl overflow-hidden shadow-2xl">
-          <div className="p-5 border-b border-white/10 flex flex-wrap items-center justify-between gap-4">
+        <div className="rounded-3xl bg-white border border-slate-200 overflow-hidden shadow-xs">
+          <div className="p-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h3 className="text-base sm:text-lg font-extrabold text-white">
+              <h3 className="text-base sm:text-lg font-extrabold text-slate-900">
                 Incoming Customer Supply Orders ({filteredSupplierOrders.length})
               </h3>
-              <p className="text-xs text-white/60">
+              <p className="text-xs text-slate-500">
                 Manage order acceptance, warehouse preparation, islandwide dispatch, and final delivery confirmation for items supplied by {currentUser?.username}.
               </p>
             </div>
@@ -640,10 +640,10 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
                   key={tab.id}
                   type="button"
                   onClick={() => setOrderFilter(tab.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                     orderFilter === tab.id
-                      ? 'bg-emerald-400 text-slate-950 font-extrabold'
-                      : 'bg-white/10 hover:bg-white/20 text-white/75'
+                      ? 'bg-[#0b3b2c] text-white font-extrabold shadow-xs'
+                      : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs font-semibold'
                   }`}
                 >
                   {tab.label}
@@ -654,32 +654,32 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
 
           {loading ? (
             <div className="p-14 text-center">
-              <div className="w-9 h-9 border-4 border-emerald-400/20 border-t-emerald-400 rounded-full animate-spin mx-auto mb-3" />
-              <p className="text-xs font-bold text-emerald-300">Loading incoming supply orders...</p>
+              <div className="w-9 h-9 border-4 border-emerald-600/20 border-t-emerald-600 rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-xs font-bold text-emerald-800">Loading incoming supply orders...</p>
             </div>
           ) : filteredSupplierOrders.length === 0 ? (
             <div className="p-12 text-center space-y-3">
-              <Truck className="w-12 h-12 text-emerald-400/60 mx-auto" />
-              <h4 className="text-lg font-bold text-white">No Incoming Supply Orders Found</h4>
-              <p className="text-xs text-white/60 max-w-md mx-auto">
+              <Truck className="w-12 h-12 text-emerald-600/70 mx-auto" />
+              <h4 className="text-lg font-bold text-slate-900">No Incoming Supply Orders Found</h4>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
                 When farmers or greenhouse operators purchase your agricultural supplies, their orders and delivery addresses will appear here for fulfilment.
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-white/10">
+            <div className="divide-y divide-slate-200">
               {filteredSupplierOrders.map((order) => {
                 const status = order.supplierStatus || order.orderStatus || 'pending';
                 const isUpdating = updatingOrderId === order._id;
 
                 const statusStyles = {
-                  pending: 'bg-amber-500/20 border-amber-400/40 text-amber-300',
-                  accepted: 'bg-sky-500/20 border-sky-400/40 text-sky-300',
-                  preparing: 'bg-indigo-500/20 border-indigo-400/40 text-indigo-300',
-                  ready_for_dispatch: 'bg-purple-500/20 border-purple-400/40 text-purple-300',
-                  dispatched: 'bg-cyan-500/20 border-cyan-400/40 text-cyan-300',
-                  delivered: 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300',
-                  cancelled: 'bg-red-500/20 border-red-400/40 text-red-300',
-                  rejected: 'bg-red-500/20 border-red-400/40 text-red-300',
+                  pending: 'bg-amber-50 text-amber-800 border-amber-200',
+                  accepted: 'bg-blue-50 text-blue-800 border-blue-200',
+                  preparing: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+                  ready_for_dispatch: 'bg-purple-50 text-purple-800 border-purple-200',
+                  dispatched: 'bg-cyan-50 text-cyan-800 border-cyan-200',
+                  delivered: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+                  cancelled: 'bg-rose-50 text-rose-800 border-rose-200',
+                  rejected: 'bg-rose-50 text-rose-800 border-rose-200',
                 };
 
                 const statusLabels = {
@@ -694,14 +694,14 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
                 };
 
                 return (
-                  <div key={order._id} className="p-5 sm:p-6 hover:bg-white/[0.03] transition-colors space-y-4">
+                  <div key={order._id} className="p-5 sm:p-6 hover:bg-slate-50/60 transition-colors space-y-4">
                     {/* Top Row: Order Number, Date, Fulfilment Status, Supplier Revenue */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="flex flex-wrap items-center gap-3">
-                        <span className="px-3 py-1 rounded-xl bg-black/40 border border-white/15 font-mono text-xs sm:text-sm font-extrabold text-emerald-300">
+                        <span className="px-3 py-1 rounded-xl bg-slate-100 border border-slate-200 font-mono text-xs sm:text-sm font-extrabold text-slate-900">
                           {order.orderNumber}
                         </span>
-                        <span className="text-xs text-white/60">
+                        <span className="text-xs text-slate-500">
                           Placed {new Date(order.createdAt).toLocaleString()}
                         </span>
                         <span
@@ -714,8 +714,8 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
                       </div>
 
                       <div className="text-right">
-                        <span className="text-[11px] text-white/50 block">Your Supplier Allocation</span>
-                        <span className="text-lg font-extrabold text-emerald-300">
+                        <span className="text-[11px] text-slate-400 block">Your Supplier Allocation</span>
+                        <span className="text-lg font-black text-slate-950">
                           ${Number(order.supplierSubtotal || 0).toFixed(2)}
                         </span>
                       </div>
@@ -724,20 +724,20 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
                     {/* Middle Grid: Customer Delivery Info + Ordered Items for this Supplier */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                       {/* Customer & Delivery Details */}
-                      <div className="lg:col-span-5 rounded-2xl bg-black/30 border border-white/10 p-4 space-y-2 text-xs">
-                        <p className="text-[11px] font-extrabold uppercase tracking-wider text-sky-300 mb-1">
+                      <div className="lg:col-span-5 rounded-2xl bg-slate-50 border border-slate-200 p-4 space-y-2 text-xs">
+                        <p className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-800 mb-1">
                           Customer & Fulfilment Details
                         </p>
-                        <div className="flex items-center gap-2 text-white/90 font-semibold">
-                          <User className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                        <div className="flex items-center gap-2 text-slate-900 font-semibold">
+                          <User className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                           <span>{order.customerInfo?.name || order.customerName || 'Customer'}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-white/80">
-                          <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <div className="flex items-center gap-2 text-slate-600">
+                          <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                           <span>{order.customerInfo?.phone || order.contactPhone || 'N/A'}</span>
                         </div>
-                        <div className="flex items-start gap-2 text-white/80">
-                          <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                        <div className="flex items-start gap-2 text-slate-600">
+                          <MapPin className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
                           <span>
                             {order.fulfillmentMethod === 'pickup' ||
                             order.deliveryMethod === 'warehouse_pickup'
@@ -748,13 +748,13 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
                           </span>
                         </div>
                         <div className="pt-1 flex flex-wrap items-center gap-2 text-[11px]">
-                          <span className="px-2.5 py-0.5 rounded-lg bg-white/10 text-white/80 font-semibold">
+                          <span className="px-2.5 py-0.5 rounded-lg bg-white border border-slate-200 text-slate-700 font-semibold shadow-2xs">
                             {order.fulfillmentMethod === 'pickup' ||
                             order.deliveryMethod === 'warehouse_pickup'
                               ? '🏢 Warehouse Pickup'
                               : '🚚 Islandwide Delivery'}
                           </span>
-                          <span className="px-2.5 py-0.5 rounded-lg bg-white/10 text-white/80 font-semibold">
+                          <span className="px-2.5 py-0.5 rounded-lg bg-white border border-slate-200 text-slate-700 font-semibold shadow-2xs">
                             💳{' '}
                             {order.paymentMethod === 'pay_on_pickup' ||
                             order.paymentMethod === 'pay_on_collection'
@@ -763,18 +763,18 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
                           </span>
                         </div>
                         {(order.customerInfo?.notes || order.notes) && (
-                          <p className="text-[11px] text-amber-200/90 bg-amber-500/10 border border-amber-400/20 rounded-xl p-2 mt-2">
+                          <p className="text-[11px] text-amber-900 bg-amber-50 border border-amber-200 rounded-xl p-2 mt-2">
                             <strong>Note:</strong> {order.customerInfo?.notes || order.notes}
                           </p>
                         )}
                       </div>
 
                       {/* Ordered Items Owned by This Supplier */}
-                      <div className="lg:col-span-7 rounded-2xl bg-black/30 border border-white/10 p-4 space-y-2.5">
-                        <p className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-300">
+                      <div className="lg:col-span-7 rounded-2xl bg-slate-50 border border-slate-200 p-4 space-y-2.5">
+                        <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700">
                           Items Ordered From Your Catalog ({(order.myItems || []).length})
                         </p>
-                        <div className="divide-y divide-white/10">
+                        <div className="divide-y divide-slate-200">
                           {(order.myItems || []).map((item, idx) => (
                             <div key={idx} className="py-2 flex items-center justify-between gap-3 text-xs">
                               <div className="flex items-center gap-3 min-w-0">
@@ -782,25 +782,25 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
                                   <img
                                     src={item.image}
                                     alt={item.name}
-                                    className="w-10 h-10 rounded-lg object-cover border border-white/10 shrink-0"
+                                    className="w-10 h-10 rounded-lg object-cover border border-slate-200 shrink-0"
                                   />
                                 ) : (
-                                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                                  <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
                                     📦
                                   </div>
                                 )}
                                 <div className="min-w-0">
-                                  <p className="font-bold text-white truncate">{item.name}</p>
-                                  <p className="text-[11px] text-white/60">
+                                  <p className="font-bold text-slate-900 truncate">{item.name}</p>
+                                  <p className="text-[11px] text-slate-500">
                                     {item.category} • ${Number(item.price || item.unitPrice || 0).toFixed(2)} / {item.unit}
                                   </p>
                                 </div>
                               </div>
                               <div className="text-right shrink-0">
-                                <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 font-extrabold">
+                                <span className="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold">
                                   Qty: {item.quantity} {item.unit}
                                 </span>
-                                <p className="text-xs font-extrabold text-white mt-1">
+                                <p className="text-xs font-black text-slate-900 mt-1">
                                   ${Number(item.itemTotal || item.lineTotal || (item.price || 0) * item.quantity).toFixed(2)}
                                 </p>
                               </div>
@@ -812,8 +812,8 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
 
                     {/* Bottom Action Bar: Order Status Lifecycle Transitions */}
                     {status !== 'cancelled' && status !== 'rejected' && status !== 'delivered' && (
-                      <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
-                        <span className="text-xs text-white/60">
+                      <div className="pt-2 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                        <span className="text-xs text-slate-500">
                           Update Fulfilment Stage:
                         </span>
 
@@ -824,39 +824,43 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
                                 type="button"
                                 disabled={isUpdating}
                                 onClick={() =>
-                                  handleUpdateOrderStatus(order._id, 'accepted', 'Accepted')
+                                  handleUpdateOrderStatus(order._id, 'rejected', 'Rejected')
                                 }
-                                className="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-40 text-slate-950 text-xs font-extrabold cursor-pointer transition-all"
+                                className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 disabled:opacity-40 text-rose-700 text-xs font-bold cursor-pointer transition-all"
                               >
-                                ✓ Accept Order
+                                ✕ Reject Order
                               </button>
                               <button
                                 type="button"
                                 disabled={isUpdating}
                                 onClick={() =>
-                                  handleUpdateOrderStatus(order._id, 'rejected', 'Rejected')
+                                  handleUpdateOrderStatus(order._id, 'accepted', 'Accepted')
                                 }
-                                className="px-3.5 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/35 border border-red-400/40 disabled:opacity-40 text-red-300 text-xs font-bold cursor-pointer transition-all"
+                                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white text-xs font-bold cursor-pointer shadow-xs transition-all"
                               >
-                                ✕ Reject & Restore Stock
+                                ✓ Accept Order
                               </button>
                             </>
                           )}
 
-                          {(status === 'accepted' || status === 'pending') && (
+                          {status === 'accepted' && (
                             <button
                               type="button"
                               disabled={isUpdating}
                               onClick={() =>
-                                handleUpdateOrderStatus(order._id, 'preparing', 'Preparing')
+                                handleUpdateOrderStatus(
+                                  order._id,
+                                  'preparing',
+                                  'Preparing in Warehouse'
+                                )
                               }
-                              className="px-3.5 py-2 rounded-xl bg-indigo-500/25 hover:bg-indigo-500/40 border border-indigo-400/40 disabled:opacity-40 text-indigo-200 text-xs font-bold cursor-pointer transition-all"
+                              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white text-xs font-bold cursor-pointer shadow-xs transition-all"
                             >
-                              ⚙️ Mark Preparing
+                              📦 Start Warehouse Preparation
                             </button>
                           )}
 
-                          {(status === 'accepted' || status === 'preparing') && (
+                          {status === 'preparing' && (
                             <button
                               type="button"
                               disabled={isUpdating}
@@ -864,25 +868,23 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
                                 handleUpdateOrderStatus(
                                   order._id,
                                   'ready_for_dispatch',
-                                  'Ready for Dispatch'
+                                  'Ready for Dispatch / Collection'
                                 )
                               }
-                              className="px-3.5 py-2 rounded-xl bg-purple-500/25 hover:bg-purple-500/40 border border-purple-400/40 disabled:opacity-40 text-purple-200 text-xs font-bold cursor-pointer transition-all"
+                              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-xs font-bold cursor-pointer shadow-xs transition-all"
                             >
-                              📦 Ready for Dispatch
+                              🚚 Ready for Dispatch / Pickup
                             </button>
                           )}
 
-                          {(status === 'accepted' ||
-                            status === 'preparing' ||
-                            status === 'ready_for_dispatch') && (
+                          {status === 'ready_for_dispatch' && (
                             <button
                               type="button"
                               disabled={isUpdating}
                               onClick={() =>
                                 handleUpdateOrderStatus(order._id, 'dispatched', 'Dispatched')
                               }
-                              className="px-3.5 py-2 rounded-xl bg-cyan-500/25 hover:bg-cyan-500/40 border border-cyan-400/40 disabled:opacity-40 text-cyan-200 text-xs font-bold cursor-pointer transition-all"
+                              className="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 disabled:opacity-40 text-white text-xs font-bold cursor-pointer shadow-xs transition-all"
                             >
                               🚚 Mark Dispatched
                             </button>
@@ -895,7 +897,7 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
                               onClick={() =>
                                 handleUpdateOrderStatus(order._id, 'delivered', 'Delivered')
                               }
-                              className="px-4 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 disabled:opacity-40 text-slate-950 text-xs font-extrabold cursor-pointer shadow-lg shadow-emerald-500/20 transition-all"
+                              className="px-4 py-2 rounded-xl bg-[#0b3b2c] hover:bg-[#07291e] disabled:opacity-40 text-white text-xs font-extrabold cursor-pointer shadow-xs transition-all"
                             >
                               ✓ Confirm Delivered
                             </button>
@@ -911,291 +913,291 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
         </div>
       ) : (
         /* TAB 1: Supplier Product Listings Table */
-        <div className="rounded-3xl bg-white/[0.07] border border-white/15 backdrop-blur-xl overflow-hidden shadow-2xl">
-        <div className="p-5 border-b border-white/10 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h3 className="text-base sm:text-lg font-extrabold text-white">
-              Your Agricultural Supply Listings ({filteredSupplierItems.length})
-            </h3>
-            <p className="text-xs text-white/60">
-              Only products created by your supplier account ({currentUser?.email}) are shown here. Use inline controls to adjust stock in real time.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {[
-              { id: 'all', label: `All (${mySupplies.length})` },
-              { id: 'lowStock', label: `Low Stock (${metrics.lowStockCount})` },
-              { id: 'outOfStock', label: `Out of Stock (${metrics.outOfStockCount})` },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setStockFilter(tab.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  stockFilter === tab.id
-                    ? 'bg-sky-500 text-slate-950 font-extrabold'
-                    : 'bg-white/10 hover:bg-white/20 text-white/75'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-
-            <button
-              type="button"
-              onClick={fetchSupplierData}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white cursor-pointer"
-              title="Refresh supplier listings"
-            >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-sky-400' : ''}`} />
-            </button>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="p-14 text-center">
-            <div className="w-9 h-9 border-4 border-sky-400/20 border-t-sky-400 rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-xs font-bold text-sky-300">Loading your supplier listings...</p>
-          </div>
-        ) : mySupplies.length === 0 ? (
-          <div className="p-12 text-center space-y-4">
-            <Package className="w-12 h-12 text-sky-400/70 mx-auto" />
+        <div className="rounded-3xl bg-white border border-slate-200 overflow-hidden shadow-xs">
+          <div className="p-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h4 className="text-lg font-bold text-white">No Supply Products Listed Yet</h4>
-              <p className="text-xs text-white/60 max-w-md mx-auto mt-1">
-                Start building your B2B/farmer agricultural catalog by adding seeds, fertilizers, irrigation valves, or IoT sensor kits.
+              <h3 className="text-base sm:text-lg font-extrabold text-slate-900">
+                Your Agricultural Supply Listings ({filteredSupplierItems.length})
+              </h3>
+              <p className="text-xs text-slate-500">
+                Only products created by your supplier account ({currentUser?.email}) are shown here. Use inline controls to adjust stock in real time.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleOpenCreate}
-              className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider cursor-pointer"
-            >
-              + Create First Supply Listing
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { id: 'all', label: `All (${mySupplies.length})` },
+                { id: 'lowStock', label: `Low Stock (${metrics.lowStockCount})` },
+                { id: 'outOfStock', label: `Out of Stock (${metrics.outOfStockCount})` },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setStockFilter(tab.id)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                    stockFilter === tab.id
+                      ? 'bg-[#0b3b2c] text-white font-extrabold shadow-xs'
+                      : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs font-semibold'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+
+              <button
+                type="button"
+                onClick={fetchSupplierData}
+                className="p-2 rounded-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs cursor-pointer"
+                title="Refresh supplier listings"
+              >
+                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-emerald-600' : 'text-slate-500'}`} />
+              </button>
+            </div>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-white/10 text-[11px] uppercase tracking-wider text-white/50 bg-black/20">
-                  <th className="py-3.5 px-4">Product & Brand</th>
-                  <th className="py-3.5 px-4">Category</th>
-                  <th className="py-3.5 px-4">Unit Price</th>
-                  <th className="py-3.5 px-4">Stock Level</th>
-                  <th className="py-3.5 px-4">Visibility</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/10 text-xs sm:text-sm">
-                {filteredSupplierItems.map((item) => {
-                  const thumb =
-                    item.image ||
-                    (Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : '');
-                  const isOut = item.quantity <= 0;
-                  const isLow = item.quantity > 0 && item.quantity <= (item.lowStockThreshold || 5);
-                  const isUpdatingThis = stockUpdatingId === item._id;
 
-                  return (
-                    <tr key={item._id} className="hover:bg-white/[0.04] transition-colors">
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl overflow-hidden bg-black/40 border border-white/10 shrink-0 flex items-center justify-center">
-                            {thumb ? (
-                              <img src={thumb} alt={item.name} className="w-full h-full object-cover" />
-                            ) : (
-                              <span>⚙️</span>
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-bold text-white line-clamp-1">{item.name}</p>
-                            <p className="text-[11px] text-sky-300/80">
-                              {[item.brand, item.model, item.sku ? `SKU: ${item.sku}` : '']
-                                .filter(Boolean)
-                                .join(' • ') || 'Standard Supply'}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
+          {loading ? (
+            <div className="p-14 text-center">
+              <div className="w-9 h-9 border-4 border-emerald-600/20 border-t-emerald-600 rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-xs font-bold text-emerald-800">Loading your supplier listings...</p>
+            </div>
+          ) : mySupplies.length === 0 ? (
+            <div className="p-12 text-center space-y-4">
+              <Package className="w-12 h-12 text-slate-400 mx-auto" />
+              <div>
+                <h4 className="text-lg font-bold text-slate-900">No Supply Products Listed Yet</h4>
+                <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+                  Start building your agricultural catalog by adding seeds, fertilizers, plant supplements, or greenhouse equipment.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleOpenCreate}
+                className="px-5 py-2.5 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white font-extrabold text-xs uppercase tracking-wider cursor-pointer shadow-xs"
+              >
+                + Create First Supply Listing
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 text-[11px] uppercase tracking-wider text-slate-500 bg-slate-50">
+                    <th className="py-3.5 px-4 font-bold">Product & Brand</th>
+                    <th className="py-3.5 px-4 font-bold">Category</th>
+                    <th className="py-3.5 px-4 font-bold">Unit Price</th>
+                    <th className="py-3.5 px-4 font-bold">Stock Level</th>
+                    <th className="py-3.5 px-4 font-bold">Visibility</th>
+                    <th className="py-3.5 px-4 text-right font-bold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 text-xs sm:text-sm">
+                  {filteredSupplierItems.map((item) => {
+                    const thumb =
+                      item.image ||
+                      (Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : '');
+                    const isOut = item.quantity <= 0;
+                    const isLow = item.quantity > 0 && item.quantity <= (item.lowStockThreshold || 5);
+                    const isUpdatingThis = stockUpdatingId === item._id;
 
-                      <td className="py-3.5 px-4">
-                        <span className="px-2.5 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-white/90">
-                          {item.category}
-                        </span>
-                      </td>
-
-                      <td className="py-3.5 px-4 font-extrabold text-white">
-                        ${Number(item.price).toFixed(2)}{' '}
-                        <span className="text-xs font-normal text-white/60">/ {item.unit}</span>
-                      </td>
-
-                      <td className="py-3.5 px-4">
-                        {stockEditId === item._id ? (
-                          <div className="flex flex-wrap items-center gap-2 bg-black/40 p-2 rounded-xl border border-sky-400/40">
-                            <div>
-                              <span className="text-[10px] text-white/50 block">Qty</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={stockEditValue}
-                                onChange={(e) => setStockEditValue(e.target.value)}
-                                className="w-16 px-2 py-1 rounded bg-black/60 border border-white/20 text-white text-xs font-bold"
-                              />
-                            </div>
-                            <div>
-                              <span className="text-[10px] text-white/50 block">Low Alert</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={thresholdEditValue}
-                                onChange={(e) => setThresholdEditValue(e.target.value)}
-                                className="w-14 px-2 py-1 rounded bg-black/60 border border-white/20 text-amber-300 text-xs font-bold"
-                              />
-                            </div>
-                            <button
-                              type="button"
-                              disabled={isUpdatingThis}
-                              onClick={() =>
-                                handleQuickStockAdjust(item, {
-                                  quantity: Number(stockEditValue),
-                                  lowStockThreshold: Number(thresholdEditValue),
-                                })
-                              }
-                              className="px-2.5 py-1 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold cursor-pointer"
-                            >
-                              Save
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setStockEditId(null)}
-                              className="p-1 text-white/50 hover:text-white cursor-pointer"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="space-y-1.5">
-                            <div className="flex items-center gap-2">
-                              {isOut ? (
-                                <span className="px-2.5 py-0.5 rounded-full bg-red-500/20 border border-red-400/40 text-red-300 text-xs font-bold">
-                                  Out of Stock (0)
-                                </span>
-                              ) : isLow ? (
-                                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold">
-                                  Low: {item.quantity} {item.unit}
-                                </span>
+                    return (
+                      <tr key={item._id} className="hover:bg-slate-50/70 transition-colors">
+                        <td className="py-3.5 px-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center">
+                              {thumb ? (
+                                <img src={thumb} alt={item.name} className="w-full h-full object-cover" />
                               ) : (
-                                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold">
-                                  {item.quantity} {item.unit}
-                                </span>
+                                <span>⚙️</span>
                               )}
                             </div>
+                            <div className="min-w-0">
+                              <p className="font-bold text-slate-900 line-clamp-1">{item.name}</p>
+                              <p className="text-[11px] text-slate-500">
+                                {[item.brand, item.model, item.sku ? `SKU: ${item.sku}` : '']
+                                  .filter(Boolean)
+                                  .join(' • ') || 'Standard Supply'}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
 
-                            {/* Quick Stepper & Restock Controls */}
-                            <div className="flex items-center gap-1">
-                              <button
-                                type="button"
-                                disabled={isUpdatingThis || item.quantity <= 0}
-                                onClick={() => handleQuickStockAdjust(item, { adjustment: -1 })}
-                                className="w-6 h-6 rounded bg-white/10 hover:bg-white/20 disabled:opacity-30 flex items-center justify-center text-white cursor-pointer"
-                                title="Decrease stock by 1"
-                              >
-                                <Minus className="w-3 h-3" />
-                              </button>
+                        <td className="py-3.5 px-4">
+                          <span className="px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700">
+                            {item.category}
+                          </span>
+                        </td>
+
+                        <td className="py-3.5 px-4 font-extrabold text-slate-900">
+                          ${Number(item.price).toFixed(2)}{' '}
+                          <span className="text-xs font-normal text-slate-400">/ {item.unit}</span>
+                        </td>
+
+                        <td className="py-3.5 px-4">
+                          {stockEditId === item._id ? (
+                            <div className="flex flex-wrap items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-300">
+                              <div>
+                                <span className="text-[10px] text-slate-500 block">Qty</span>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={stockEditValue}
+                                  onChange={(e) => setStockEditValue(e.target.value)}
+                                  className="w-16 px-2 py-1 rounded bg-white border border-slate-300 text-slate-900 text-xs font-bold"
+                                />
+                              </div>
+                              <div>
+                                <span className="text-[10px] text-slate-500 block">Low Alert</span>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={thresholdEditValue}
+                                  onChange={(e) => setThresholdEditValue(e.target.value)}
+                                  className="w-14 px-2 py-1 rounded bg-white border border-slate-300 text-amber-700 text-xs font-bold"
+                                />
+                              </div>
                               <button
                                 type="button"
                                 disabled={isUpdatingThis}
-                                onClick={() => handleQuickStockAdjust(item, { adjustment: 1 })}
-                                className="w-6 h-6 rounded bg-white/10 hover:bg-white/20 disabled:opacity-30 flex items-center justify-center text-white cursor-pointer"
-                                title="Increase stock by 1"
+                                onClick={() =>
+                                  handleQuickStockAdjust(item, {
+                                    quantity: Number(stockEditValue),
+                                    lowStockThreshold: Number(thresholdEditValue),
+                                  })
+                                }
+                                className="px-2.5 py-1 rounded-lg bg-[#0b3b2c] hover:bg-[#07291e] text-white text-xs font-bold cursor-pointer"
                               >
-                                <Plus className="w-3 h-3" />
+                                Save
                               </button>
                               <button
                                 type="button"
-                                disabled={isUpdatingThis}
-                                onClick={() => handleQuickStockAdjust(item, { adjustment: 10 })}
-                                className="px-1.5 h-6 rounded bg-emerald-500/20 hover:bg-emerald-500/35 border border-emerald-400/30 text-emerald-300 text-[10px] font-bold cursor-pointer"
-                                title="Quick restock +10"
+                                onClick={() => setStockEditId(null)}
+                                className="p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
                               >
-                                +10
+                                <X className="w-3.5 h-3.5" />
                               </button>
-                              <button
-                                type="button"
-                                onClick={() => openInlineStockEditor(item)}
-                                className="px-2 h-6 rounded bg-sky-500/15 hover:bg-sky-500/30 border border-sky-400/30 text-sky-300 text-[10px] font-bold cursor-pointer"
-                                title="Set exact stock & alert threshold"
-                              >
-                                Set
-                              </button>
-                              {item.quantity > 0 && (
+                            </div>
+                          ) : (
+                            <div className="space-y-1.5">
+                              <div className="flex items-center gap-2">
+                                {isOut ? (
+                                  <span className="px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
+                                    Out of Stock (0)
+                                  </span>
+                                ) : isLow ? (
+                                  <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
+                                    Low: {item.quantity} {item.unit}
+                                  </span>
+                                ) : (
+                                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
+                                    {item.quantity} {item.unit}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Quick Stepper & Restock Controls */}
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  disabled={isUpdatingThis || item.quantity <= 0}
+                                  onClick={() => handleQuickStockAdjust(item, { adjustment: -1 })}
+                                  className="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-200 disabled:opacity-30 flex items-center justify-center text-slate-700 cursor-pointer"
+                                  title="Decrease stock by 1"
+                                >
+                                  <Minus className="w-3 h-3" />
+                                </button>
                                 <button
                                   type="button"
                                   disabled={isUpdatingThis}
-                                  onClick={() => handleQuickStockAdjust(item, { quantity: 0 })}
-                                  className="px-1.5 h-6 rounded bg-red-500/15 hover:bg-red-500/30 border border-red-400/30 text-red-300 text-[10px] font-bold cursor-pointer"
-                                  title="Mark Out of Stock (0)"
+                                  onClick={() => handleQuickStockAdjust(item, { adjustment: 1 })}
+                                  className="w-6 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-200 disabled:opacity-30 flex items-center justify-center text-slate-700 cursor-pointer"
+                                  title="Increase stock by 1"
                                 >
-                                  0
+                                  <Plus className="w-3 h-3" />
                                 </button>
-                              )}
+                                <button
+                                  type="button"
+                                  disabled={isUpdatingThis}
+                                  onClick={() => handleQuickStockAdjust(item, { adjustment: 10 })}
+                                  className="px-1.5 h-6 rounded bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-[10px] font-bold cursor-pointer"
+                                  title="Quick restock +10"
+                                >
+                                  +10
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => openInlineStockEditor(item)}
+                                  className="px-2 h-6 rounded bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-[10px] font-bold cursor-pointer"
+                                  title="Set exact stock & alert threshold"
+                                >
+                                  Set
+                                </button>
+                                {item.quantity > 0 && (
+                                  <button
+                                    type="button"
+                                    disabled={isUpdatingThis}
+                                    onClick={() => handleQuickStockAdjust(item, { quantity: 0 })}
+                                    className="px-1.5 h-6 rounded bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 text-[10px] font-bold cursor-pointer"
+                                    title="Mark Out of Stock (0)"
+                                  >
+                                    0
+                                  </button>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </td>
-
-                      <td className="py-3.5 px-4">
-                        <button
-                          type="button"
-                          onClick={() => handleToggleStatus(item)}
-                          className={`px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 cursor-pointer transition-all ${
-                            item.status === 'active'
-                              ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
-                              : 'bg-white/10 border-white/20 text-white/50'
-                          }`}
-                          title="Click to toggle Active / Inactive visibility"
-                        >
-                          {item.status === 'active' ? (
-                            <>
-                              <Eye className="w-3.5 h-3.5" />
-                              <span>Active</span>
-                            </>
-                          ) : (
-                            <>
-                              <EyeOff className="w-3.5 h-3.5" />
-                              <span>Hidden</span>
-                            </>
                           )}
-                        </button>
-                      </td>
+                        </td>
 
-                      <td className="py-3.5 px-4 text-right">
-                        <div className="inline-flex items-center gap-2">
+                        <td className="py-3.5 px-4">
                           <button
                             type="button"
-                            onClick={() => handleOpenEdit(item)}
-                            className="p-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/35 border border-sky-400/30 text-sky-300 cursor-pointer"
-                            title="Edit product & specifications"
+                            onClick={() => handleToggleStatus(item)}
+                            className={`px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 cursor-pointer transition-all ${
+                              item.status === 'active'
+                                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                                : 'bg-slate-100 border-slate-200 text-slate-400'
+                            }`}
+                            title="Click to toggle Active / Inactive visibility"
                           >
-                            <Edit3 className="w-4 h-4" />
+                            {item.status === 'active' ? (
+                              <>
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>Active</span>
+                              </>
+                            ) : (
+                              <>
+                                <EyeOff className="w-3.5 h-3.5" />
+                                <span>Hidden</span>
+                              </>
+                            )}
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => setDeleteTarget(item)}
-                            className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500/35 border border-red-400/30 text-red-300 cursor-pointer"
-                            title="Delete product"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+                        </td>
+
+                        <td className="py-3.5 px-4 text-right">
+                          <div className="inline-flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEdit(item)}
+                              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 cursor-pointer"
+                              title="Edit product & specifications"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDeleteTarget(item)}
+                              className="p-2 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 cursor-pointer"
+                              title="Delete product"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 
