@@ -1,4 +1,4 @@
-# SmartGrow OS — Greenhouse Management & Agricultural Marketplaces
+# SmartGrow — Greenhouse Management & Agricultural Marketplaces
 
 SmartGrow OS is a full-stack greenhouse automation, hydroponic telemetry, and dual agricultural marketplace platform built with **React + Vite + Tailwind CSS v4** on the frontend and **Node.js + Express + MongoDB (Mongoose)** on the backend.
 
