@@ -189,57 +189,8 @@ export const SupportView = ({
         </div>
       </div>
 
-      {/* Hero Banner Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 mb-12">
-        <div className="relative rounded-3xl bg-white border border-slate-200/90 p-8 sm:p-12 md:p-16 overflow-hidden shadow-xl">
-          {/* Ambient Glows */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-100/40 rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-100/40 rounded-full blur-[90px] pointer-events-none" />
-
-          <div className="relative z-10 max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-bold uppercase tracking-wider text-emerald-900 mb-4 shadow-xs">
-              <LifeBuoy className="w-3.5 h-3.5 text-emerald-700" />
-              <span>SmartGrow Support & Knowledge Base</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
-              How can we assist your{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-800 via-teal-700 to-[#0b3b2c]">
-                agricultural operations?
-              </span>
-            </h1>
-
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed mb-8">
-              Find instant answers for sensor calibrations, marketplace orders, and expert consultations, or contact our engineering and agronomy team directly.
-            </p>
-
-            {/* Live Search Input */}
-            <div className="relative w-full max-w-2xl">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                <Search className="w-5 h-5" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search troubleshooting, sensor calibration, delivery, escrow..."
-                className="w-full pl-12 pr-10 py-4 rounded-2xl bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 focus:border-[#0b3b2c] text-slate-900 placeholder-slate-400 text-sm sm:text-base font-medium outline-none transition-all shadow-inner"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-700"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* 3 Contact Support Channel Cards */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 mb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 mb-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Card 1: 24/7 Hotline */}
           <div className="rounded-2xl bg-white border border-slate-200 hover:border-slate-300 p-6 transition-all duration-300 flex flex-col justify-between group shadow-sm hover:shadow-md">
@@ -328,7 +279,7 @@ export const SupportView = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           {/* Left Column: Knowledge Base & FAQs (7 cols) */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                   Frequently Asked Questions
@@ -336,6 +287,24 @@ export const SupportView = ({
                 <p className="text-slate-500 text-xs sm:text-sm mt-1">
                   Answers curated by SmartGrow hardware engineers and agronomists
                 </p>
+              </div>
+              <div className="relative w-full sm:w-64">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search FAQs..."
+                  className="w-full pl-9 pr-8 py-2 rounded-xl bg-white border border-slate-200 focus:border-[#0b3b2c] text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none transition-all shadow-xs"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </div>
 
