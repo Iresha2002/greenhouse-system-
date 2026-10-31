@@ -579,7 +579,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
   const totalBasketItems = cartItems.reduce((sum, item) => sum + item.cartQuantity, 0);
 
   // If user is a supplier and opened the Supplier Studio Portal
-  if (isSupplierStudioOpen && currentUser?.role === 'supplier') {
+  if (isSupplierStudioOpen) {
     return (
       <SupplierProductManager
         currentUser={currentUser}
@@ -612,28 +612,18 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
 
         {/* Action Pills matching Page 6: My profile, My orders, Basket */}
         <div className="flex items-center gap-2.5 flex-wrap">
-          {currentUser?.role === 'supplier' && (
-            <button
-              type="button"
-              onClick={() => setIsSupplierStudioOpen(true)}
-              className="px-4 py-2 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs transition-all cursor-pointer shadow-2xs"
-            >
-              Supplier Studio
-            </button>
-          )}
-
-          <button
+                    <button
             type="button"
-            onClick={() => setIsProfileModalOpen(true)}
-            className="px-4 py-2 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs transition-all cursor-pointer shadow-2xs"
+            onClick={() => setIsSupplierStudioOpen(true)}
+            className="px-4 py-2 rounded-full border border-emerald-600 text-emerald-800 hover:bg-emerald-50 text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
           >
-            My profile
+            Supplier studio
           </button>
 
           <button
             type="button"
             onClick={() => setIsCustomerOrdersOpen(true)}
-            className="px-4 py-2 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs transition-all cursor-pointer shadow-2xs"
+            className="px-4 py-2 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
           >
             My orders
           </button>

@@ -263,7 +263,7 @@ router.post('/', async (req, res) => {
 router.get(
   '/supplier/my-orders',
   protect,
-  authorizeRoles('supplier'),
+  authorizeRoles('supplier', 'farmer', 'admin'),
   async (req, res) => {
     try {
       const supplierId = req.user._id;
@@ -349,7 +349,7 @@ router.get(
 router.patch(
   '/:id/supplier-status',
   protect,
-  authorizeRoles('supplier'),
+  authorizeRoles('supplier', 'farmer', 'admin'),
   async (req, res) => {
     try {
       const { id } = req.params;

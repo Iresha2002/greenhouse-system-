@@ -238,7 +238,7 @@ router.get('/', async (req, res) => {
 // ==========================================
 
 // 3. GET LOGGED-IN SUPPLIER'S OWN SUPPLY LISTINGS + DASHBOARD METRICS
-router.get('/supplier/my-supplies', protect, authorizeRoles('supplier'), async (req, res) => {
+router.get('/supplier/my-supplies', protect, authorizeRoles('supplier', 'farmer', 'admin'), async (req, res) => {
   try {
     const mySupplies = await SupplyProduct.find({ supplier: req.user._id }).sort({
       createdAt: -1
@@ -284,7 +284,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // 5. CREATE NEW AGRICULTURAL SUPPLY LISTING (SUPPLIER ONLY)
-router.post('/', protect, authorizeRoles('supplier'), async (req, res) => {
+router.post('/', protect, authorizeRoles('supplier', 'farmer', 'admin'), async (req, res) => {
   try {
     const {
       name,
@@ -385,7 +385,7 @@ router.post('/', protect, authorizeRoles('supplier'), async (req, res) => {
 });
 
 // 6. UPDATE EXISTING SUPPLY LISTING (SUPPLIER ONLY - STRICT OWNERSHIP ENFORCED)
-router.put('/:id', protect, authorizeRoles('supplier'), async (req, res) => {
+router.put('/:id', protect, authorizeRoles('supplier', 'farmer', 'admin'), async (req, res) => {
   try {
     const supply = await SupplyProduct.findById(req.params.id);
     if (!supply) {
@@ -514,7 +514,7 @@ router.put('/:id', protect, authorizeRoles('supplier'), async (req, res) => {
 });
 
 // 7. TOGGLE LISTING STATUS (ACTIVE / INACTIVE / DRAFT) (SUPPLIER ONLY - OWNERSHIP ENFORCED)
-router.patch('/:id/status', protect, authorizeRoles('supplier'), async (req, res) => {
+router.patch('/:id/status', protect, authorizeRoles('supplier', 'farmer', 'admin'), async (req, res) => {
   try {
     const supply = await SupplyProduct.findById(req.params.id);
     if (!supply) {
@@ -549,7 +549,7 @@ router.patch('/:id/status', protect, authorizeRoles('supplier'), async (req, res
 });
 
 // 8. DELETE SUPPLY PRODUCT LISTING (SUPPLIER ONLY - OWNERSHIP ENFORCED)
-router.delete('/:id', protect, authorizeRoles('supplier'), async (req, res) => {
+router.delete('/:id', protect, authorizeRoles('supplier', 'farmer', 'admin'), async (req, res) => {
   try {
     const supply = await SupplyProduct.findById(req.params.id);
     if (!supply) {
@@ -573,7 +573,7 @@ router.delete('/:id', protect, authorizeRoles('supplier'), async (req, res) => {
 });
 
 // 9. UPDATE SUPPLY INVENTORY STOCK & LOW-STOCK THRESHOLD (SUPPLIER ONLY - OWNERSHIP ENFORCED)
-router.patch('/:id/stock', protect, authorizeRoles('supplier'), async (req, res) => {
+router.patch('/:id/stock', protect, authorizeRoles('supplier', 'farmer', 'admin'), async (req, res) => {
   try {
     const { quantity, adjustment, lowStockThreshold } = req.body;
 

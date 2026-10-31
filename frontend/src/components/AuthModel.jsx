@@ -68,7 +68,7 @@ const AuthModal = ({ onLoginSuccess, onClose }) => {
                             />
                             <select name="role" value={formData.role} onChange={handleChange} aria-label="Select User Role">
                                 <option value="farmer">🌱 Farmer (Greenhouse Grower)</option>
-                                <option value="supplier">📦 Supplier (Agri Equipment & Inputs)</option>
+                                <option value="supplier">📦 Supplier (Sell Agri Supplies & Equipment)</option>
                                 <option value="customer">🛒 Customer (Produce Buyer)</option>
                                 <option value="expert">🎓 Agricultural Expert (Agronomist / Consultant)</option>
                                 <option value="admin">🛡️ Platform Administrator</option>
