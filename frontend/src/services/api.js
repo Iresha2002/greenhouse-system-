@@ -41,6 +41,27 @@ export const loginUser = async (credentials) => {
 };
 
 // Helper for authenticated requests
+// Automatically intercept expired or invalid authentication tokens
+axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            const errMsg = String(error.response.data?.error || '');
+            if (
+                errMsg.toLowerCase().includes('token') ||
+                errMsg.toLowerCase().includes('expired') ||
+                errMsg.toLowerCase().includes('access denied') ||
+                errMsg.toLowerCase().includes('no longer exists')
+            ) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.dispatchEvent(new CustomEvent('smartgrow:auth-expired', { detail: errMsg }));
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
     return token ? { headers: { Authorization: `Bearer ${token}` } } : {};

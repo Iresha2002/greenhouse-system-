@@ -38,6 +38,25 @@ export function App() {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
+  // Listen for session expiry and login requests
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setCurrentUser(null);
+      setIsAuthModalOpen(true);
+    };
+    const handleOpenLogin = () => {
+      setIsAuthModalOpen(true);
+    };
+    window.addEventListener('smartgrow:auth-expired', handleAuthExpired);
+    window.addEventListener('smartgrow:open-login', handleOpenLogin);
+    return () => {
+      window.removeEventListener('smartgrow:auth-expired', handleAuthExpired);
+      window.removeEventListener('smartgrow:open-login', handleOpenLogin);
+    };
+  }, []);
+
   // Landing Page Slide States
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState('left');

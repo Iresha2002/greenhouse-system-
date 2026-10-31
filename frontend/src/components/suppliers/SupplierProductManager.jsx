@@ -591,8 +591,28 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
       </div>
 
       {errorMsg && !isFormOpen && (
-        <div className="p-4 rounded-2xl bg-red-500/20 border border-red-400/40 text-red-200 text-xs sm:text-sm font-semibold">
-          {errorMsg}
+        <div className="p-4 rounded-2xl bg-red-500/20 border border-red-400/40 text-red-200 text-xs sm:text-sm font-semibold flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-red-300 shrink-0" />
+            <span>
+              {errorMsg.toLowerCase().includes('token') || errorMsg.toLowerCase().includes('expired')
+                ? 'Your login session has expired. Please log in again to manage your supplies.'
+                : errorMsg}
+            </span>
+          </div>
+          {(errorMsg.toLowerCase().includes('token') || errorMsg.toLowerCase().includes('expired')) && (
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.dispatchEvent(new CustomEvent('smartgrow:open-login'));
+              }}
+              className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shrink-0 cursor-pointer shadow-sm text-center"
+            >
+              Log In Again
+            </button>
+          )}
         </div>
       )}
 
@@ -1249,8 +1269,28 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
             </p>
 
             {errorMsg && (
-              <div className="mb-4 p-3.5 rounded-xl bg-red-500/20 border border-red-400/40 text-red-200 text-xs font-bold">
-                {errorMsg}
+              <div className="mb-4 p-4 rounded-xl bg-red-500/20 border border-red-400/40 text-red-200 text-xs font-semibold flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-red-300 shrink-0" />
+                  <span>
+                    {errorMsg.toLowerCase().includes('token') || errorMsg.toLowerCase().includes('expired')
+                      ? 'Your login session has expired. Please log in again to continue saving this listing.'
+                      : errorMsg}
+                  </span>
+                </div>
+                {(errorMsg.toLowerCase().includes('token') || errorMsg.toLowerCase().includes('expired')) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      localStorage.removeItem('token');
+                      localStorage.removeItem('user');
+                      window.dispatchEvent(new CustomEvent('smartgrow:open-login'));
+                    }}
+                    className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shrink-0 cursor-pointer shadow-sm text-center"
+                  >
+                    Log In Again
+                  </button>
+                )}
               </div>
             )}
 
