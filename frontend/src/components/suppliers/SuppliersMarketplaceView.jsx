@@ -606,7 +606,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
             Buy farm supplies
           </h1>
           <p className="text-slate-600 text-sm mt-1">
-            Seeds, plant food, sensors and more. 10 sectors &middot; {supplies.length} products.
+            Seeds, plant food, sensors and more.
           </p>
         </div>
 
@@ -634,23 +634,6 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
             className="px-5 py-2 rounded-full bg-[#0b3b2c] hover:bg-[#07291e] text-white font-extrabold text-xs transition-all cursor-pointer shadow-xs"
           >
             Basket ({totalBasketItems})
-          </button>
-        </div>
-      </div>
-
-      {/* Live status line matching Page 6 */}
-      <div className="flex items-center justify-between text-xs text-slate-500 border-b border-slate-200 pb-4">
-        <div className="flex items-center gap-2">
-          <span>
-            {isUsingFallback ? 'Sample fallback catalog' : 'Live stock list'}
-            {currentUser && ` · Signed in as ${currentUser.fullName || currentUser.username} (${currentUser.role})`}
-          </span>
-          <button
-            type="button"
-            onClick={fetchSuppliesCatalog}
-            className="text-emerald-700 font-semibold hover:underline cursor-pointer ml-2"
-          >
-            Refresh list
           </button>
         </div>
       </div>
@@ -762,38 +745,7 @@ export const SuppliersMarketplaceView = ({ currentUser }) => {
           <option value="priceDesc" className="bg-white text-slate-900">Price: High to Low</option>
         </select>
 
-        {/* In-stock toggle pill */}
-        <button
-          type="button"
-          onClick={() => setAvailabilityFilter((prev) => (prev === 'all' ? 'inStock' : 'all'))}
-          className={`px-3.5 py-2 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
-            availabilityFilter === 'inStock'
-              ? 'bg-emerald-50 border-emerald-400 text-emerald-800 font-bold'
-              : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-          }`}
-        >
-          In stock only
-        </button>
-
-        {/* Price tag */}
-        <span className="text-xs text-slate-600 font-semibold px-2">
-          Price $0 – ${maxPrice}
-        </span>
-
-        {/* Reset filters */}
-        <button
-          type="button"
-          onClick={handleResetFilters}
-          className="text-xs text-emerald-700 hover:text-emerald-900 underline cursor-pointer ml-auto font-semibold"
-        >
-          Reset filters
-        </button>
-      </div>
-
-      {/* Showing count matching Page 6 */}
-      <div className="text-xs text-slate-500 font-medium">
-        Showing {filteredSupplies.length} of {supplies.length} supplies
-      </div>
+        </div>
 
       {/* Product Grid, Loading State, or Empty State */}
       {loading ? (

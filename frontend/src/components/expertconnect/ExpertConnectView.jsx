@@ -330,12 +330,7 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
           </p>
         </div>
 
-        {currentUser ? (
-          <div className="text-xs text-slate-700 bg-white border border-slate-200 px-3.5 py-1.5 rounded-full shrink-0 flex items-center gap-2 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span>Signed in as <strong className="text-slate-900">{currentUser.username}</strong> ({currentUser.role})</span>
-          </div>
-        ) : (
+        {!currentUser && (
           <button
             type="button"
             onClick={onOpenLogin}

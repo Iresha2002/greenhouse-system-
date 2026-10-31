@@ -17,6 +17,7 @@ import {
   Package,
   Layers,
   Image as ImageIcon,
+  UploadCloud,
 } from 'lucide-react';
 import {
   getMyProducts,
@@ -29,6 +30,39 @@ import {
 import FarmerOrdersManager from './FarmerOrdersManager';
 
 const CATEGORIES = ['Vegetables', 'Fruits', 'Leafy Greens', 'Herbs', 'Other Produce'];
+
+const compressImageFile = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        const maxDim = 1200;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 const UNITS = ['kg', 'g', 'pack', 'bundle', 'head', 'piece'];
 
 export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
@@ -129,6 +163,19 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
       status: product.status || 'active',
     });
     setIsModalOpen(true);
+  };
+
+
+  const handleDirectImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const compressed = await compressImageFile(file);
+      setFormData((prev) => ({ ...prev, image: compressed }));
+    } catch (err) {
+      console.error('Image upload failed:', err);
+      showNotification('Failed to process image. Please try another photo.', 'error');
+    }
   };
 
   // Submit Add or Edit
@@ -640,18 +687,69 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
                 </div>
               </div>
 
-              {/* Image URL */}
+              {/* Direct Photo Upload & URL */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Crop Image URL (Optional)
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Crop Photo (Upload Directly or Paste URL)
                 </label>
-                <input
-                  type="url"
-                  placeholder="https://images.unsplash.com/photo-..."
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:border-emerald-600 focus:bg-white"
-                />
+
+                {formData.image ? (
+                  <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <img
+                      src={formData.image}
+                      alt="Crop preview"
+                      className="w-20 h-20 rounded-xl object-cover border border-slate-300 shadow-2xs shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-slate-900 truncate">Photo selected</p>
+                      <p className="text-[11px] text-slate-500 mb-2">Ready to publish with this crop listing.</p>
+                      <div className="flex items-center gap-2">
+                        <label className="px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-100 cursor-pointer shadow-2xs transition-colors">
+                          Change photo
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleDirectImageUpload}
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setFormData((prev) => ({ ...prev, image: '' }))}
+                          className="px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold hover:bg-rose-100 cursor-pointer transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <label className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-slate-300 hover:border-emerald-600 bg-slate-50 hover:bg-emerald-50/50 transition-all cursor-pointer group text-center">
+                      <UploadCloud className="w-8 h-8 text-slate-400 group-hover:text-emerald-700 mb-2 transition-colors" />
+                      <span className="text-xs font-bold text-slate-800 group-hover:text-emerald-900">
+                        Click to upload photo directly from your device
+                      </span>
+                      <span className="text-[11px] text-slate-500 mt-0.5">
+                        PNG, JPG, WebP up to 10MB (automatically optimized)
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleDirectImageUpload}
+                      />
+                    </label>
+
+                    <input
+                      type="url"
+                      placeholder="Or paste an image link (https://...)"
+                      value={formData.image}
+                      onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                      className="w-full px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-xs focus:outline-none focus:border-emerald-600 focus:bg-white"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Description */}

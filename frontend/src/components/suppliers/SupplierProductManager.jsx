@@ -39,6 +39,39 @@ import {
   updateSupplierOrderStatus,
 } from '../../services/api';
 
+
+const compressImageFile = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        const maxDim = 1200;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 const CATEGORIES = [
   'Seeds',
   'Fertilizers',
@@ -160,6 +193,19 @@ export const SupplierProductManager = ({ currentUser, onBackToMarketplace, onCat
   useEffect(() => {
     fetchSupplierData();
   }, [fetchSupplierData]);
+
+
+  const handleDirectImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const compressed = await compressImageFile(file);
+      setFormData((prev) => ({ ...prev, image: compressed }));
+    } catch (err) {
+      console.error('Image upload failed:', err);
+      setErrorMsg('Failed to process image. Please try another photo.');
+    }
+  };
 
   const handleOpenCreate = () => {
     setEditingId(null);
