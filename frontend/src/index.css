@@ -13,6 +13,12 @@
   }
 }
 
+/* Prevent Tailwind space-y-* utilities from pushing fixed overlays down from top of viewport */
+.fixed {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
 /* Palette and Glassmorphism Perfectly Matched to Reference Recreated Light Palette */
 .bg-video-canvas {
   background: radial-gradient(120% 100% at 65% 35%, #ffffff 0%, #f4f8f5 40%, #edf4f0 75%, #e5efe9 100%);

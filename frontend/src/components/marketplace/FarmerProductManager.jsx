@@ -263,7 +263,7 @@ export const FarmerProductManager = ({ currentUser, onBackToMarketplace }) => {
   };
 
   return (
-    <div className="w-full flex flex-col space-y-8 animate-in fade-in duration-300">
+    <div className="w-full flex flex-col gap-8">
       {/* Toast Notification */}
       {successMsg && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl bg-emerald-500 text-emerald-950 font-bold shadow-2xl border border-emerald-300 animate-in slide-in-from-bottom-3 duration-200">

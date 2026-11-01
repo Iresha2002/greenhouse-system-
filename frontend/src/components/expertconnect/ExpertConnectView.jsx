@@ -310,7 +310,7 @@ export const ExpertConnectView = ({ currentUser, onOpenLogin }) => {
   };
 
   return (
-    <div className="space-y-6 pb-16">
+    <div className="flex flex-col gap-6 pb-16">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-full bg-[#0a2e26] border border-emerald-400/50 text-white shadow-2xl backdrop-blur-xl">

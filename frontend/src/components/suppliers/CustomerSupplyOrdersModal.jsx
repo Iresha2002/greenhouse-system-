@@ -180,16 +180,24 @@ export const CustomerSupplyOrdersModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#071f19]/95 backdrop-blur-xl animate-in fade-in duration-200 text-white pt-20 sm:pt-24">
-      {/* Top Action Bar */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-2">
-        <button
-          onClick={onClose}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-xs sm:text-sm font-semibold text-[#4de1b7] hover:text-white transition-all cursor-pointer shadow-sm group"
-        >
-          <span className="group-hover:-translate-x-0.5 transition-transform">&larr;</span>
-          <span>Back to supplies</span>
-        </button>
+    <div className="fixed inset-0 z-[60] m-0 overflow-y-auto bg-[#071f19] text-white animate-in fade-in duration-200">
+      {/* Sticky Top Action Bar */}
+      <div className="sticky top-0 z-20 border-b border-white/10 bg-[#0a2720]/95 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-[#4de1b7]/20 border border-[#4de1b7]/40 flex items-center justify-center text-[#4de1b7] font-black text-sm">
+              SG
+            </div>
+            <span className="text-lg font-bold text-white tracking-tight">SmartGrow</span>
+          </div>
+          <button
+            onClick={onClose}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-xs sm:text-sm font-semibold text-[#4de1b7] hover:text-white transition-all cursor-pointer shadow-sm group"
+          >
+            <span className="group-hover:-translate-x-0.5 transition-transform">&larr;</span>
+            <span>Back to supplies</span>
+          </button>
+        </div>
       </div>
 
       {/* Main Container */}
@@ -349,7 +357,7 @@ export const CustomerSupplyOrdersModal = ({
                       <div className="text-right">
                         <span className="text-xs text-white/50 block">Total</span>
                         <span className="text-base sm:text-lg font-bold text-[#4de1b7]">
-                          ${Number(order.totalAmount || 0).toFixed(2)}
+                          ${Number(order.total ?? order.totalAmount ?? 0).toFixed(2)}
                         </span>
                       </div>
                       <button
@@ -365,10 +373,10 @@ export const CustomerSupplyOrdersModal = ({
                   {/* Summary row */}
                   <div className="pt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-white/70">
                     <span>
-                      {order.items?.length || 0} supplies &middot; {order.deliveryMethod === 'pickup' ? 'Warehouse Pickup' : 'Agri Courier'}
+                      {order.items?.length || 0} supplies &middot; {(order.fulfillmentMethod || order.deliveryMethod) === 'pickup' ? 'Warehouse Pickup' : 'Agri Courier'}
                     </span>
                     <span className="text-white/50">
-                      Customer: {order.customerName} ({order.customerPhone})
+                      Customer: {order.customerInfo?.name || order.customerName || "Customer"} ({order.customerInfo?.phone || order.customerPhone || ""})
                     </span>
                   </div>
 
@@ -419,11 +427,11 @@ export const CustomerSupplyOrdersModal = ({
                               <div>
                                 <span className="font-bold text-white">{it.name}</span>
                                 <span className="text-white/50 block text-[11px]">
-                                  {it.quantity} {it.unit || 'unit'} &times; ${Number(it.unitPrice || 0).toFixed(2)}
+                                  {it.quantity} {it.unit || 'unit'} &times; ${Number(it.price ?? it.unitPrice ?? 0).toFixed(2)}
                                 </span>
                               </div>
                               <span className="font-bold text-white">
-                                ${Number(it.totalPrice || (it.unitPrice * it.quantity) || 0).toFixed(2)}
+                                ${Number(it.itemTotal ?? it.totalPrice ?? ((it.price ?? it.unitPrice ?? 0) * it.quantity) ?? 0).toFixed(2)}
                               </span>
                             </div>
                           ))}
@@ -433,7 +441,7 @@ export const CustomerSupplyOrdersModal = ({
                       {/* Delivery and cancel */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
                         <div className="text-xs text-white/60">
-                          <span>Address: {order.deliveryAddress || 'Warehouse Depot Collection'}</span>
+                          <span>Address: {order.customerInfo?.address || order.deliveryAddress || 'Warehouse Depot Collection'}</span>
                         </div>
 
                         {canCancel && (

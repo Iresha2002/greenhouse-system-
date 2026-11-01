@@ -173,7 +173,7 @@ export const FarmerOrdersManager = ({ currentUser }) => {
   };
 
   return (
-    <div className="w-full space-y-6 animate-in fade-in duration-300">
+    <div className="w-full flex flex-col gap-6">
       {/* Toast Notification */}
       {notification && (
         <div

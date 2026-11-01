@@ -59,7 +59,7 @@ export const CartDrawer = ({
   const itemCount = cartItems.length;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#071f19]/95 backdrop-blur-xl animate-in fade-in duration-200 text-white">
+    <div className="fixed inset-0 z-[60] m-0 overflow-y-auto bg-[#071f19] text-white animate-in fade-in duration-200">
       {/* Top Header Bar matching Page 4 */}
       <div className="border-b border-white/10 bg-[#0a2720]/80 sticky top-0 z-10 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">

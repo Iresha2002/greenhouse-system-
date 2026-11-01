@@ -104,8 +104,8 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <>
-      <header className="relative z-30 flex items-center justify-between px-6 sm:px-12 pt-6 pb-3 w-full max-w-7xl mx-auto">
+    <div className="sticky top-0 z-40 w-full bg-[#f6f9f8]/95 backdrop-blur-md border-b border-slate-200/70">
+      <header className="relative flex items-center justify-between px-6 sm:px-12 py-3.5 w-full max-w-7xl mx-auto">
         {/* Left: Brand with leaf icon */}
         <div
           onClick={handleGoHome}
@@ -257,6 +257,6 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       </header>
-    </>
+    </div>
   );
 };
