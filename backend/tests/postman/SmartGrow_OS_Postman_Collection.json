@@ -1,0 +1,120 @@
+{
+  "info": {
+    "name": "SmartGrow OS Automated API Test Suite (EC4206)",
+    "_postman_id": "d8f29c11-4a7b-4f88-9d21-889102a5b601",
+    "description": "Automated Postman API test collection for SmartGrow OS Greenhouse & Agricultural Marketplace",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "API-TC-01: Health Check (GET /api/health)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Response time is less than 200ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(200);",
+              "});",
+              "pm.test('Service status is UP', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.status).to.eql('UP');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        }
+      }
+    },
+    {
+      "name": "API-TC-04: Calculate Order Total with ORGANIC10 (POST /api/orders/calculate)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 201 Created', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "pm.test('10% ORGANIC10 discount applied accurately', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.subtotal).to.eql(2000);",
+              "    pm.expect(jsonData.discount).to.eql(200);",
+              "    pm.expect(jsonData.finalTotal).to.eql(1800);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"unitPrice\": 500,\n  \"quantity\": 4,\n  \"discountCode\": \"ORGANIC10\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/orders/calculate",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "orders", "calculate"]
+        }
+      }
+    },
+    {
+      "name": "API-TC-05: IoT Water Pump Automation (POST /api/sensors/evaluate-pump)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Water pump turns ON when soil moisture is 22%', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.pumpAction).to.eql('ON');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"soilMoisture\": 22,\n  \"isMaintenanceMode\": false\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/sensors/evaluate-pump",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "sensors", "evaluate-pump"]
+        }
+      }
+    }
+  ]
+}
