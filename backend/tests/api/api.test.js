@@ -105,16 +105,29 @@ describe('SmartGrow OS Automated REST API Test Suite', () => {
         assert.strictEqual(data.valid, true);
     });
 
-    it('API-TC-03: POST /api/auth/validate-password should return 400 Bad Request for weak password', async () => {
+    it('API-TC-03: POST /api/auth/validate-password should return 400 Bad Request for weak password (< 3 chars)', async () => {
         const res = await fetch(`${baseUrl}/api/auth/validate-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password: 'weak' })
+            body: JSON.stringify({ password: 'a1' })
         });
         const data = await res.json();
 
         assert.strictEqual(res.status, 400);
         assert.strictEqual(data.valid, false);
+    });
+
+    it('API-TC-03b: POST /api/auth/validate-password should return 400 Bad Request when password contains spaces', async () => {
+        const res = await fetch(`${baseUrl}/api/auth/validate-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: 'Green @123' })
+        });
+        const data = await res.json();
+
+        assert.strictEqual(res.status, 400);
+        assert.strictEqual(data.valid, false);
+        assert.strictEqual(data.message, 'Password must not contain spaces');
     });
 
     it('API-TC-04: POST /api/cart/summary should return 201 Created and free delivery for basket >= $50', async () => {
