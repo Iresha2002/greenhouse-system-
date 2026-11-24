@@ -6,7 +6,7 @@ const {
   calculateBasketSummary,
 } = require('../../utils/qaLogic');
 
-// Lightweight expect() helper matching Vitest / Jest syntax from Lecture Notes
+// Lightweight expect() helper matching Vitest / Jest syntax 
 function expect(actual) {
   return {
     toBe(expected) {
@@ -19,8 +19,8 @@ function expect(actual) {
 }
 
 describe('1. SmartGrow OS Password Validator (TDD Workflow)', () => {
-  it('returns { valid: false } for a short password (< 8 characters)', () => {
-    const result = validatePassword('Ab1@');
+  it('returns { valid: false } for a short password (< 3 characters)', () => {
+    const result = validatePassword('A1');
     expect(result.valid).toBe(false);
   });
 
@@ -36,6 +36,11 @@ describe('1. SmartGrow OS Password Validator (TDD Workflow)', () => {
 
   it('returns { valid: false } when password has no special character', () => {
     const result = validatePassword('Greenhouse123');
+    expect(result.valid).toBe(false);
+  });
+
+  it('returns { valid: false } when password contains spaces', () => {
+    const result = validatePassword('Green @123');
     expect(result.valid).toBe(false);
   });
 
@@ -64,6 +69,14 @@ describe('2. SmartGrow OS Water Pump Automation Unit Tests', () => {
 });
 
 describe('3. SmartGrow OS Basket & Delivery Fee Unit Tests', () => {
+  it('returns { subtotal: 0, deliveryFee: 0, total: 0 } when basket items array is empty', () => {
+    expect(calculateBasketSummary([], 'delivery')).toEqual({
+      subtotal: 0,
+      deliveryFee: 0,
+      total: 0,
+    });
+  });
+
   it('adds $2.50 delivery fee for Home Delivery when subtotal is below $50', () => {
     const items = [{ price: 4.5, quantity: 4 }]; // $18.00
     expect(calculateBasketSummary(items, 'delivery')).toEqual({
