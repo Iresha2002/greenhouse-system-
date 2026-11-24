@@ -1,22 +1,25 @@
 /**
  * Core business logic functions for SmartGrow OS
- * Used in Unit Testing (TDD) and Behaviour-Driven Development (BDD)
  */
 
-// 1. Password Validator (TDD Red-Green-Refactor Example matching Lecture Notes)
+// STEP 3 (REFACTORED CODE) — Clean, no duplicate return blocks, and fixes whitespace edge case:
 function validatePassword(password) {
-  if (typeof password !== 'string' || password.length < 8) {
-    return { valid: false, message: 'Password must be at least 8 characters long' };
+  if (typeof password !== 'string' || password.length < 3) {
+    return { valid: false, message: 'Password must be at least 3 characters long' };
   }
-  if (!/[A-Z]/.test(password)) {
-    return { valid: false, message: 'Password must contain at least one uppercase letter' };
+
+  const rules = [
+    { check: !/\s/.test(password),          message: 'Password must not contain spaces' },
+    { check: /[A-Z]/.test(password),        message: 'Password must contain at least one uppercase letter' },
+    { check: /[0-9]/.test(password),        message: 'Password must contain at least one digit' },
+    { check: /[^a-zA-Z0-9\s]/.test(password), message: 'Password must contain at least one special character' },
+  ];
+
+  const failedRule = rules.find((rule) => !rule.check);
+  if (failedRule) {
+    return { valid: false, message: failedRule.message };
   }
-  if (!/[0-9]/.test(password)) {
-    return { valid: false, message: 'Password must contain at least one digit' };
-  }
-  if (!/[^a-zA-Z0-9]/.test(password)) {
-    return { valid: false, message: 'Password must contain at least one special character' };
-  }
+
   return { valid: true, message: 'Password is valid' };
 }
 

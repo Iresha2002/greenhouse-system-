@@ -1,5 +1,6 @@
 const SensorReading = require('../models/SensorReading');
 const Device = require('../models/Device');
+const { controlWaterPump } = require('./qaLogic');
 
 //helper function to generate random sensor readings for testing purposes
 const getRandomNumber = (min, max) => {
@@ -24,16 +25,17 @@ const simulateReadings = async () => {
 
         console.log(` SIMULATOR: Temp ${temp}°C | Humidity ${hum}% | Soil ${soil}% | Light ${light} lux`);
 
-        // 3. Automation Rule for Water Pump
+        // 3. Automation Rule for Water Pump (using controlWaterPump from qaLogic.js)
         const pump = await Device.findOne({ type: 'PUMP' });
 
-        if (pump && pump.mode === 'AUTOMATIC') {
-            if (soil < 30 && pump.status !== 'ON') {
+        if (pump) {
+            const action = controlWaterPump(pump.mode, soil);
+            if (action === 'PUMP_ON' && pump.status !== 'ON') {
                 pump.status = 'ON';
                 pump.lastUpdated = Date.now();
                 await pump.save();
                 console.log('AUTOMATION: Soil moisture low (< 30%). Water Pump turned ON! ');
-            } else if (soil >= 60 && pump.status !== 'OFF') {
+            } else if (action === 'PUMP_OFF' && pump.status !== 'OFF') {
                 pump.status = 'OFF';
                 pump.lastUpdated = Date.now();
                 await pump.save();
@@ -50,7 +52,5 @@ const startSimulator = () => {
     setInterval(simulateReadings, 10000);
     console.log('Sensor Simulator Started (Interval: 10s)');
 };
-
-
 
 module.exports = startSimulator;

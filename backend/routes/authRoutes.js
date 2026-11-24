@@ -4,10 +4,15 @@ const User     = require('../models/User');
 const jwt      = require('jsonwebtoken');
 const bcrypt   = require('bcryptjs');
 const { protect } = require('../middleware/authMiddleware');
+const { validatePassword } = require('../utils/qaLogic');
 
 router.post('/register', async (req, res) => {
     const { username, email, password, role, phoneNumber, location } = req.body;
     try {
+        const pwValidation = validatePassword(password);
+        if (!pwValidation.valid) {
+            return res.status(400).json({ error: pwValidation.message });
+        }
         const existingUser = await User.findOne({
             $or: [{ email }, { username }]
         });
